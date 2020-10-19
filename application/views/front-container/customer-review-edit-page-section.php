@@ -1,0 +1,348 @@
+<!-- Main content from side menu customer section -->
+<div class="col-lg-9 order-1 order-lg-2">
+  <div class="product-show-option">
+    <div class="row msg-alert">
+    </div>
+
+    <div class="row">
+      <?php if ($this->session->flashdata('success')) : ?>
+        <div class="alert alert-success alert-dismissible fade show col-lg-12" role="alert">
+          <strong>Alert <i class="fa fa-check" aria-hidden="true"></i></strong>
+          <br>
+          <?php echo $this->session->flashdata('success'); ?>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      <?php elseif ($this->session->flashdata('error')) : ?>
+        <div class="alert alert-danger alert-dismissible fade show col-lg-12" role="alert">
+          <strong>Alert <i class="fa fa-exclamation" aria-hidden="true"></i></strong>
+          <br>
+          <?php echo $this->session->flashdata('error'); ?>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      <?php endif; ?>
+    </div>
+
+    <div class="row">
+      <div class="card mb-3 shadow" style="width: 100%;">
+
+        <div class="row no-gutters">
+          <div class="col-md-4">
+            <img src="<?php echo base_url() ?>image/product/<?php echo $data['image'] ?>" class="card-img">
+            <input type="hidden" name="comment_id" id="comment_id" value="<?php echo $data['id_comment'] ?>" readonly>
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title" style="font-weight: bold;"><a href="<?php echo base_url(); ?>product-detail/<?php echo $data['id_product'] ?>" style="color: orange;"><?php echo $data['product_name'] ?>
+
+                </a></h5>
+
+              <div id="rating-detail"></div>
+
+              <p class="card-text">
+                <div id="reviewed-date"></div>
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="card mb-3 shadow" style="width: 100%;">
+
+        <div class="row no-gutters">
+          <div class="col-md-12">
+            <div class="card-body">
+              <h5 class="card-title">Edit Review</h5>
+
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Your rating</label>
+                <div class="col-sm-10">
+                  <div id="rateYo"></div>
+                  <input type="hidden" name="rate_val" id="rate_val" readonly>
+                </div>
+                <span class="help-block"></span>
+              </div>
+
+              <form action="" method="POST" id="form-edit-comment" enctype="multipart/form-data">
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">Review message</label>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" name="message" id="message" cols="5" rows="5" placeholder="Edit your review for this product"><?php echo set_value('message') ?></textarea>
+                  </div>
+                  <span class="help-block"><?php echo form_error('message') ?></span>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label"></label>
+                  <div class="col-sm-10">
+                    <div class="row" id="show-detail-comment">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label"></label>
+                  <div class="col-sm-10">
+                    <span>File size: <span>Maximum 1 Megabytes</span></span>
+                    <br>
+                    <span>Number of files: <span>Maximum 5 images</span></span>
+                    <br>
+                    <span>Extensions allowed: <span>JPG, JPEG, GIF, PNG</span></span>
+                    <div class="dropzone mt-1 mb-3">
+                      <div class="dz-message">
+                        <h4> Attach file in here</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <div class="col-sm-10">
+                    <a href="<?php echo base_url() ?>customer-review" class="btn btn-secondary btn-sm" id="btnCancel"><i class="fa fa-undo"></i> Cancel</a>
+                    <button type="submit" class="btn btn-success btn-sm" id="btnUpdate"><i class="fa fa-floppy-o"></i> Update</button>
+                  </div>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main content from side menu customer section end -->
+
+<script>
+  getCommentReview();
+  getCommentDetailReview();
+
+  $(document).ready(function() {
+    // rating star
+    $("#rateYo").rateYo({
+      // rating: $('#rate_val').val(),
+      starWidth: '25px',
+      fullStar: true
+    });
+
+    $("#rateYo").rateYo().on("rateyo.change", function(e, data) {
+      var rating = data.rating;
+      $('#rate_val').val(rating);
+    });
+
+    $.validator.setDefaults({
+      highlight: function(element) {
+        $(element).closest("#form-edit-comment").addClass("has-error");
+      },
+      unhighlight: function(element) {
+        $(element).closest("#form-edit-comment").removeClass("has-error");
+      },
+      errorElement: "span",
+      errorClass: "error-message",
+      errorPlacement: function(error, element) {
+        if (element.parent(".input-group").length) {
+          error.insertBefore(element.parent()).css("color", "red");
+        } else {
+          error.insertBefore(element).css("color", "red");
+        }
+
+        Swal.fire({
+          icon: "error",
+          title: error,
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      },
+    });
+
+    var $validator = $("#form-edit-comment").validate({
+      rules: {
+        message: {
+          required: true,
+          minlength: 20
+        },
+      },
+      messages: {
+        message: {
+          required: "Comment message is required!",
+          minlength: "Minimum of 20 characters"
+        },
+      },
+    });
+
+    $("#btnUpdate").click(function() {
+      // e.preventDefault();
+      $("#btnUpdate").attr("disabled", true); //set button disable
+
+      var $valid = $("#form-edit-comment").valid();
+      if (!$valid) {
+        $("#btnUpdate").attr("disabled", false); //set button enable
+        return false;
+      } else {
+        $.ajax({
+          url: '<?php echo base_url() ?>update-comment-review',
+          type: 'POST',
+          dataType: 'JSON',
+          data: {
+            comment_id: $('#comment_id').val(),
+            rate: $('#rate_val').val(),
+            message: $('#message').val()
+          },
+          success: function() {
+
+            Swal.fire({
+              icon: "success",
+              title: "Successfully updating your comment!",
+              showConfirmButton: false,
+              timer: 2000,
+            });
+
+            getCommentReview();
+            getCommentDetailReview();
+
+            $("#btnUpdate").attr("disabled", false); //set button enable
+          }
+        })
+      }
+    })
+  })
+
+  function getCommentReview() {
+    var comment_id = $('#comment_id').val();
+
+    $.ajax({
+      url: '<?php echo base_url() ?>customer_review/getCommentReviewByID',
+      data: {
+        comment_id: comment_id
+      },
+      type: 'POST',
+      dataType: 'JSON',
+      success: function(response) {
+        if (response.status == true) {
+          $('#rating-detail').html(response.rating_detail);
+          $('#reviewed-date').html(response.review_date);
+
+          $("#rateYo").rateYo("option", "rating", response.rating);
+          $('#rate_val').val(response.rating);
+
+          /* $("#rateYo").rateYo({
+            rating: $('#rate_val').val(response.rating),
+            starWidth: '25px',
+            fullStar: true
+          }); */
+
+          $('#message').val(response.message);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: 'Something wrong, please refresh the page!',
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
+      }
+    })
+  }
+
+  function getCommentDetailReview() {
+    $.ajax({
+      url: '<?php echo base_url() ?>get-detail-comment-review',
+      data: {
+        comment_id: $('#comment_id').val()
+      },
+      type: 'POST',
+      dataType: 'JSON',
+      success: function(data) {
+        $('#show-detail-comment').html(data.html);
+      }
+    })
+  }
+
+  function deleteCommentDetail(id) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Are you sure delete this image?',
+      text: "You won't be able to revert this!",
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Delete'
+    }).then((result) => {
+      if (result.value) {
+        $.ajax({
+          url: '<?php echo base_url() ?>delete-comment-detail-review/' + id,
+          data: {
+            image_id: id
+          },
+          type: 'POST',
+          dataType: 'JSON',
+          success: function(data) {
+            if (data.status == true) {
+              Swal.fire({
+                icon: "success",
+                title: "Successfully delete your comment image!",
+                showConfirmButton: false,
+                timer: 2000,
+              });
+
+              // getCommentReview();
+              getCommentDetailReview();
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Unsuccessfully delete your comment image, please try again!",
+                showConfirmButton: false,
+                timer: 2000,
+              });
+            }
+          }
+        })
+      }
+    });
+  }
+
+  // IMAGE BY DROPZONE
+  Dropzone.autoDiscover = false;
+
+  var foto_upload = new Dropzone(".dropzone", {
+    url: "<?php echo base_url() ?>insert-comment-image",
+    autoProcessQueue: false,
+    parallelUploads: 10,
+    maxFilesize: 1,
+    maxFiles: 5,
+    method: "post",
+    acceptedFiles: "image/*", // application/pdf,.psd
+    paramName: "image",
+    dictInvalidFileType: "This file type is not allowed",
+    addRemoveLinks: true,
+    success: function(file, response) {
+      console.log(response);
+    }
+  });
+
+  $('#btnUpdate').click(function() {
+    foto_upload.processQueue();
+  });
+
+  //Event ketika Memulai mengupload
+  foto_upload.on("sending", function(a, b, c) {
+    a.token = Math.random();
+    c.append("token_foto", a.token); //Menmpersiapkan token untuk masing masing foto
+    c.append("id", $('#comment_id').val());
+
+    var th = this;
+    setTimeout(function() {
+      th.removeAllFiles();
+    }, 2000);
+  });
+</script>
