@@ -95,14 +95,14 @@
                 icon: "success",
                 title: "Successfully deleted your comment!",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 5000,
               });
             } else {
               Swal.fire({
                 icon: "error",
                 title: "Failed deleted your comment, please try again!",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 5000,
               });
             }
 

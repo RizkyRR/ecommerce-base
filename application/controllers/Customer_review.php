@@ -130,10 +130,12 @@ class Customer_review extends CI_Controller
       for ($x = 1; $x <= round($detailComment['rating'], 0, PHP_ROUND_HALF_DOWN); $x++) {
         $rating .= '<i class="fa fa-star" style="color: rgb(254, 191, 53);"></i>';
       }
+
       if (strpos(round($detailComment['rating'], 0, PHP_ROUND_HALF_DOWN), '.')) {
         $rating .= '<i class="fa fa-star-half-o" style="color: rgb(254, 191, 53);"></i>';
         $x++;
       }
+
       while ($x <= 5) {
         $rating .= '<i class="fa fa-star-o" style="color: rgb(254, 191, 53);"></i>';
         $x++;
@@ -162,34 +164,43 @@ class Customer_review extends CI_Controller
   public function getCommentDetailReviewByID()
   {
     $response = array();
+    $file_list = array();
+
+    $target_dir = FCPATH . "image/comment_review/";
     $email = $this->session->userdata('customer_email');
     $comment_id = $this->input->post('comment_id');
 
-    $dataComment = $this->customerReview_m->getCommentDetailReviewByID($comment_id, $email);
+    $data = $this->customerReview_m->getCommentDetailReviewByID($comment_id, $email);
 
-    $html = '';
+    if (is_dir($target_dir)) {
 
-    if ($dataComment != null) {
-      $i = 0;
+      if ($dh = opendir($target_dir)) {
 
-      $html .= '<table class="table table-borderless"><tbody>';
-      foreach ($dataComment as $val) {
+        // Read files
+        if ((readdir($dh)) !== false) {
 
-        $html .= '
-          <tr>
-            <td><img style="margin-right: 4px; margin-top: 3px; width: 256px; height: 256px;" src="' . base_url() . 'image/comment_review/' . $val['image'] . '" alt="" /></td>
-            <td><a href="javascript:void(0)" class="btn btn-danger btn-sm" id="btnDeleteComment" onclick="deleteCommentDetail(' . $val['id_detail_comment'] . ')" title="delete image"><i class="fa fa-trash"></i></a></td>
-          </tr>';
+          if ($data != '' && $data != '.' && $data != '..') {
+
+            foreach ($data as $val) {
+              // File path
+              $file_path = $target_dir . $val['image'];
+
+              // Check its not folder
+              if (!is_dir($file_path)) {
+
+                $size = filesize($file_path);
+
+                $file_list[] = array('name' => $val['image'], 'size' => $size, 'path' => $file_path);
+              }
+            }
+          }
+        }
+        closedir($dh);
       }
-
-      $html .= '</tbody></table>';
-    } else {
-      $html .= '';
     }
 
-    $response['html'] = $html;
-
-    echo json_encode($response);
+    echo json_encode($file_list);
+    exit;
   }
 
   public function updateCommentReview()
@@ -217,32 +228,23 @@ class Customer_review extends CI_Controller
     echo json_encode($response);
   }
 
-  public function deleteCommentDetailReview($id)
+  public function deleteCommentDetailReview()
   {
-    $response = array();
-    $dataDetail = $this->db->get_where('customer_comment_details', array('id' => $id));
+    //Ambil token foto
+    $token = $this->input->post('name');
 
+    $foto = $this->db->get_where('customer_comment_details', array('image' => $token));
 
-    if ($dataDetail->num_rows() > 0) {
-      $hasil = $dataDetail->row();
-      $imageName = $hasil->image;
-
-      if (file_exists($file = FCPATH . 'image/comment_review/' . $imageName)) {
+    if ($foto->num_rows() > 0) {
+      $hasil = $foto->row();
+      $nama_foto = $hasil->image;
+      if (file_exists($file = FCPATH . 'image/comment_review/' . $nama_foto)) {
         @unlink($file);
       }
-
-      $delete = $this->customerReview_m->deleteCommentDetailReview($id);
-
-      if ($delete > 0) {
-        $response['status'] = true;
-      } else {
-        $response['status'] = false;
-      }
-    } else {
-      $response['status'] = false;
+      $this->db->delete('customer_comment_details', array('image' => $token));
     }
 
-    echo json_encode($response);
+    echo "{}";
   }
 }
   

@@ -524,14 +524,14 @@
                 icon: "success",
                 title: data.message,
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 5000,
               });
             } else {
               Swal.fire({
                 icon: "error",
                 title: data.message,
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 5000,
               });
             }
 

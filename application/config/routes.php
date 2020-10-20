@@ -104,7 +104,7 @@ $route['insert-comment-image'] = 'product_shop/insertResizeImages';
 $route['edit-comment-review/(:any)'] = 'customer_review/editCommentReview/$1';
 $route['get-detail-comment-review'] = 'customer_review/getCommentDetailReviewByID';
 $route['update-comment-review'] = 'customer_review/updateCommentReview';
-$route['delete-comment-detail-review/(:any)'] = 'customer_review/deleteCommentDetailReview/$1';
+$route['delete-comment-detail-review'] = 'customer_review/deleteCommentDetailReview';
 $route['remove-comment-image'] = 'product_shop/removeImage';
 $route['delete-comment-review/(:any)'] = 'product_shop/deleteCommentReview/$1';
 

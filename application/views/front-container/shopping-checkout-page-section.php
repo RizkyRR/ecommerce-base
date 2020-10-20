@@ -137,7 +137,7 @@
                 icon: 'success',
                 title: data.message,
                 showConfirmButton: false,
-                timer: 3000
+                timer: 5000
               })
 
               console.log(data.qty);
@@ -146,7 +146,7 @@
                 icon: 'error',
                 title: data.message,
                 showConfirmButton: false,
-                timer: 3000
+                timer: 5000
               })
 
               console.log(data.qty);
@@ -160,7 +160,7 @@
               icon: "error",
               title: textStatus,
               showConfirmButton: false,
-              timer: 3000,
+              timer: 5000,
             });
 
             $('#place-order').text('Place Order'); //change button text

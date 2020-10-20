@@ -5,13 +5,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class CustomerCart_m extends CI_Model
 {
 
-  public function checkSetCart($email, $product_id, $variant_id)
+  public function checkSetCart($email, $product_id)
   {
-    if ($variant_id != null) {
-      return $this->db->get_where('customer_carts', ['customer_email' => $email, 'product_id' => $product_id, 'variant_id' => $variant_id])->row_array();
-    } else {
-      return $this->db->get_where('customer_carts', ['customer_email' => $email, 'product_id' => $product_id])->row_array();
-    }
+    return $this->db->get_where('customer_carts', ['customer_email' => $email, 'product_id' => $product_id])->row_array();
   }
 
   public function insertCart($data)
@@ -20,16 +16,10 @@ class CustomerCart_m extends CI_Model
     return $this->db->insert_id();
   }
 
-  public function updateCart($email, $product_id, $variant_id, $data)
+  public function updateCart($email, $product_id, $data)
   {
-    if ($variant_id != null) {
-      $this->db->where('customer_email', $email);
-      $this->db->where('product_id', $product_id);
-      $this->db->where('variant_id', $variant_id);
-    } else {
-      $this->db->where('customer_email', $email);
-      $this->db->where('product_id', $product_id);
-    }
+    $this->db->where('customer_email', $email);
+    $this->db->where('product_id', $product_id);
 
     $this->db->update('customer_carts', $data);
 
@@ -47,16 +37,13 @@ class CustomerCart_m extends CI_Model
 
   public function getDetailShoppingCart($email)
   {
-    $this->db->select('*, SUM(customer_carts.quantity) as total_qty, products.id AS id_product, product_details.id AS id_detail, customer_carts.id AS id_cart, products.qty AS product_qty, customer_carts.quantity AS cart_qty, product_variants.id AS id_variant'); //*
+    $this->db->select('*, SUM(customer_carts.quantity) as total_qty, products.id AS id_product, product_details.id AS id_detail, customer_carts.id AS id_cart, products.qty AS product_qty, customer_carts.quantity AS cart_qty'); //*
 
     $this->db->from('customer_carts');
     $this->db->join('product_details', 'product_details.product_id = customer_carts.product_id');
-    $this->db->join('product_variants', 'product_variants.id = customer_carts.variant_id', 'left');
     $this->db->join('products', 'customer_carts.product_id = products.id');
 
     $this->db->group_by('product_details.product_id');
-    // $this->db->group_by('customer_carts.customer_email');
-    $this->db->group_by('customer_carts.variant_id');
 
     $this->db->where('customer_carts.customer_email', $email);
     $this->db->order_by('customer_carts.created_at', 'DESC');

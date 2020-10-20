@@ -12,7 +12,7 @@ class Category_shop extends CI_Controller
 
   public function getAllCategory()
   {
-    $data = $this->category_m->getAllCategory();
+    $data = $this->category_m->getCategory();
     echo json_encode($data);
   }
 }

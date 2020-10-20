@@ -86,11 +86,7 @@
                       <tr>
                         <td class="center"><?php echo $no++; ?></td>
 
-                        <?php if ($val['product_variant_id'] != null && $val['product_variant_id'] != 0) : ?>
-                          <td class="left strong"><?php echo $val['product_name'] ?> (<?php echo $val['variant_name'] ?>)</td>
-                        <?php else : ?>
-                          <td class="left strong"><?php echo $val['product_name'] ?></td>
-                        <?php endif; ?>
+                        <td class="left strong"><?php echo $val['product_name'] ?></td>
 
                         <td class="center"><?php echo $val['weight_return'] ?> Gram</td>
                         <td class="right">Rp. <?php echo number_format($val['price'], 0, ',', '.') ?></td>

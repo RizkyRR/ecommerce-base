@@ -702,7 +702,7 @@ class Product_m extends CI_Model
     return $query->result_array();
   } */
 
-  public function getAllProductShop($limit, $offset, $keyword, $sort)
+  public function getAllProductShop($limit, $offset, $keyword, $sort, $type_sort)
   {
     $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount, product_variants.id AS id_variant'); //*
 
@@ -720,7 +720,7 @@ class Product_m extends CI_Model
       $this->db->or_like('product_name', $keyword);
     }
 
-    $this->db->order_by('products.' . $sort, 'DESC');
+    $this->db->order_by('products.' . $sort, $type_sort);
 
     $this->db->where('products.qty > 0 OR product_variants.variant_qty > 0');
 
@@ -956,20 +956,13 @@ class Product_m extends CI_Model
 
   public function getShoppingCart($email)
   {
-    $this->db->select('*, SUM(quantity) as total_qty, products.id AS id_product, product_details.id AS id_detail, customer_carts.id AS id_cart, products.qty AS product_qty, customer_carts.quantity AS cart_qty, product_variants.id AS id_variant'); //*
-
-    /* $this->db->from('products');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
-    $this->db->join('customer_carts', 'customer_carts.product_id = products.id'); */
+    $this->db->select('*, SUM(quantity) as total_qty, products.id AS id_product, product_details.id AS id_detail, customer_carts.id AS id_cart, products.qty AS product_qty, customer_carts.quantity AS cart_qty'); //*
 
     $this->db->from('customer_carts');
     $this->db->join('product_details', 'product_details.product_id = customer_carts.product_id');
-    $this->db->join('product_variants', 'product_variants.id = customer_carts.variant_id', 'left');
     $this->db->join('products', 'customer_carts.product_id = products.id');
 
     $this->db->group_by('product_details.product_id');
-    // $this->db->group_by('customer_carts.customer_email');
-    $this->db->group_by('customer_carts.variant_id');
 
     $this->db->where('customer_carts.customer_email', $email);
     $this->db->order_by('customer_carts.created_at', 'DESC');

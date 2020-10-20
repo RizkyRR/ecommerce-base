@@ -86,20 +86,6 @@
               </div>
 
               <!-- Data Variant -->
-              <div class="pd-size-choose">
-                <?php if ($variant != null) : ?>
-                  <?php $i = 0; ?>
-                  <?php foreach ($variant as $val) : ?>
-                    <?php $i++; ?>
-                    <div class="sc-item item-variant-<?php echo $i; ?>" onclick="changeVariant(<?php echo $i; ?>)">
-                      <input type="radio" id="id_variant_<?php echo $i; ?>" name="id_variant_<?php echo $i; ?>" value="<?php echo $val['id_variant'] ?>">
-                      <label for="size-<?php echo $val['id_variant'] ?>"><?php echo $val['variant_name'] ?></label>
-                    </div>
-                  <?php endforeach; ?>
-                  <input type="hidden" name="select_variant" id="select_variant" readonly>
-                <?php endif; ?>
-              </div>
-
               <ul class="pd-tags">
                 <li><span>AVAILABLE STOCK</span>: <span class="info-available-stock"></span>
                 </li>
@@ -326,29 +312,6 @@
     });
   }
 
-  function changeVariant(row) {
-    // var id_variant = $('input:radio[name="id_variant_"' + row + ']').val();
-    var id_variant = $('#id_variant_' + row).val();
-    var id_product = $('#product_id').val();
-    console.log(id_variant);
-
-    $('#select_variant').val(id_variant);
-
-    // DO AJAX FOR GET DINAMICALLY STOCK
-    $.ajax({
-      url: '<?= base_url() ?>get-available-stock-variant-product',
-      data: {
-        product_id: id_product,
-        variant_id: id_variant
-      },
-      type: 'POST',
-      dataType: 'JSON',
-      success: function(data) {
-        $('.info-available-stock').html(data.qty);
-      }
-    });
-  }
-
   // number qty
   $("#number_qty").attr({
     "min": 1 // values (or variables) here
@@ -426,7 +389,7 @@
         icon: "error",
         title: error,
         showConfirmButton: false,
-        timer: 2000,
+        timer: 5000,
       });
     },
   });
@@ -482,7 +445,7 @@
             icon: "success",
             title: "Successfully sending your comment!",
             showConfirmButton: false,
-            timer: 2000,
+            timer: 5000,
           });
 
           checkCustomerComment();
@@ -513,14 +476,13 @@
   }
 
   function getValidateQty() {
-    var variant_id = $("#select_variant").val();
-    if (variant_id != 0) {
+    var qty_val = $('#number_qty_val').val();
+    if (qty_val != 0) {
       $.ajax({
         url: '<?php echo base_url() ?>get-check-qty-product',
         data: {
           product_id: $('#product_id').val(),
-          variant_id: $("#select_variant").val(),
-          qty: $('#number_qty_val').val()
+          qty: qty_val
         },
         type: 'POST',
         dataType: 'JSON',
@@ -532,7 +494,7 @@
               icon: "error",
               title: data.message,
               showConfirmButton: false,
-              timer: 2000,
+              timer: 5000,
             });
 
             $('#number_qty').val(1);
@@ -543,79 +505,15 @@
     } else {
       Swal.fire({
         icon: "error",
-        title: "Please select 1 variant!",
+        title: "Sorry, for the minimum purchase is 1!",
         showConfirmButton: false,
-        timer: 2000,
+        timer: 5000,
       });
 
       $('#number_qty').val(1);
       $('#number_qty_val').val(1);
     }
   }
-
-  /* function showRelatedProducts() {
-    var id = $('#product_id').val();
-
-    $.ajax({
-      url: '<?php echo base_url() ?>get-related-product',
-      type: 'POST',
-      data: {
-        product_id: id
-      },
-      dataType: 'JSON',
-      success: function(data) {
-        $('#show-related-product').html(data.html);
-      }
-    })
-  }
-
-  function setShoppingWishlist(id_row) {
-    if (id_row) {
-      $.ajax({
-        url: '<?php echo base_url() ?>' + "set-shopping-wishlist",
-        data: {
-          product_id: id_row
-        },
-        type: "POST",
-        dataType: "JSON",
-        success: function(data) {
-          if (data.status == "auth") {
-            Swal.fire({
-              title: "Sorry, you need to sign in!",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#3085d6",
-              cancelButtonColor: "#d33",
-              confirmButtonText: "Yes, sign in!",
-            }).then((result) => {
-              if (result.value) {
-                location.href = '<?php echo base_url() ?>' + "sign-in";
-              }
-            });
-          } else {
-            if (data.status == "insert") {
-              $('#wishstate-' + id_row).removeClass('fa fa-heart-o');
-              $('#wishstate-' + id_row).addClass('fa fa-heart');
-
-              showRelatedProducts();
-            } else {
-              $('#wishstate-' + id_row).removeClass('fa fa-heart');
-              $('#wishstate-' + id_row).addClass('fa fa-heart-o');
-
-              showRelatedProducts();
-            }
-          }
-        },
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "No row, please refresh the page!",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-    }
-  } */
 
   function checkCustomerComment() {
     $.ajax({
@@ -655,7 +553,20 @@
   });
 
   $('#btnSend').click(function() {
-    foto_upload.processQueue();
+    $('#btnSend').text('Sending...'); //change button text
+    $('#btnSend').attr('disabled', true); //set button disable 
+
+    var $valid = $("#form-comment").valid();
+
+    if (!$valid) {
+      $("#btnSend").text("Sending Message"); //change button text
+      $("#btnSend").attr("disabled", false); //set button enable
+      return false;
+    } else {
+      foto_upload.processQueue();
+      $('#btnSend').text('Sending Message'); //change button text
+      $('#btnSend').attr('disabled', false); //set button enable 
+    }
   });
 
   //Event ketika Memulai mengupload
@@ -667,7 +578,7 @@
     var th = this;
     setTimeout(function() {
       th.removeAllFiles();
-    }, 2000);
+    }, 5000);
   });
 
   function delete_comment(id) {
@@ -691,14 +602,14 @@
                 icon: "success",
                 title: "Successfully deleted your comment!",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 5000,
               });
             } else {
               Swal.fire({
                 icon: "error",
                 title: "Failed deleted your comment, please try again!",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 5000,
               });
             }
 

@@ -377,7 +377,7 @@
                 icon: "success",
                 title: "Successfully deleted your image!",
                 showConfirmButton: false,
-                timer: 1500,
+                timer: 5000,
               });
             }
           });

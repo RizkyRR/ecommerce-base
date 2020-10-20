@@ -15,7 +15,8 @@
                     <option value="created_at">Date</option>
                     <option value="price">Price</option>
                   </select>
-                  <button type="submit" class="primary-btn" style="height: 40px;"><i class="fa fa-sort-amount-asc" aria-hidden="true"></i></button>
+                  <button type="submit" class="primary-btn" style="height: 40px;" name="type_sort" value="asc" title="lower to higher"><i class="fa fa-sort-amount-asc" aria-hidden="true"></i></button>
+                  <button type="submit" class="primary-btn" style="height: 40px;" name="type_sort" value="desc" title="higher to lower"><i class="fa fa-sort-amount-desc" aria-hidden="true"></i></button>
 
                 </form>
 

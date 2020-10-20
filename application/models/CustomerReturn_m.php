@@ -100,11 +100,10 @@ class CustomerReturn_m extends CI_Model
 
   public function getDetailPurchaseReturnByID($order_id)
   {
-    $this->db->select('*, customer_purchase_return_details.id AS id_return_detail, products.id AS id_product, product_variants.id AS id_variant, status_orders.id AS id_status, customer_purchase_return_details.qty AS qty_return, products.qty AS qty_product, products.weight AS weight_product, customer_purchase_return_details.weight AS weight_return');
+    $this->db->select('*, customer_purchase_return_details.id AS id_return_detail, products.id AS id_product, status_orders.id AS id_status, customer_purchase_return_details.qty AS qty_return, products.qty AS qty_product, products.weight AS weight_product, customer_purchase_return_details.weight AS weight_return');
 
     $this->db->from('customer_purchase_return_details');
     $this->db->join('products', 'products.id = customer_purchase_return_details.product_id', 'left');
-    $this->db->join('product_variants', 'product_variants.id = customer_purchase_return_details.product_variant_id', 'left');
     $this->db->join('status_orders', 'status_orders.id = customer_purchase_return_details.status_order_id', 'left');
 
     $this->db->where_not_in('customer_purchase_return_details.status_order_id', 1);

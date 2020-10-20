@@ -34,9 +34,12 @@ class Product_shop extends CI_Controller
     // SORTING
     if ($this->input->post('input_sort')) {
       $info['sort'] = $this->input->post('input_sort');
-      $this->session->set_userdata('sort', $info['sort']);
+      $info['sort_type'] = $this->input->post('type_sort');
+
+      $this->session->set_userdata(['sort' => $info['sort'], 'type_sort' => $info['sort_type']]);
     } else {
       $info['sort'] = 'created_at';
+      $info['sort_type'] = 'DESC';
     }
 
     // DB PAGINATION FOR SEARCHING
@@ -44,7 +47,7 @@ class Product_shop extends CI_Controller
     $this->db->or_like('category_name', $info['keyword']);
     $this->db->or_like('product_name', $info['keyword']);
 
-    $this->db->order_by($info['sort'], 'DESC');
+    $this->db->order_by($info['sort'], $info['sort_type']);
 
     // PAGINATION
     $config['base_url']     = base_url() . 'product-section/index';
@@ -86,7 +89,7 @@ class Product_shop extends CI_Controller
     }
 
     $info['total_rows'] = $config['total_rows'];
-    $info['products'] = $this->product_m->getAllProductShop($config['per_page'], $info['start'], $info['keyword'], $info['sort']);
+    $info['products'] = $this->product_m->getAllProductShop($config['per_page'], $info['start'], $info['keyword'], $info['sort'], $info['sort_type']);
 
     $email = $this->session->userdata('customer_email');
     $info['wishlist'] = $this->product_m->getWishlistSet($email, $id = null);
@@ -575,31 +578,16 @@ class Product_shop extends CI_Controller
   {
     $response = array();
     $product_id = $this->input->post('product_id');
-    $variant_id = $this->input->post('variant_id');
     $qty = $this->input->post('qty');
 
     $dataProducts = $this->product_m->getCheckQtyProductByID($product_id);
-    $dataVariants = $this->product_m->variantData($product_id);
+    $getQty = $dataProducts['qty'];
 
-    if ($dataVariants != null) {
-      $dataVariant = $this->product_m->getCheckQtyVariantByID($product_id, $variant_id);
-      $getQty = $dataVariant['variant_qty'];
-
-      if ($qty <= $getQty) {
-        $response['status'] = "true";
-      } else {
-        $response['status'] = "false";
-        $response['message'] = "Sorry, you exceeded the quantity limit for this variant!";
-      }
+    if ($qty <= $getQty) {
+      $response['status'] = "true";
     } else {
-      $getQty = $dataProducts['qty'];
-
-      if ($qty <= $getQty) {
-        $response['status'] = "true";
-      } else {
-        $response['status'] = "false";
-        $response['message'] = "Sorry, you exceeded the quantity limit for this product!";
-      }
+      $response['status'] = "false";
+      $response['message'] = "Sorry, you exceeded the quantity limit for this product!";
     }
 
     echo json_encode($response);
@@ -625,32 +613,7 @@ class Product_shop extends CI_Controller
 
     if ($products != null) {
       foreach ($products as $val) {
-        // wishlist info 
-
-        /* if ($wishlists != null) {
-          foreach ($wishlists as $w) {
-
-            if ($w['product_id'] == $val['id_product']) {
-              $wishlist .= '<div class="icon">
-                <a href="javascript:void(0)" title="wishlist" id="set-shopping-wishlist-' . $val['id_product'] . '" data-data="' . $val['id_product'] . '" onclick="setShoppingWishlist(\'' . $val['id_product'] . '\')">
-                  <i id="wishstate-' . $val['id_product'] . '" class="fa fa-heart"></i>
-                </a>   
-              </div>';
-            } else {
-              $wishlist .= '<div class="icon">
-                <a href="javascript:void(0)" title="wishlist" id="set-shopping-wishlist-' . $val['id_product'] . '" data-data="' . $val['id_product'] . '" onclick="setShoppingWishlist(\'' . $val['id_product'] . '\')">
-                  <i id="wishstate-' . $val['id_product'] . '" class="fa fa-heart-o"></i>
-                </a>   
-              </div>';
-            }
-          }
-        } else {
-          $wishlist .= '<div class="icon">
-            <a href="javascript:void(0)" title="wishlist" id="set-shopping-wishlist-' . $val['id_product'] . '" data-data="' . $val['id_product'] . '" onclick="setShoppingWishlist(\'' . $val['id_product'] . '\')">
-              <i id="wishstate-' . $val['id_product'] . '" class="fa fa-heart-o"></i>
-            </a>   
-          </div>';
-        } */
+        // wishlist info
 
         if ($wishlists != null) {
           foreach ($wishlists as $w) {
@@ -735,15 +698,9 @@ class Product_shop extends CI_Controller
 
     // set id product and variant and price
     $product_id = $this->input->post('product_id');
-    $variant_id = $this->input->post('variant_id');
-    $product_price = $this->input->post('product_price');
 
     // get session
     $email = $this->session->userdata('customer_email');
-
-    //get product price 
-    $product = $this->product_m->getProductShopByID($product_id);
-    $productPrice = $product['price']; // this one is hard to get and finally change method to take a product price
 
     // set custom id customer cart 
     $code = "CART" . "-";
@@ -753,96 +710,55 @@ class Product_shop extends CI_Controller
     $quantity = $this->input->post('qty');
     // $subAmount = $quantity * $product_price; // set instanly for get price by hidden input field 
 
-    // set variant statement and make it default
-    if ($variant_id != 0) {
-      $getVariant = $variant_id;
-    } else {
-      $getVariant = 0;
-    }
-
     $data = [
       'id' => $generate,
       'customer_email' => $email,
       'product_id' => $product_id,
-      'variant_id' => $getVariant,
       'quantity' => $quantity,
       'created_at' => date('Y-m-d H:i:s')
     ];
 
-    // check for variants 
+    // check for product 
     $dataProducts = $this->product_m->getCheckQtyProductByID($product_id);
-    $dataVariants = $this->product_m->variantData($product_id);
-
 
     // check wishlist set or not
-    $checkCart = $this->customerCart_m->checkSetCart($email, $product_id, $variant_id);
+    $checkCart = $this->customerCart_m->checkSetCart($email, $product_id);
 
     // check session before click button
     if (!$email) {
       $response['status'] = 'auth';
     } else {
-      // jika memiliki atau terdaftar dalam product_variants
-      if ($dataVariants != null) {
-        $dataVariant = $this->product_m->getCheckQtyVariantByID($product_id, $variant_id);
-        $getQty = $dataVariant['variant_qty'];
+      // jika memiliki atau terdaftar dalam product
+      $getQty = $dataProducts['qty'];
 
-        if ($quantity <= $getQty) {
-          $response['quantity'] = "true";
+      if ($quantity <= $getQty) {
+        $response['quantity'] = "true";
 
-          if ($checkCart > 0) {
-            $getQty = $checkCart['quantity'];
-            // delete data in wishlist table
-            $getQty = $getQty + $quantity;
-            // $amountPrice = $getQty * $product_price;
+        if ($checkCart != null) {
+          $getQty = $checkCart['quantity'];
+          // delete data in wishlist table
+          $getQty = $getQty + $quantity;
+          // $amountPrice = $getQty * $product_price;
 
-            $dataQty = [
-              'quantity' => $getQty,
-            ];
+          $dataQty = [
+            'quantity' => $getQty
+          ];
 
-            $this->customerCart_m->updateCart($email, $product_id, $variant_id, $dataQty);
+          $this->customerCart_m->updateCart($email, $product_id, $dataQty);
 
-            $response['status'] = 'update';
-          } else {
-            // insert data in wishlist table
-            $this->customerCart_m->insertCart($data);
-
-            $response['status'] = 'insert';
-          }
+          $response['status'] = 'update';
         } else {
-          $response['quantity'] = "false";
-          $response['message'] = "Sorry, you exceeded the quantity limit for this variant!";
+          // insert data in wishlist table
+          $this->customerCart_m->insertCart($data);
+
+          $response['status'] = 'insert';
         }
       } else {
-        $getQty = $dataProducts['qty'];
-
-        if ($quantity <= $getQty) {
-          $response['quantity'] = "true";
-
-          if ($checkCart != null) {
-            $getQty = $checkCart['quantity'];
-            // delete data in wishlist table
-            $getQty = $getQty + $quantity;
-            // $amountPrice = $getQty * $product_price;
-
-            $dataQty = [
-              'quantity' => $getQty
-            ];
-
-            $this->customerCart_m->updateCart($email, $product_id, $variant_id, $dataQty);
-
-            $response['status'] = 'update';
-          } else {
-            // insert data in wishlist table
-            $this->customerCart_m->insertCart($data);
-
-            $response['status'] = 'insert';
-          }
-        } else {
-          $response['quantity'] = "false";
-          $response['message'] = "Sorry, you exceeded the quantity limit for this product!";
-        }
+        $response['quantity'] = "false";
+        $response['message'] = "Sorry, you exceeded the quantity limit for this product!";
       }
     }
+
     echo json_encode($response);
   }
 
@@ -1031,26 +947,17 @@ class Product_shop extends CI_Controller
 
     // get result product cart 
     $html = '';
-    // $productId = '';
     $getShoppingCart = $this->product_m->getShoppingCart($email);
-    // $getShoppingCartWithVariant = $this->product_m->getShoppingCartWithVariant($email);
-    // $getVariantData = $this->product_m->variantData();
 
     foreach ($getShoppingCart as $val) {
       $id = htmlspecialchars(json_encode($val['id_cart']));
-
-      if ($val['variant_id'] > 0) {
-        $productName = '<a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><h6>' . $val['product_name'] . ' (' . $val['variant_name'] . ')</h6></a>';
-      } else {
-        $productName = '<a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><h6>' . $val['product_name'] . '</h6></a>';
-      }
 
       $html .= '<tr>' .
         '<td class="si-pic"><a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><img style="height: 100px; width: 100px" src="' . base_url() . 'image/product/' . $val['image'] . '"></a></td>' .
         '<td class="si-text">' .
         '<div class="product-selected">' .
         '<p>Rp. ' . number_format($val['price'], 0, ',', '.') . ' x ' . $val['cart_qty'] . '</p>' .
-        $productName .
+        '<a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><h6>' . $val['product_name'] . '</h6></a>' .
         '</div>' .
         '</td>' .
         '<td class="si-close">' .

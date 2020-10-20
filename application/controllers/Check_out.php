@@ -229,22 +229,15 @@ class Check_out extends CI_Controller
       foreach ($data as $val) {
         $i++;
 
-        if ($val['variant_id'] > 0) {
-          $productName = $val['product_name'] . ' (' . $val['variant_name'] . ')';
-        } else {
-          $productName = $val['product_name'];
-        }
-
         $html .= '<li class="fw-normal">
-        ' . $productName . ' x ' . $val['cart_qty'];
+        ' . $val['product_name'] . ' x ' . $val['cart_qty'];
 
         $qty_price = $val['cart_qty'] * $val['price'];
 
         $html .= '<span>Rp. ' . number_format($qty_price, 0, ',', '.') . '
         </span>
 
-        <input type="hidden" name="product_id[]" id="product_row_' . $i . '" value="' . $val['id_product'] . '" readonly>
-        <input type="hidden" name="variant_id[]" id="variant_row_' . $i . '" value="' . $val['variant_id'] . '" readonly>
+        <input type="hidden" name="product_id[]" id="product_row_' . $i . '" value="' . $val['id_product'] . '" readonly
         <input type="hidden" name="unit_price[]" id="unit_price_row_' . $i . '" value="' . $val['price'] . '" readonly>
         <input type="hidden" name="qty[]" id="qty_row_' . $i . '" value="' . $val['cart_qty'] . '" readonly>
         <input type="hidden" name="amount_price[]" id="amount_price_row_' . $i . '" value="' . $qty_price . '" readonly>

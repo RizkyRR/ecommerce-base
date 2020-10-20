@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2020 at 07:09 PM
+-- Generation Time: Oct 20, 2020 at 06:19 PM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.10
 
@@ -165,7 +165,7 @@ CREATE TABLE `company_profile` (
 --
 
 INSERT INTO `company_profile` (`id`, `company_name`, `business_email`, `phone`, `address`, `about`, `image`) VALUES
-(1, 'Sandang Store', 'admin@sandangstore.com', '089654789124', 'Jl. Yudistira No.5, Pendrikan Kidul, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah 50131', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '7c00266d54136917cd179ff1abaaae6f.png');
+(1, 'Sandang Store', 'admin@sandangstore.com', '089654789124', 'Jl. Yudistira No.5, Pendrikan Kidul, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah 50131', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '7f0b2fe113b35e17c1375638ee779aae.png');
 
 -- --------------------------------------------------------
 
@@ -315,7 +315,6 @@ CREATE TABLE `customer_carts` (
   `id` varchar(128) NOT NULL,
   `customer_email` varchar(128) NOT NULL,
   `product_id` varchar(128) NOT NULL,
-  `variant_id` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
   `created_at` datetime NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
@@ -324,11 +323,11 @@ CREATE TABLE `customer_carts` (
 -- Dumping data for table `customer_carts`
 --
 
-INSERT INTO `customer_carts` (`id`, `customer_email`, `product_id`, `variant_id`, `quantity`, `created_at`) VALUES
-('0920-CART-141013', 'rahmadianto018@gmail.com', 'PRDCT-0820-003722', 947, 1, '2020-09-16 14:10:13'),
-('0920-CART-134513', 'rahmadianto018@gmail.com', 'PRDCT-0820-003722', 949, 2, '2020-09-15 13:45:13'),
-('0920-CART-003712', 'customer@adminstore.com', 'PRDCT-0820-003802', 0, 1, '2020-09-15 00:37:12'),
-('0920-CART-193013', 'customer@adminstore.com', 'PRDCT-0820-003722', 949, 2, '2020-09-30 19:30:13');
+INSERT INTO `customer_carts` (`id`, `customer_email`, `product_id`, `quantity`, `created_at`) VALUES
+('0920-CART-141013', 'rahmadianto018@gmail.com', 'PRDCT-0820-003722', 1, '2020-09-16 14:10:13'),
+('0920-CART-134513', 'rahmadianto018@gmail.com', 'PRDCT-0820-003722', 2, '2020-09-15 13:45:13'),
+('0920-CART-003712', 'customer@adminstore.com', 'PRDCT-0820-003802', 2, '2020-09-15 00:37:12'),
+('0920-CART-193013', 'customer@adminstore.com', 'PRDCT-0820-003722', 5, '2020-09-30 19:30:13');
 
 -- --------------------------------------------------------
 
@@ -351,10 +350,9 @@ CREATE TABLE `customer_comments` (
 --
 
 INSERT INTO `customer_comments` (`id`, `product_id`, `email`, `rating`, `message`, `comment_date`, `comment_update_date`) VALUES
-('0920-CMNT-140651', 'PRDCT-0820-003451', 'customer@adminstore.com', 3, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '2020-09-18 14:07:04', '2020-09-21 22:15:11'),
+('0920-CMNT-140651', 'PRDCT-0820-003451', 'customer@adminstore.com', 2, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '2020-09-18 14:07:04', '2020-10-20 22:12:25'),
 ('0920-CMNT-135726', 'PRDCT-0820-003722', 'rahmadianto018@gmail.com', 3, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '2020-09-05 13:58:45', NULL),
-('0920-CMNT-134810', 'PRDCT-0820-003722', 'customer@adminstore.com', 4, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. \nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '2020-09-18 13:48:22', '2020-09-22 19:47:29'),
-('0920-CMNT-140527', 'PRDCT-0820-003058', 'customer@adminstore.com', 2, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '2020-09-18 14:06:23', '2020-09-22 19:49:11');
+('0920-CMNT-140527', 'PRDCT-0820-003058', 'customer@adminstore.com', 3, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '2020-09-18 14:06:23', '2020-10-20 22:59:36');
 
 -- --------------------------------------------------------
 
@@ -375,13 +373,13 @@ CREATE TABLE `customer_comment_details` (
 --
 
 INSERT INTO `customer_comment_details` (`id`, `comment_id`, `image`, `info`, `token`) VALUES
-(193, '0920-CMNT-134810', '53d488433694c3a5f99c32e0f7edb8d9.png', '181529', '0.9849919037472306'),
-(194, '0920-CMNT-134810', 'b993acc7ba4d9b1df02ee17c4ca05071.png', '141415', '0.9896196274737863'),
 (174, '0920-CMNT-135726', '22e9c66653b15bbe6fbf7f5a26f3cd28.png', '153187', '0.7550073758281453'),
 (170, '0920-CMNT-135726', 'a566b975d1a1957948e693d9c7a12515.png', '209715', '0.5203233933727047'),
 (171, '0920-CMNT-135726', 'd63ac9cc8b7fcee602126ac54ae418f3.png', '185477', '0.6789252855581398'),
 (172, '0920-CMNT-135726', '381769662a04af8544eb70ab65a06856.png', '166634', '0.2648594836512028'),
-(173, '0920-CMNT-135726', '4f66fe0e7b3e028f0d45f33f84ca64b5.png', '178211', '0.23459726960584337');
+(173, '0920-CMNT-135726', '4f66fe0e7b3e028f0d45f33f84ca64b5.png', '178211', '0.23459726960584337'),
+(216, '0920-CMNT-140527', 'b40868e817d08966ac1dba9f5fe2979f.jpg', '32622', '0.8058910419521248'),
+(219, '0920-CMNT-140527', 'aaf78bca4ca85f7f0f5cc9cf51145cd3.jpg', '70418', '0.9727497988695619');
 
 -- --------------------------------------------------------
 
@@ -424,7 +422,6 @@ CREATE TABLE `customer_purchase_order_details` (
   `id` int(11) NOT NULL,
   `purchase_order_id` varchar(32) NOT NULL,
   `product_id` varchar(32) NOT NULL,
-  `product_variant_id` int(11) NOT NULL,
   `weight` int(11) NOT NULL,
   `qty` int(11) NOT NULL,
   `unit_price` int(11) NOT NULL,
@@ -436,9 +433,9 @@ CREATE TABLE `customer_purchase_order_details` (
 -- Dumping data for table `customer_purchase_order_details`
 --
 
-INSERT INTO `customer_purchase_order_details` (`id`, `purchase_order_id`, `product_id`, `product_variant_id`, `weight`, `qty`, `unit_price`, `amount`, `status_order_id`) VALUES
-(1, 'O-103744', 'PRDCT-0820-003058', 0, 200, 2, 500000, 1000000, 2),
-(2, 'O-103744', 'PRDCT-0820-003722', 948, 200, 1, 445000, 445000, 2);
+INSERT INTO `customer_purchase_order_details` (`id`, `purchase_order_id`, `product_id`, `weight`, `qty`, `unit_price`, `amount`, `status_order_id`) VALUES
+(1, 'O-103744', 'PRDCT-0820-003058', 200, 2, 500000, 1000000, 2),
+(2, 'O-103744', 'PRDCT-0820-003722', 200, 1, 445000, 445000, 2);
 
 -- --------------------------------------------------------
 
@@ -478,7 +475,6 @@ CREATE TABLE `customer_purchase_return_details` (
   `id` int(11) NOT NULL,
   `purchase_return_id` varchar(32) NOT NULL,
   `product_id` varchar(32) NOT NULL,
-  `product_variant_id` int(11) NOT NULL,
   `weight` int(11) NOT NULL,
   `qty` int(11) NOT NULL,
   `unit_price` int(11) NOT NULL,
@@ -491,8 +487,8 @@ CREATE TABLE `customer_purchase_return_details` (
 -- Dumping data for table `customer_purchase_return_details`
 --
 
-INSERT INTO `customer_purchase_return_details` (`id`, `purchase_return_id`, `product_id`, `product_variant_id`, `weight`, `qty`, `unit_price`, `amount`, `information`, `status_order_id`) VALUES
-(1, 'R-103744', 'PRDCT-0820-003722', 948, 0, 1, 445000, 445000, 'Rusak', 2);
+INSERT INTO `customer_purchase_return_details` (`id`, `purchase_return_id`, `product_id`, `weight`, `qty`, `unit_price`, `amount`, `information`, `status_order_id`) VALUES
+(1, 'R-103744', 'PRDCT-0820-003722', 0, 1, 445000, 445000, 'Rusak', 2);
 
 -- --------------------------------------------------------
 
@@ -2053,28 +2049,6 @@ INSERT INTO `product_slugs` (`id`, `product_id`, `slug`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `product_variants`
---
-
-CREATE TABLE `product_variants` (
-  `id` int(11) NOT NULL,
-  `product_id` varchar(32) NOT NULL,
-  `variant_name` varchar(32) NOT NULL,
-  `variant_qty` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `product_variants`
---
-
-INSERT INTO `product_variants` (`id`, `product_id`, `variant_name`, `variant_qty`) VALUES
-(949, 'PRDCT-0820-003722', 'L', 10),
-(948, 'PRDCT-0820-003722', 'M', 20),
-(947, 'PRDCT-0820-003722', 'S', 30);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `purchase`
 --
 
@@ -2533,8 +2507,7 @@ ALTER TABLE `customer_address`
 --
 ALTER TABLE `customer_carts`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `product_id` (`product_id`),
-  ADD KEY `variant_id` (`variant_id`);
+  ADD KEY `product_id` (`product_id`);
 
 --
 -- Indexes for table `customer_comments`
@@ -2563,7 +2536,7 @@ ALTER TABLE `customer_purchase_orders`
 --
 ALTER TABLE `customer_purchase_order_details`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `purchase_order_id` (`purchase_order_id`,`product_id`,`product_variant_id`,`status_order_id`);
+  ADD KEY `purchase_order_id` (`purchase_order_id`,`product_id`,`status_order_id`);
 
 --
 -- Indexes for table `customer_purchase_returns`
@@ -2577,7 +2550,7 @@ ALTER TABLE `customer_purchase_returns`
 --
 ALTER TABLE `customer_purchase_return_details`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `purchase_return_id` (`purchase_return_id`,`product_id`,`product_variant_id`,`status_order_id`);
+  ADD KEY `purchase_return_id` (`purchase_return_id`,`product_id`,`status_order_id`);
 
 --
 -- Indexes for table `customer_token`
@@ -2748,12 +2721,6 @@ ALTER TABLE `product_slugs`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `product_variants`
---
-ALTER TABLE `product_variants`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `purchase`
 --
 ALTER TABLE `purchase`
@@ -2891,7 +2858,7 @@ ALTER TABLE `customer_address`
 -- AUTO_INCREMENT for table `customer_comment_details`
 --
 ALTER TABLE `customer_comment_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=212;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=223;
 
 --
 -- AUTO_INCREMENT for table `customer_purchase_order_details`
@@ -3018,12 +2985,6 @@ ALTER TABLE `product_images`
 --
 ALTER TABLE `product_slugs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `product_variants`
---
-ALTER TABLE `product_variants`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=950;
 
 --
 -- AUTO_INCREMENT for table `purchase_hutang`

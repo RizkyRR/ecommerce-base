@@ -44,21 +44,14 @@ class Customer_cart extends CI_Controller
 
         $i++;
 
-        if ($val['variant_id'] > 0) {
-          $productName = '<a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><h5>' . $val['product_name'] . ' (' . $val['variant_name'] . ')</h5></a>';
-        } else {
-          $productName = '<a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><h5>' . $val['product_name'] . '</h5></a>';
-        }
-
         $html .= '<tr id="row_' . $i . '">' .
           '<td class="cart-pic">
               <a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><img style="width: 170px; height: 170px" src="' . base_url() . 'image/product/' . $val['image'] . '" alt=""></a>' .
           '<input type="hidden" name="id_product[]" id="id_product_' . $i . '" value="' . $val['id_product'] . '" readonly>' .
-          '<input type="hidden" name="select_variant[]" id="select_variant_' . $i . '" value="' . $val['id_variant'] . '" readonly>' .
           '</td>' .
 
           '<td class="cart-title">' .
-          $productName .
+          '<a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><h5>' . $val['product_name'] . '</h5></a>' .
           '</td>' .
 
           '<td class="p-price">' . $val['price'] .

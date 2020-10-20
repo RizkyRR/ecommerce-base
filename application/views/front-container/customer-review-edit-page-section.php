@@ -63,7 +63,7 @@
               <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Your rating</label>
                 <div class="col-sm-10">
-                  <div id="rateYo"></div>
+                  <div class="star-rating rateYo" id="rateYo"></div>
                   <input type="hidden" name="rate_val" id="rate_val" readonly>
                 </div>
                 <span class="help-block"></span>
@@ -76,14 +76,6 @@
                     <textarea class="form-control" name="message" id="message" cols="5" rows="5" placeholder="Edit your review for this product"><?php echo set_value('message') ?></textarea>
                   </div>
                   <span class="help-block"><?php echo form_error('message') ?></span>
-                </div>
-
-                <div class="form-group row">
-                  <label class="col-sm-2 col-form-label"></label>
-                  <div class="col-sm-10">
-                    <div class="row" id="show-detail-comment">
-                    </div>
-                  </div>
                 </div>
 
                 <div class="form-group row">
@@ -124,10 +116,9 @@
 <!-- Main content from side menu customer section end -->
 
 <script>
-  getCommentReview();
-  getCommentDetailReview();
-
   $(document).ready(function() {
+    getCommentReview();
+
     // rating star
     $("#rateYo").rateYo({
       // rating: $('#rate_val').val(),
@@ -142,25 +133,31 @@
 
     $.validator.setDefaults({
       highlight: function(element) {
-        $(element).closest("#form-edit-comment").addClass("has-error");
+        $(element).closest(".form-group").addClass("has-error");
       },
       unhighlight: function(element) {
-        $(element).closest("#form-edit-comment").removeClass("has-error");
+        $(element).closest(".form-group").removeClass("has-error");
       },
       errorElement: "span",
       errorClass: "error-message",
       errorPlacement: function(error, element) {
-        if (element.parent(".input-group").length) {
-          error.insertBefore(element.parent()).css("color", "red");
+        if (element.parent('.input-group').length) {
+          error.insertAfter(element.parent()); // radio/checkbox?
+        }
+        /* else if (element.hasClass('select2')) {
+               error.insertAfter(element.next('span')); // select2
+             } */
+        else if (element.hasClass("select2-hidden-accessible")) {
+          error.insertAfter(element.next('span.select2')); // select2 new ver
         } else {
-          error.insertBefore(element).css("color", "red");
+          error.insertAfter(element); // default
         }
 
         Swal.fire({
           icon: "error",
           title: error,
           showConfirmButton: false,
-          timer: 2000,
+          timer: 5000,
         });
       },
     });
@@ -204,115 +201,63 @@
               icon: "success",
               title: "Successfully updating your comment!",
               showConfirmButton: false,
-              timer: 2000,
+              timer: 5000,
             });
 
             getCommentReview();
-            getCommentDetailReview();
 
             $("#btnUpdate").attr("disabled", false); //set button enable
           }
         })
       }
     })
+
+    function getCommentReview() {
+      var comment_id = $('#comment_id').val();
+
+      $.ajax({
+        url: '<?php echo base_url() ?>customer_review/getCommentReviewByID',
+        data: {
+          comment_id: comment_id
+        },
+        type: 'POST',
+        dataType: 'JSON',
+        success: function(response) {
+          if (response.status == true) {
+            $('#rating-detail').html(response.rating_detail);
+            $('#reviewed-date').html(response.review_date);
+
+            $("#rateYo").rateYo("option", "rating", response.rating);
+            $('#rate_val').val(response.rating);
+
+            /* $("#rateYo").rateYo({
+              rating: response.rating,
+              starWidth: '25px',
+              fullStar: true
+            }); */
+
+
+            $('#message').val(response.message);
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: 'Something wrong, please refresh the page!',
+              showConfirmButton: false,
+              timer: 5000,
+            });
+          }
+        }
+      })
+    }
   })
 
-  function getCommentReview() {
-    var comment_id = $('#comment_id').val();
-
-    $.ajax({
-      url: '<?php echo base_url() ?>customer_review/getCommentReviewByID',
-      data: {
-        comment_id: comment_id
-      },
-      type: 'POST',
-      dataType: 'JSON',
-      success: function(response) {
-        if (response.status == true) {
-          $('#rating-detail').html(response.rating_detail);
-          $('#reviewed-date').html(response.review_date);
-
-          $("#rateYo").rateYo("option", "rating", response.rating);
-          $('#rate_val').val(response.rating);
-
-          /* $("#rateYo").rateYo({
-            rating: $('#rate_val').val(response.rating),
-            starWidth: '25px',
-            fullStar: true
-          }); */
-
-          $('#message').val(response.message);
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: 'Something wrong, please refresh the page!',
-            showConfirmButton: false,
-            timer: 2000,
-          });
-        }
-      }
-    })
-  }
-
-  function getCommentDetailReview() {
-    $.ajax({
-      url: '<?php echo base_url() ?>get-detail-comment-review',
-      data: {
-        comment_id: $('#comment_id').val()
-      },
-      type: 'POST',
-      dataType: 'JSON',
-      success: function(data) {
-        $('#show-detail-comment').html(data.html);
-      }
-    })
-  }
-
-  function deleteCommentDetail(id) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Are you sure delete this image?',
-      text: "You won't be able to revert this!",
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Delete'
-    }).then((result) => {
-      if (result.value) {
-        $.ajax({
-          url: '<?php echo base_url() ?>delete-comment-detail-review/' + id,
-          data: {
-            image_id: id
-          },
-          type: 'POST',
-          dataType: 'JSON',
-          success: function(data) {
-            if (data.status == true) {
-              Swal.fire({
-                icon: "success",
-                title: "Successfully delete your comment image!",
-                showConfirmButton: false,
-                timer: 2000,
-              });
-
-              // getCommentReview();
-              getCommentDetailReview();
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Unsuccessfully delete your comment image, please try again!",
-                showConfirmButton: false,
-                timer: 2000,
-              });
-            }
-          }
-        })
-      }
-    });
-  }
 
   // IMAGE BY DROPZONE
   Dropzone.autoDiscover = false;
+  var currentFile = null;
+  var comment_id = $('#comment_id').val();
+  var fileList = new Array;
+  var fileListCounter = 0;
 
   var foto_upload = new Dropzone(".dropzone", {
     url: "<?php echo base_url() ?>insert-comment-image",
@@ -325,13 +270,97 @@
     paramName: "image",
     dictInvalidFileType: "This file type is not allowed",
     addRemoveLinks: true,
+    removedfile: function(file) {
+      var fileName = file.name;
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Delete'
+      }).then((result) => {
+        if (result.value) {
+          $.ajax({
+            url: "<?php echo base_url() ?>delete-comment-detail-review",
+            type: "POST",
+            data: {
+              name: fileName,
+              request: 'delete'
+            },
+            sucess: function(data) {
+              console.log('success: ' + data);
+
+              Swal.fire({
+                icon: "success",
+                title: "Successfully deleted your image!",
+                showConfirmButton: false,
+                timer: 5000,
+              });
+
+              getCommentReview();
+            }
+          });
+
+          var _ref;
+          return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;
+        }
+      });
+    },
+    init: function() { //https://makitweb.com/how-to-display-existing-files-on-server-in-dropzone-php/
+      myDropzone = this;
+
+      $.ajax({
+        url: '<?php echo base_url() ?>get-detail-comment-review',
+        data: {
+          comment_id: comment_id
+        },
+        type: 'post',
+        dataType: 'json',
+        success: function(response) {
+
+          $.each(response, function(key, value) {
+            var mockFile = {
+              name: value.name,
+              size: value.size,
+              accepted: true,
+            };
+
+            foto_upload.emit("addedfile", mockFile);
+            // foto_upload.emit("thumbnail", mockFile, value.path);
+            foto_upload.emit("thumbnail", mockFile, "http://" + window.location.hostname + '/ecommerce-base' + '/image/comment_review/' + value.name);
+            foto_upload.emit("complete", mockFile);
+            foto_upload.files.push(mockFile);
+
+            /*  // remove files - NOW OK
+             foto_upload.removeAllFiles(true); */
+          });
+
+        }
+      });
+    },
     success: function(file, response) {
       console.log(response);
     }
   });
 
   $('#btnUpdate').click(function() {
-    foto_upload.processQueue();
+    $('#btnUpdate').text('Updating...'); //change button text
+    $('#btnUpdate').attr('disabled', true); //set button disable 
+
+    var $valid = $("#form-edit-comment").valid();
+
+    if (!$valid) {
+      $("#btnUpdate").text("Update"); //change button text
+      $("#btnUpdate").attr("disabled", false); //set button enable
+      return false;
+    } else {
+      foto_upload.processQueue();
+      $('#btnUpdate').text('Update'); //change button text
+      $('#btnUpdate').attr('disabled', false); //set button enable 
+    }
   });
 
   //Event ketika Memulai mengupload
@@ -339,10 +368,46 @@
     a.token = Math.random();
     c.append("token_foto", a.token); //Menmpersiapkan token untuk masing masing foto
     c.append("id", $('#comment_id').val());
-
-    var th = this;
-    setTimeout(function() {
-      th.removeAllFiles();
-    }, 2000);
   });
+
+  //Event ketika foto dihapus
+  /* foto_upload.on("removedfile", function(file) {
+    var fileName = file.name;
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Delete'
+    }).then((result) => {
+      if (result.value) {
+        $.ajax({
+          url: "<?php echo base_url() ?>delete-comment-detail-review",
+          type: "POST",
+          data: {
+            name: fileName,
+            request: 'delete'
+          },
+          sucess: function(data) {
+            console.log('success: ' + data);
+
+            Swal.fire({
+              icon: "success",
+              title: "Successfully deleted your image!",
+              showConfirmButton: false,
+              timer: 5000,
+            });
+
+            var _ref;
+            return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;
+
+            getCommentReview();
+          }
+        });
+      }
+    });
+  }); */
 </script>

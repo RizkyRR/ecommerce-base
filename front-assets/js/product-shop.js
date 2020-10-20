@@ -170,7 +170,6 @@ function getTotal(row = null) {
 	if (row) {
 		var price_val = Number($("#price_val_" + row).val());
 		var qty_val = Number($("#qty_val_" + row).val());
-		var variant_id = $("#select_variant_" + row).val();
 		var total = price_val * qty_val;
 		// total = total.toFixed();
 
@@ -230,7 +229,6 @@ function getCartValidateQty(row = null) {
 			url: url.pathname + "get-check-qty-product",
 			data: {
 				product_id: $("#id_product_" + row).val(),
-				variant_id: $("#select_variant_" + row).val(),
 				qty: $("#qty_val_" + row).val(),
 			},
 			type: "POST",
@@ -471,78 +469,67 @@ function setDetailButtonCart() {
 	var qty = $("#number_qty").val();
 	var qty_val = $("#number_qty_val").val();
 	var product_id = $("#product_id").val();
-	var variant_id = $("#select_variant").val();
 	var product_price = $("#product_price").val();
 
 	var url = new URL("http://localhost/ecommerce-base/");
 
 	if (qty != 0) {
-		if (variant_id != 0) {
-			$.ajax({
-				url: url.pathname + "set-detail-shopping-cart",
-				data: {
-					qty: qty_val,
-					product_id: product_id,
-					variant_id: variant_id,
-					product_price: product_price,
-				},
-				type: "POST",
-				dataType: "JSON",
-				success: function (data) {
-					if (data.status == "auth") {
-						Swal.fire({
-							title: "Sorry, you need to sign in!",
-							icon: "warning",
-							showCancelButton: true,
-							confirmButtonColor: "#3085d6",
-							cancelButtonColor: "#d33",
-							confirmButtonText: "Yes, sign in!",
-						}).then((result) => {
-							if (result.value) {
-								location.href = url.pathname + "sign-in";
-							}
-						});
-					} else {
-						if (data.quantity == "true") {
-							if (data.status == "insert") {
-								Swal.fire({
-									icon: "success",
-									title: "Successfully added to your shopping cart!",
-									showConfirmButton: false,
-									timer: 1500,
-								});
-							} else if (data.status == "update") {
-								Swal.fire({
-									icon: "success",
-									title: "Successfully updated to your shopping cart!",
-									showConfirmButton: false,
-									timer: 1500,
-								});
-							}
-
-							showShoppingCart();
-						} else {
-							Swal.fire({
-								icon: "error",
-								title: data.message,
-								showConfirmButton: false,
-								timer: 2000,
-							});
-
-							$("#number_qty").val(1);
-							$("#number_qty_val").val(1);
+		$.ajax({
+			url: url.pathname + "set-detail-shopping-cart",
+			data: {
+				qty: qty_val,
+				product_id: product_id,
+				product_price: product_price,
+			},
+			type: "POST",
+			dataType: "JSON",
+			success: function (data) {
+				if (data.status == "auth") {
+					Swal.fire({
+						title: "Sorry, you need to sign in!",
+						icon: "warning",
+						showCancelButton: true,
+						confirmButtonColor: "#3085d6",
+						cancelButtonColor: "#d33",
+						confirmButtonText: "Yes, sign in!",
+					}).then((result) => {
+						if (result.value) {
+							location.href = url.pathname + "sign-in";
 						}
+					});
+				} else {
+					if (data.quantity == "true") {
+						if (data.status == "insert") {
+							Swal.fire({
+								icon: "success",
+								title: "Successfully added to your shopping cart!",
+								showConfirmButton: false,
+								timer: 1500,
+							});
+						} else if (data.status == "update") {
+							Swal.fire({
+								icon: "success",
+								title: "Successfully updated to your shopping cart!",
+								showConfirmButton: false,
+								timer: 1500,
+							});
+						}
+
+						showShoppingCart();
+					} else {
+						Swal.fire({
+							icon: "error",
+							title: data.message,
+							showConfirmButton: false,
+							timer: 2000,
+						});
+
+						$("#number_qty").val(1);
+						$("#number_qty_val").val(1);
 					}
-				},
-			});
-		} else {
-			Swal.fire({
-				icon: "error",
-				title: "Please select 1 variant!",
-				showConfirmButton: false,
-				timer: 2000,
-			});
-		}
+				}
+			},
+		});
 	} else {
 		Swal.fire({
 			icon: "error",
