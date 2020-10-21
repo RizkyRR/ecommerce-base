@@ -113,63 +113,7 @@
 
 <script>
   $(document).ready(function() {
-    $('#place-order').on('click', function(e) {
-      e.preventDefault();
-      $('#place-order').text('Processing...'); //change button text
-      $('#place-order').attr('disabled', true); //set button disable 
 
-      var $valid = $(".checkout-form").valid();
-
-      if (!$valid) {
-        $("#place-order").text("Place Order"); //change button text
-        $("#place-order").attr("disabled", false); //set button enable
-        return false;
-      } else {
-        $.ajax({
-          url: '<?php echo base_url(); ?>insert-check-out',
-          type: 'POST',
-          data: $('.checkout-form').serialize(),
-          cache: false,
-          dataType: 'JSON',
-          success: function(data) {
-            if (data.status == true) {
-              Swal.fire({
-                icon: 'success',
-                title: data.message,
-                showConfirmButton: false,
-                timer: 5000
-              })
-
-              console.log(data.qty);
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: data.message,
-                showConfirmButton: false,
-                timer: 5000
-              })
-
-              console.log(data.qty);
-            }
-
-            $('#place-order').text('Place Order'); //change button text
-            $('#place-order').attr('disabled', false); //set button enable 
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            Swal.fire({
-              icon: "error",
-              title: textStatus,
-              showConfirmButton: false,
-              timer: 5000,
-            });
-
-            $('#place-order').text('Place Order'); //change button text
-            $('#place-order').attr('disabled', false); //set button enable 
-
-          }
-        });
-      }
-    })
 
   });
 

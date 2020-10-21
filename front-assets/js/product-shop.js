@@ -182,7 +182,6 @@ function getTotal(row = null) {
 			url: url.pathname + "update-cart",
 			data: {
 				product_id: $("#id_product_" + row).val(),
-				variant_id: variant_id,
 				qty: $("#qty_val_" + row).val(),
 				amount: $("#amount_val_" + row).val(),
 			},
@@ -463,6 +462,68 @@ function subAmountCheckOut() {
 	var total_val = Number($("#check-out-total-val").val(total_ppn));
 	$("#check-out-total").html("Rp. " + total_ppn + "");
 }
+
+// INSERT CHECK OUT INTO DATABASE
+$("#place-order").on("click", function (e) {
+	e.preventDefault();
+	$("#place-order").text("Processing..."); //change button text
+	$("#place-order").attr("disabled", true); //set button disable
+
+	var $valid = $(".checkout-form").valid();
+
+	if (!$valid) {
+		$("#place-order").text("Place Order"); //change button text
+		$("#place-order").attr("disabled", false); //set button enable
+		return false;
+	} else {
+		var url = new URL("http://localhost/ecommerce-base/");
+
+		$.ajax({
+			url: url.pathname + "insert-check-out",
+			type: "POST",
+			data: $(".checkout-form").serialize(),
+			cache: false,
+			dataType: "JSON",
+			success: function (data) {
+				if (data.status == true) {
+					Swal.fire({
+						icon: "success",
+						title: data.message,
+						showConfirmButton: false,
+						timer: 5000,
+					});
+
+					window.location.href = url + "customer-history-purchase-order";
+				} else {
+					Swal.fire({
+						icon: "error",
+						title: data.message,
+						showConfirmButton: false,
+						timer: 5000,
+					});
+				}
+
+				showShoppingCart();
+				showDetailCart();
+				getCheckOutOrder();
+
+				$("#place-order").text("Place Order"); //change button text
+				$("#place-order").attr("disabled", false); //set button enable
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				Swal.fire({
+					icon: "error",
+					title: textStatus,
+					showConfirmButton: false,
+					timer: 5000,
+				});
+
+				$("#place-order").text("Place Order"); //change button text
+				$("#place-order").attr("disabled", false); //set button enable
+			},
+		});
+	}
+});
 
 // FOR DETAIL PRODUCT CART
 function setDetailButtonCart() {

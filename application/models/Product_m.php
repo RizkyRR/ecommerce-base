@@ -173,17 +173,6 @@ class Product_m extends CI_Model
     $this->db->insert('products', $data);
   }
 
-  public function insertProductVariant($data)
-  {
-    $this->db->insert('product_variants', $data);
-  }
-
-  public function updateProductVariant($id, $data)
-  {
-    $this->db->where('id', $id);
-    $this->db->update('product_variants', $data);
-  }
-
   public function insert_image($data)
   {
     // $this->db->insert('product_images', $data);
@@ -276,34 +265,6 @@ class Product_m extends CI_Model
 
     $query = $this->db->get();
     return $query->result_array();
-  }
-
-  public function variantData($id)
-  {
-    $this->db->select('*, products.id AS id_product, product_variants.id AS id_variant');
-
-    $this->db->from('product_variants');
-    $this->db->join('products', 'products.id = product_variants.product_id', 'left');
-
-    $this->db->where('product_variants.product_id', $id);
-    $this->db->order_by('product_variants.variant_name', 'desc');
-
-    $query = $this->db->get();
-    return $query->result_array();
-  }
-
-  public function variantDataByID($variant_id)
-  {
-    $this->db->select('*, products.id AS id_product, product_variants.id AS id_variant');
-
-    $this->db->from('product_variants');
-    $this->db->join('products', 'products.id = product_variants.product_id', 'left');
-
-    $this->db->where('product_variants.id', $variant_id);
-    // $this->db->where('product_variants.product_id', $product_id);
-
-    $query = $this->db->get();
-    return $query->row_array();
   }
 
   public function update($id, $data)
@@ -519,34 +480,6 @@ class Product_m extends CI_Model
     return $query->row_array();
   }
 
-  public function getCheckQtyVariantByID($id, $variant)
-  {
-    $this->db->select('*, products.id AS id_product, product_variants.id AS id_variant'); //*
-
-    $this->db->from('products');
-    $this->db->join('product_variants', 'product_variants.product_id = products.id', 'left');
-
-    $this->db->where('products.qty > 0 OR product_variants.variant_qty > 0');
-    $this->db->where('products.id', $id);
-    $this->db->where('product_variants.id', $variant);
-
-    $query = $this->db->get();
-    return $query->row_array();
-  }
-
-  public function existsDataVariant($product_id)
-  {
-    // $this->db->where('id', $variant_id);
-    $this->db->where('product_id', $product_id);
-
-    $query = $this->db->get('product_variants');
-    if ($query->num_rows() > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   public function getRelatedProduct($category_id)
   {
     $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
@@ -704,13 +637,12 @@ class Product_m extends CI_Model
 
   public function getAllProductShop($limit, $offset, $keyword, $sort, $type_sort)
   {
-    $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount, product_variants.id AS id_variant'); //*
+    $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
     $this->db->join('product_details', 'product_details.product_id = products.id');
     $this->db->join('product_categories', 'product_categories.id = products.category_id');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
-    $this->db->join('product_variants', 'product_variants.product_id = products.id', 'left');
 
     $this->db->group_by('product_details.product_id');
 
@@ -722,7 +654,7 @@ class Product_m extends CI_Model
 
     $this->db->order_by('products.' . $sort, $type_sort);
 
-    $this->db->where('products.qty > 0 OR product_variants.variant_qty > 0');
+    $this->db->where('products.qty > 0');
 
     $this->db->limit($limit, $offset);
 
@@ -732,17 +664,16 @@ class Product_m extends CI_Model
 
   public function getProductShopByID($id)
   {
-    $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount, product_variants.id AS id_variant'); //*
+    $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
     $this->db->join('product_details', 'product_details.product_id = products.id');
     $this->db->join('product_categories', 'product_categories.id = products.category_id');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
-    $this->db->join('product_variants', 'product_variants.product_id = products.id', 'left');
 
     $this->db->group_by('product_details.product_id');
 
-    $this->db->where('products.qty > 0 OR product_variants.variant_qty > 0');
+    $this->db->where('products.qty > 0');
     $this->db->where('products.id', $id);
 
     $query = $this->db->get();
@@ -996,16 +927,10 @@ class Product_m extends CI_Model
     return $query->result_array();
   }
 
-  public function updateDetailShoppingCart($email, $prod_id, $variant_id, $data)
+  public function updateDetailShoppingCart($email, $prod_id, $data)
   {
-    if ($variant_id != null) {
-      $this->db->where('customer_email', $email);
-      $this->db->where('product_id', $prod_id);
-      $this->db->where('variant_id', $variant_id);
-    } else {
-      $this->db->where('customer_email', $email);
-      $this->db->where('product_id', $prod_id);
-    }
+    $this->db->where('customer_email', $email);
+    $this->db->where('product_id', $prod_id);
 
     $this->db->update('customer_carts', $data);
   }

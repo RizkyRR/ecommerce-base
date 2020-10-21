@@ -237,7 +237,7 @@ class Check_out extends CI_Controller
         $html .= '<span>Rp. ' . number_format($qty_price, 0, ',', '.') . '
         </span>
 
-        <input type="hidden" name="product_id[]" id="product_row_' . $i . '" value="' . $val['id_product'] . '" readonly
+        <input type="hidden" name="product_id[]" id="product_row_' . $i . '" value="' . $val['id_product'] . '" readonly>
         <input type="hidden" name="unit_price[]" id="unit_price_row_' . $i . '" value="' . $val['price'] . '" readonly>
         <input type="hidden" name="qty[]" id="qty_row_' . $i . '" value="' . $val['cart_qty'] . '" readonly>
         <input type="hidden" name="amount_price[]" id="amount_price_row_' . $i . '" value="' . $qty_price . '" readonly>
@@ -359,30 +359,23 @@ class Check_out extends CI_Controller
 
       for ($j = 0; $j < $count_product; $j++) {
         $getProduct = $this->product_m->getProductById($this->input->post('product_id')[$j]);
-        $getProductVariant = $this->product_m->variantDataByID($this->input->post('variant_id')[$j]);
         $qtyProduct = $this->input->post('qty')[$j];
-        $vrntProduct = $this->input->post('variant_id')[$j];
         $idProduct = $this->input->post('product_id')[$j];
-
-        // checking product has variant or not
       }
 
-      $checkVariantExist = $this->product_m->existsDataVariant($idProduct);
-
-      // kalo ada variant maka dikondisikan dengan qty variant
-      if (($getProductVariant['variant_qty'] >= $qtyProduct) && ($getProduct['qty'] >= $qtyProduct)) {
+      // kalo tidak ada maka dikondisikan dengan qty product
+      if ($getProduct['qty'] >= $qtyProduct) {
         // store data into purchase order
         $this->customerPurchase_m->insertPurchaseOrders($data_order);
 
         // store data into purchase order shipping
         $this->customerPurchase_m->insertPurchaseOrderShipping($data_order_shipping);
 
-        // Store to sales_order_details
+        // Store to purchase_order_details
         for ($i = 0; $i < $count_product; $i++) {
           $data_order_detail = [
             'purchase_order_id' => $generate_id,
             'product_id' => $this->input->post('product_id')[$i],
-            'product_variant_id' => $this->input->post('variant_id')[$i],
             'weight' => $this->input->post('weight')[$i],
             'qty' => $this->input->post('qty')[$i],
             'unit_price' => $this->input->post('unit_price')[$i],
@@ -392,134 +385,28 @@ class Check_out extends CI_Controller
 
           $this->customerPurchase_m->insertPurchaseOrderDetails($data_order_detail);
 
-          if ($checkVariantExist == true) {
-            // Update product to decrease stock after doing new order especially in product variants
-            $data_product_variant = $this->product_m->variantDataByID($this->input->post('variant_id')[$i]);
-            $qty_variant = ((int)$getProductVariant['variant_qty'] - (int)$this->input->post('qty')[$i]);
+          // Update product to decrease stock after doing new order especially in products
+          $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
+          $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
 
-            $update_product_variant = array(
-              'variant_qty' => $qty_variant
-            );
+          $update_product = array(
+            'qty' => $qty
+          );
 
-            $this->product_m->updateProductVariant($this->input->post('variant_id')[$i], $update_product_variant);
-          } else {
-            // Update product to decrease stock after doing new order especially in products
-            $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
-            $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
-
-            $update_product = array(
-              'qty' => $qty
-            );
-
-            $this->product_m->update($this->input->post('product_id')[$i], $update_product);
-          }
+          $this->product_m->update($this->input->post('product_id')[$i], $update_product);
         }
 
-        $this->customerCart_m->deleteCart($email);
+        $this->customerCart_m->deleteCart($email, null);
 
         $response['status'] = true;
-        $response['qty'] = $qty_variant;
+        $response['qty'] = $qty;
         $response['message'] = 'Your order has been added, please make a payment immediately!';
         // redirect('order', 'refresh');
       } else {
         $response['status'] = false;
-        $response['message'] = 'Your quantity of ' . $getProductVariant['product_name'] . ' is limited !';
+        $response['message'] = 'Your quantity of ' . $getProduct['product_name'] . ' is limited !';
         // redirect('orders/addorder', 'refresh');
       }
-
-      /* if ($checkVariantExist == true) {
-        // kalo ada variant maka dikondisikan dengan qty variant
-        if ($getProductVariant['variant_qty'] >= $qtyProduct) {
-          // store data into purchase order
-          $this->customerPurchase_m->insertPurchaseOrders($data_order);
-
-          // store data into purchase order shipping
-          $this->customerPurchase_m->insertPurchaseOrderShipping($data_order_shipping);
-
-          // Store to sales_order_details
-          for ($i = 0; $i < $count_product; $i++) {
-            $data_order_detail = [
-              'purchase_order_id' => $generate_id,
-              'product_id' => $this->input->post('product_id')[$i],
-              'product_variant_id' => $this->input->post('variant_id')[$i],
-              'weight' => $this->input->post('weight')[$i],
-              'qty' => $this->input->post('qty')[$i],
-              'unit_price' => $this->input->post('unit_price')[$i],
-              'amount' => $this->input->post('amount_price')[$i],
-              'status_order_id' => 2
-            ];
-
-            $this->customerPurchase_m->insertPurchaseOrderDetails($data_order_detail);
-
-            // Update product to decrease stock after doing new order especially in product variants
-            $data_product_variant = $this->product_m->variantDataByID($this->input->post('variant_id')[$i]);
-            $qty_variant = ((int)$getProductVariant['variant_qty'] - (int)$this->input->post('qty')[$i]);
-
-            $update_product_variant = array(
-              'variant_qty' => $qty_variant
-            );
-
-            $this->product_m->updateProductVariant($this->input->post('variant_id')[$i], $update_product_variant);
-          }
-
-          $this->customerCart_m->deleteCart($email);
-
-          $response['status'] = true;
-          $response['qty'] = $qty_variant;
-          $response['message'] = 'Your order has been added, please make a payment immediately!';
-          // redirect('order', 'refresh');
-        } else {
-          $response['status'] = false;
-          $response['message'] = 'Your quantity of ' . $getProductVariant['product_name'] . ' is limited !';
-          // redirect('orders/addorder', 'refresh');
-        }
-      } else {
-        // kalo tidak ada maka dikondisikan dengan qty product
-        if ($getProduct['qty'] >= $qtyProduct) {
-          // store data into purchase order
-          $this->customerPurchase_m->insertPurchaseOrders($data_order);
-
-          // store data into purchase order shipping
-          $this->customerPurchase_m->insertPurchaseOrderShipping($data_order_shipping);
-
-          // Store to purchase_order_details
-          for ($i = 0; $i < $count_product; $i++) {
-            $data_order_detail = [
-              'purchase_order_id' => $generate_id,
-              'product_id' => $this->input->post('product_id')[$i],
-              'product_variant_id' => 404,
-              'weight' => $this->input->post('weight')[$i],
-              'qty' => $this->input->post('qty')[$i],
-              'unit_price' => $this->input->post('unit_price')[$i],
-              'amount' => $this->input->post('amount_price')[$i],
-              'status_order_id' => 2
-            ];
-
-            $this->customerPurchase_m->insertPurchaseOrderDetails($data_order_detail);
-
-            // Update product to decrease stock after doing new order especially in products
-            $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
-            $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
-
-            $update_product = array(
-              'qty' => $qty
-            );
-
-            $this->product_m->update($this->input->post('product_id')[$i], $update_product);
-          }
-
-          $this->customerCart_m->deleteCart($email);
-
-          $response['status'] = true;
-          $response['qty'] = $qty;
-          $response['message'] = 'Your order has been added, please make a payment immediately!';
-          // redirect('order', 'refresh');
-        } else {
-          $response['status'] = false;
-          $response['message'] = 'Your quantity of ' . $getProductVariant['product_name'] . ' is limited !';
-          // redirect('orders/addorder', 'refresh');
-        }
-      } */
     }
 
     echo json_encode($response);

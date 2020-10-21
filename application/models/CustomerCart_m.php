@@ -26,11 +26,16 @@ class CustomerCart_m extends CI_Model
     return $this->db->affected_rows();
   }
 
-  public function deleteCart($email, $cart_id = null)
+  public function deleteCart($email, $cart_id)
   {
-    $this->db->where('id', $cart_id);
-    $this->db->where('customer_email', $email);
-    $this->db->delete('customer_carts');
+    if ($cart_id != null) {
+      $this->db->where('id', $cart_id);
+      $this->db->where('customer_email', $email);
+      $this->db->delete('customer_carts');
+    } else {
+      $this->db->where('customer_email', $email);
+      $this->db->delete('customer_carts');
+    }
 
     return $this->db->affected_rows();
   }

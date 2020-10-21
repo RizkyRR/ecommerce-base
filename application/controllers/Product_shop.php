@@ -215,7 +215,6 @@ class Product_shop extends CI_Controller
     $info['avg_rating'] = number_format($getSumRatingx, 1);
     $info['rating_comment'] = $rating;
 
-    $info['variant'] = $this->product_m->variantData($id);
     $info['detail'] = $this->product_m->getDetailProductShop($id);
     $info['images'] = $this->product_m->getImageProductShop($id);
 
@@ -550,25 +549,6 @@ class Product_shop extends CI_Controller
     } else {
       $response['status'] = false;
       $response['qty'] = 0;
-    }
-
-    echo json_encode($response);
-  }
-
-  public function getAvailableStockVariantProductByID()
-  {
-    $response = array();
-    $product_id = $this->input->post('product_id');
-    $variant_id = $this->input->post('variant_id');
-
-    $dataVariants = $this->product_m->variantData($product_id);
-
-    if ($dataVariants != null) {
-      $dataVariant = $this->product_m->getCheckQtyVariantByID($product_id, $variant_id);
-      $getQty = $dataVariant['variant_qty'];
-
-      $response['status'] = "true";
-      $response['qty'] = $getQty;
     }
 
     echo json_encode($response);
@@ -989,7 +969,6 @@ class Product_shop extends CI_Controller
     $product_id = $this->input->post('product_id');
     $qty = $this->input->post('qty');
     $amountPrice = $this->input->post('amount');
-    $variant_id = $this->input->post('variant_id');
 
     $response = array();
 
@@ -1001,7 +980,7 @@ class Product_shop extends CI_Controller
         // 'amount_price' => $amountPrice
       ];
 
-      $this->product_m->updateDetailShoppingCart($email, $product_id, $variant_id, $data);
+      $this->product_m->updateDetailShoppingCart($email, $product_id, $data);
     } else {
       $response['status'] = true;
 
@@ -1010,7 +989,7 @@ class Product_shop extends CI_Controller
         // 'amount_price' => $amountPrice
       ];
 
-      $this->product_m->updateDetailShoppingCart($email, $product_id, $variant_id, $data);
+      $this->product_m->updateDetailShoppingCart($email, $product_id, $data);
     }
 
     echo json_encode($response);

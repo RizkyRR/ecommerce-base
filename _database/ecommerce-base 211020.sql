@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 20, 2020 at 06:19 PM
+-- Generation Time: Oct 21, 2020 at 11:15 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.10
 
@@ -325,9 +325,7 @@ CREATE TABLE `customer_carts` (
 
 INSERT INTO `customer_carts` (`id`, `customer_email`, `product_id`, `quantity`, `created_at`) VALUES
 ('0920-CART-141013', 'rahmadianto018@gmail.com', 'PRDCT-0820-003722', 1, '2020-09-16 14:10:13'),
-('0920-CART-134513', 'rahmadianto018@gmail.com', 'PRDCT-0820-003722', 2, '2020-09-15 13:45:13'),
-('0920-CART-003712', 'customer@adminstore.com', 'PRDCT-0820-003802', 2, '2020-09-15 00:37:12'),
-('0920-CART-193013', 'customer@adminstore.com', 'PRDCT-0820-003722', 5, '2020-09-30 19:30:13');
+('0920-CART-134513', 'rahmadianto018@gmail.com', 'PRDCT-0820-003722', 2, '2020-09-15 13:45:13');
 
 -- --------------------------------------------------------
 
@@ -410,7 +408,8 @@ CREATE TABLE `customer_purchase_orders` (
 --
 
 INSERT INTO `customer_purchase_orders` (`id`, `invoice_order`, `customer_email`, `purchase_order_date`, `gross_amount`, `ship_amount`, `vat_charge_rate`, `vat_charge_val`, `vat_charge`, `coupon_charge_rate`, `coupon_charge`, `net_amount`, `created_date`, `updated_date`, `status_order_id`) VALUES
-('O-103744', '011020-OP-103744', 'customer@adminstore.com', 1601563210, 1445000, 16000, 10, 144500, 1589500, 0, 0, 1589500, '2020-10-01 21:35:16', '0000-00-00 00:00:00', 2);
+('O-103744', '011020-OP-103744', 'customer@adminstore.com', 1601563210, 1445000, 16000, 10, 144500, 1589500, 0, 0, 1589500, '2020-10-01 21:35:16', '0000-00-00 00:00:00', 2),
+('O-161253', '211020-OP-161253', 'customer@adminstore.com', 1603271573, 1600000, 16000, 10, 160000, 1776000, 0, 0, 1776000, '2020-10-21 16:12:53', '0000-00-00 00:00:00', 2);
 
 -- --------------------------------------------------------
 
@@ -435,7 +434,31 @@ CREATE TABLE `customer_purchase_order_details` (
 
 INSERT INTO `customer_purchase_order_details` (`id`, `purchase_order_id`, `product_id`, `weight`, `qty`, `unit_price`, `amount`, `status_order_id`) VALUES
 (1, 'O-103744', 'PRDCT-0820-003058', 200, 2, 500000, 1000000, 2),
-(2, 'O-103744', 'PRDCT-0820-003722', 200, 1, 445000, 445000, 2);
+(2, 'O-103744', 'PRDCT-0820-003722', 200, 1, 445000, 445000, 2),
+(16, 'O-161253', 'PRDCT-0820-000021', 200, 2, 500000, 1000000, 2),
+(15, 'O-161253', 'PRDCT-0820-000321', 200, 1, 600000, 600000, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customer_purchase_order_shipping`
+--
+
+CREATE TABLE `customer_purchase_order_shipping` (
+  `id` int(11) NOT NULL,
+  `purchase_order_id` varchar(64) NOT NULL,
+  `courier` varchar(64) NOT NULL,
+  `service` varchar(64) NOT NULL,
+  `etd` varchar(16) NOT NULL,
+  `delivery_receipt_number` varchar(64) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `customer_purchase_order_shipping`
+--
+
+INSERT INTO `customer_purchase_order_shipping` (`id`, `purchase_order_id`, `courier`, `service`, `etd`, `delivery_receipt_number`) VALUES
+(9, 'O-161253', 'jne', 'Layanan Reguler (REG)', '1-2', NULL);
 
 -- --------------------------------------------------------
 
@@ -493,6 +516,21 @@ INSERT INTO `customer_purchase_return_details` (`id`, `purchase_return_id`, `pro
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `customer_purchase_return_shipping`
+--
+
+CREATE TABLE `customer_purchase_return_shipping` (
+  `id` int(11) NOT NULL,
+  `purchase_return_id` varchar(32) NOT NULL,
+  `courier` varchar(32) NOT NULL,
+  `service` varchar(32) NOT NULL,
+  `etd` varchar(16) NOT NULL,
+  `delivery_receipt_number` varchar(64) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `customer_token`
 --
 
@@ -530,7 +568,8 @@ INSERT INTO `customer_wishlists` (`id`, `customer_email`, `product_id`, `created
 (123, 'customer@adminstore.com', 'PRDCT-0820-000321', '2020-09-16 23:50:55'),
 (124, 'customer@adminstore.com', 'PRDCT-0820-000504', '2020-09-16 23:53:21'),
 (117, 'customer@adminstore.com', 'PRDCT-0820-003722', '2020-09-16 23:34:11'),
-(82, 'customer@adminstore.com', 'PRDCT-0820-003802', '2020-09-16 20:55:27');
+(82, 'customer@adminstore.com', 'PRDCT-0820-003802', '2020-09-16 20:55:27'),
+(126, 'customer@adminstore.com', 'PRDCT-0820-001521', '2020-10-21 15:50:47');
 
 -- --------------------------------------------------------
 
@@ -1727,36 +1766,36 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `product_name`, `slug`, `category_id`, `supplier_id`, `description`, `qty`, `price`, `weight`, `availability`, `created_at`, `updated_at`) VALUES
-('PRDCT-0420-084545', 'Indomie Goreng', 'indomie-goreng', '2', 'SPL0003', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 15, 3500, 0, 0, '2020-07-04 13:47:48', '2020-07-31 15:31:10'),
-('PRDCT-0320-164257', 'Kaos Catton Combed 20s', 'kaos-catton-combed-20s', '6', 'SPL0004', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 20, 66500, 0, 0, '2020-03-19 22:44:26', '2020-09-14 19:49:38'),
-('PRDCT-0320-153504', 'Celana Jeans Aja', 'celana-jeans-aja', '6', 'SPL0004', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 20, 251100, 0, 0, '2020-03-21 21:35:41', '2020-07-31 15:28:28'),
-('PRDCT-0420-084902', 'Pepsi Blue', 'pepsi-blue', '3', 'SPL0003', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 25, 11210, 0, 0, '2020-04-07 13:50:14', '2020-07-31 15:31:16'),
-('PRDCT-0420-085050', 'Energen', 'energen', '3', 'SPL0005', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 7000, 0, 0, '2020-04-07 13:52:43', '2020-07-31 15:31:22'),
-('PRDCT-0420-085344', 'Slai Olai', 'slai-olai', '2', 'SPL0005', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 45, 6000, 0, 0, '2020-04-07 13:54:20', '2020-07-31 15:31:28'),
-('PRDCT-0420-085449', 'TOP Coffee', 'top-coffee', '3', 'SPL0002', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 80, 7125, 0, 0, '2020-04-07 13:55:58', '2020-09-14 19:51:26'),
-('PRDCT-0420-085606', 'Pulpy Orange', 'pulpy-orange', '3', 'SPL0003', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 20, 3800, 0, 0, '2020-04-07 13:57:40', '2020-07-31 15:31:39'),
-('PRDCT-0620-162750', 'Coca Cola', 'coca-cola', '3', 'SPL0003', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 100, 10000, 0, 0, '2020-06-11 21:29:20', '2020-07-31 15:31:45'),
-('PRDCT-0720-135500', 'Cleone Baju Atasan Wanita Blus Casual Tangan Balon', 'cleone-baju-atasan-wanita-blus-casual-tangan-balon', '7', 'SPL0004', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 20, 98000, 0, 0, '2020-07-21 13:55:16', '0000-00-00 00:00:00'),
-('PRDCT-0820-235857', 'Vans Authentic Full Black', 'vans-authentic-full-black', '8', 'SPL0006', 'The Authentic, Vans original and now iconic style, is a simple low top, lace-up with durable canvas upper, metal eyelets, Vans flag label and Vans original Waffle Outsole.', 50, 500000, 0, 0, '2020-08-07 00:00:10', '0000-00-00 00:00:00'),
-('PRDCT-0820-000021', 'Vans Authentic Black White', 'vans-authentic-black-white', '8', 'SPL0006', 'The Authentic, Vans original and now iconic style, is a simple low top, lace-up with durable canvas upper, metal eyelets, Vans flag label and Vans original Waffle Outsole.', 50, 500000, 0, 0, '2020-08-07 00:01:22', '0000-00-00 00:00:00'),
-('PRDCT-0820-000131', 'Vans Pig suede Authentic', 'vans-pig-suede-authentic', '8', 'SPL0006', 'The Pig Suede Authentic combines the original and now iconic Vans low top style with sturdy suede uppers, metal eyelets, and signature rubber waffle outsoles.', 50, 600000, 0, 0, '2020-08-07 00:02:57', '0000-00-00 00:00:00'),
-('PRDCT-0820-000321', 'Vans Prism Suede Authentic', 'vans-prism-suede-authentic', '8', 'SPL0006', 'The Prism Suede Authentic combines the original and now iconic Vans low top style with metallic suede uppers, metal eyelets, and signature rubber waffle outsoles.', 50, 600000, 0, 0, '2020-08-07 00:04:16', '0000-00-00 00:00:00'),
-('PRDCT-0820-000504', 'Vans Gum Authentic', 'vans-gum-authentic', '8', 'SPL0006', 'The Gum Authentic combines the original and now iconic Vans low top style with sturdy canvas uppers, metal eyelets, gum-colored sidewalls, and signature rubber waffle', 50, 500000, 0, 0, '2020-08-07 00:05:37', '0000-00-00 00:00:00'),
-('PRDCT-0820-000712', 'Vans Off The Wall Classic Circle V Tee', 'vans-off-the-wall-classic-circle-v-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Circle V Short Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With high-density Circle V screen prints, a bound rib collar and reinforced shoulder seams, premium Vans trims, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 50, 345000, 0, 0, '2020-08-07 00:08:03', '2020-08-07 00:13:14'),
-('PRDCT-0820-000953', 'Vans Off The Wall Classic Tee', 'vans-off-the-wall-classic-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Circle V Short Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With high-density Circle V screen prints, a bound rib collar and reinforced shoulder seams, premium Vans trims, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 50, 345000, 0, 0, '2020-08-07 00:13:04', '0000-00-00 00:00:00'),
-('PRDCT-0820-001318', 'Vans Off The Wall Classic Graphic Long Sleeve Tee', 'vans-off-the-wall-classic-graphic-long-sleeve-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Graphic Long Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With high-density screen prints, a bound rib collar and reinforced shoulder seams, premium Vans trims, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 50, 395000, 0, 0, '2020-08-07 00:14:46', '0000-00-00 00:00:00'),
-('PRDCT-0820-001521', 'Vans Off The Wall Classic Stripe Long Sleeve Tee', 'vans-off-the-wall-classic-stripe-long-sleeve-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Stripe Long Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With allover stripes, a bound rib collar and reinforced shoulder seams, premium Vans trims, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 50, 445000, 0, 0, '2020-08-07 00:16:06', '0000-00-00 00:00:00'),
-('PRDCT-0820-001626', 'Vans Off The Wall Classic Long Sleeve Tee', 'vans-off-the-wall-classic-long-sleeve-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Long Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With a bound rib collar and reinforced shoulder seams, premium Vans trims, an embroidered chest patch, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 50, 395000, 0, 0, '2020-08-07 00:17:33', '0000-00-00 00:00:00'),
-('PRDCT-0820-001900', 'Converse Seasonal Color Chuck 70', 'converse-seasonal-color-chuck-70', '8', 'SPL0007', 'The Chuck 70 mixes the best details from the ’70s-era Chuck with impeccable craftsmanship and premium materials. An elevated style icon, it features more cushioning to keep you looking—and feeling—good all day. The Chuck 70 holds its own on fashion week runways and city streets, making it the go-to sneaker for those looking to enhance and express their style. This edition goes old school with a palette of trendy throwback colors.', 50, 850000, 0, 0, '2020-08-07 00:20:29', '0000-00-00 00:00:00'),
-('PRDCT-0820-002347', 'Converse Women\'s Chuck Taylor All Star Move High Top', 'converse-women-s-chuck-taylor-all-star-move-high-top', '8', 'SPL0007', 'LIGHT AND LIFTED. Up the height and the attitude in the new Chuck Taylor All Star Move. A bold, projectile platform brings an unexpected edge, without the bulky weight. Subtle changes like a jungle-cloth construction, houndstooth accents, printed lace tips and transparent patches put a fresh spin on your everyday Chucks.', 50, 700000, 0, 0, '2020-08-07 00:24:31', '0000-00-00 00:00:00'),
-('PRDCT-0820-002517', 'Converse Seasonal Color Chuck Taylor All Star', 'converse-seasonal-color-chuck-taylor-all-star', '8', 'SPL0007', 'We could tell you that it’s the OG basketball shoe, created over 100 years ago. Or that the design has largely stayed the same, because why mess with a good thing. Or how it became the unofficial sneaker of all your favorite artists and musicians, who each made it their own. Yeah, we could share a lot of stories, but the one that matters most isn’t ours—it’s yours. It’s how and where you take your Chucks. The legacy is long, but what comes next is up to you. We just make the shoe. You make the stories.', 50, 550000, 0, 0, '2020-08-07 00:26:30', '0000-00-00 00:00:00'),
-('PRDCT-0820-002811', 'Converse Chuck Taylor All Star By You', 'converse-chuck-taylor-all-star-by-you', '8', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 1000000, 0, 0, '2020-08-07 00:30:53', '0000-00-00 00:00:00'),
-('PRDCT-0820-003058', 'Converse Chuck Taylor All Star', 'converse-chuck-taylor-all-star', '8', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 500000, 0, 0, '2020-08-07 00:31:41', '0000-00-00 00:00:00'),
-('PRDCT-0820-003415', 'Converse Wordmark Long Sleeve Black', 'converse-wordmark-long-sleeve-black', '6', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 345000, 0, 0, '2020-08-07 00:34:45', '0000-00-00 00:00:00'),
-('PRDCT-0820-003451', 'Converse Wordmark Long Sleeve White', 'converse-wordmark-long-sleeve-white', '6', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 345000, 0, 0, '2020-08-07 00:35:28', '0000-00-00 00:00:00'),
-('PRDCT-0820-003633', 'Converse Chuck Taylor Patch Tee', 'converse-chuck-taylor-patch-tee', '6', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 345000, 0, 0, '2020-08-07 00:36:59', '0000-00-00 00:00:00'),
-('PRDCT-0820-003722', 'Converse Carpenter Crew', 'converse-carpenter-crew', '9', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 356000, 200, 0, '2020-08-07 00:37:43', '2020-09-10 13:35:51'),
-('PRDCT-0820-003802', 'Converse Removeable Hooded Crew', 'converse-removeable-hooded-crew', '9', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 500000, 200, 0, '2020-08-07 00:38:25', '0000-00-00 00:00:00');
+('PRDCT-0420-084545', 'Indomie Goreng', 'indomie-goreng', '2', 'SPL0003', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 15, 3500, 200, 0, '2020-07-04 13:47:48', '2020-07-31 15:31:10'),
+('PRDCT-0320-164257', 'Kaos Catton Combed 20s', 'kaos-catton-combed-20s', '6', 'SPL0004', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 20, 66500, 200, 0, '2020-03-19 22:44:26', '2020-09-14 19:49:38'),
+('PRDCT-0320-153504', 'Celana Jeans Aja', 'celana-jeans-aja', '6', 'SPL0004', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 20, 251100, 200, 0, '2020-03-21 21:35:41', '2020-07-31 15:28:28'),
+('PRDCT-0420-084902', 'Pepsi Blue', 'pepsi-blue', '3', 'SPL0003', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 25, 11210, 200, 0, '2020-04-07 13:50:14', '2020-07-31 15:31:16'),
+('PRDCT-0420-085050', 'Energen', 'energen', '3', 'SPL0005', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 7000, 200, 0, '2020-04-07 13:52:43', '2020-07-31 15:31:22'),
+('PRDCT-0420-085344', 'Slai Olai', 'slai-olai', '2', 'SPL0005', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 45, 6000, 200, 0, '2020-04-07 13:54:20', '2020-07-31 15:31:28'),
+('PRDCT-0420-085449', 'TOP Coffee', 'top-coffee', '3', 'SPL0002', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 80, 7125, 200, 0, '2020-04-07 13:55:58', '2020-09-14 19:51:26'),
+('PRDCT-0420-085606', 'Pulpy Orange', 'pulpy-orange', '3', 'SPL0003', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 20, 3800, 200, 0, '2020-04-07 13:57:40', '2020-07-31 15:31:39'),
+('PRDCT-0620-162750', 'Coca Cola', 'coca-cola', '3', 'SPL0003', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 100, 10000, 200, 0, '2020-06-11 21:29:20', '2020-07-31 15:31:45'),
+('PRDCT-0720-135500', 'Cleone Baju Atasan Wanita Blus Casual Tangan Balon', 'cleone-baju-atasan-wanita-blus-casual-tangan-balon', '7', 'SPL0004', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 20, 98000, 200, 0, '2020-07-21 13:55:16', '0000-00-00 00:00:00'),
+('PRDCT-0820-235857', 'Vans Authentic Full Black', 'vans-authentic-full-black', '8', 'SPL0006', 'The Authentic, Vans original and now iconic style, is a simple low top, lace-up with durable canvas upper, metal eyelets, Vans flag label and Vans original Waffle Outsole.', 50, 500000, 200, 0, '2020-08-07 00:00:10', '0000-00-00 00:00:00'),
+('PRDCT-0820-000021', 'Vans Authentic Black White', 'vans-authentic-black-white', '8', 'SPL0006', 'The Authentic, Vans original and now iconic style, is a simple low top, lace-up with durable canvas upper, metal eyelets, Vans flag label and Vans original Waffle Outsole.', 48, 500000, 200, 0, '2020-08-07 00:01:22', '0000-00-00 00:00:00'),
+('PRDCT-0820-000131', 'Vans Pig suede Authentic', 'vans-pig-suede-authentic', '8', 'SPL0006', 'The Pig Suede Authentic combines the original and now iconic Vans low top style with sturdy suede uppers, metal eyelets, and signature rubber waffle outsoles.', 50, 600000, 200, 0, '2020-08-07 00:02:57', '0000-00-00 00:00:00'),
+('PRDCT-0820-000321', 'Vans Prism Suede Authentic', 'vans-prism-suede-authentic', '8', 'SPL0006', 'The Prism Suede Authentic combines the original and now iconic Vans low top style with metallic suede uppers, metal eyelets, and signature rubber waffle outsoles.', 49, 600000, 200, 0, '2020-08-07 00:04:16', '0000-00-00 00:00:00'),
+('PRDCT-0820-000504', 'Vans Gum Authentic', 'vans-gum-authentic', '8', 'SPL0006', 'The Gum Authentic combines the original and now iconic Vans low top style with sturdy canvas uppers, metal eyelets, gum-colored sidewalls, and signature rubber waffle', 50, 500000, 200, 0, '2020-08-07 00:05:37', '0000-00-00 00:00:00'),
+('PRDCT-0820-000712', 'Vans Off The Wall Classic Circle V Tee', 'vans-off-the-wall-classic-circle-v-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Circle V Short Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With high-density Circle V screen prints, a bound rib collar and reinforced shoulder seams, premium Vans trims, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 48, 345000, 200, 0, '2020-08-07 00:08:03', '2020-08-07 00:13:14'),
+('PRDCT-0820-000953', 'Vans Off The Wall Classic Tee', 'vans-off-the-wall-classic-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Circle V Short Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With high-density Circle V screen prints, a bound rib collar and reinforced shoulder seams, premium Vans trims, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 49, 345000, 200, 0, '2020-08-07 00:13:04', '0000-00-00 00:00:00'),
+('PRDCT-0820-001318', 'Vans Off The Wall Classic Graphic Long Sleeve Tee', 'vans-off-the-wall-classic-graphic-long-sleeve-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Graphic Long Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With high-density screen prints, a bound rib collar and reinforced shoulder seams, premium Vans trims, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 50, 395000, 200, 0, '2020-08-07 00:14:46', '0000-00-00 00:00:00'),
+('PRDCT-0820-001521', 'Vans Off The Wall Classic Stripe Long Sleeve Tee', 'vans-off-the-wall-classic-stripe-long-sleeve-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Stripe Long Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With allover stripes, a bound rib collar and reinforced shoulder seams, premium Vans trims, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 48, 445000, 200, 0, '2020-08-07 00:16:06', '0000-00-00 00:00:00'),
+('PRDCT-0820-001626', 'Vans Off The Wall Classic Long Sleeve Tee', 'vans-off-the-wall-classic-long-sleeve-tee', '6', 'SPL0006', 'Everyone needs a T-shirt they can rely on. The Off The Wall Classic Long Sleeve T-Shirt will end your search for the perfect tee so you can focus on the more important things. Featuring an interior waffle print that pulls moisture away from the skin, this new tee keeps you comfortable and dry while sturdy-spun yarn provides durability and minimizes shrinking. With a bound rib collar and reinforced shoulder seams, premium Vans trims, an embroidered chest patch, and a checkerboard hanger loop, the Off The Wall™ tee will be the last T-shirt you\'ll ever need. Fit type: classic. Model is 6 feet tall and wearing a size Medium.', 48, 395000, 200, 0, '2020-08-07 00:17:33', '0000-00-00 00:00:00'),
+('PRDCT-0820-001900', 'Converse Seasonal Color Chuck 70', 'converse-seasonal-color-chuck-70', '8', 'SPL0007', 'The Chuck 70 mixes the best details from the ’70s-era Chuck with impeccable craftsmanship and premium materials. An elevated style icon, it features more cushioning to keep you looking—and feeling—good all day. The Chuck 70 holds its own on fashion week runways and city streets, making it the go-to sneaker for those looking to enhance and express their style. This edition goes old school with a palette of trendy throwback colors.', 47, 850000, 200, 0, '2020-08-07 00:20:29', '0000-00-00 00:00:00'),
+('PRDCT-0820-002347', 'Converse Women\'s Chuck Taylor All Star Move High Top', 'converse-women-s-chuck-taylor-all-star-move-high-top', '8', 'SPL0007', 'LIGHT AND LIFTED. Up the height and the attitude in the new Chuck Taylor All Star Move. A bold, projectile platform brings an unexpected edge, without the bulky weight. Subtle changes like a jungle-cloth construction, houndstooth accents, printed lace tips and transparent patches put a fresh spin on your everyday Chucks.', 50, 700000, 200, 0, '2020-08-07 00:24:31', '0000-00-00 00:00:00'),
+('PRDCT-0820-002517', 'Converse Seasonal Color Chuck Taylor All Star', 'converse-seasonal-color-chuck-taylor-all-star', '8', 'SPL0007', 'We could tell you that it’s the OG basketball shoe, created over 100 years ago. Or that the design has largely stayed the same, because why mess with a good thing. Or how it became the unofficial sneaker of all your favorite artists and musicians, who each made it their own. Yeah, we could share a lot of stories, but the one that matters most isn’t ours—it’s yours. It’s how and where you take your Chucks. The legacy is long, but what comes next is up to you. We just make the shoe. You make the stories.', 50, 550000, 200, 0, '2020-08-07 00:26:30', '0000-00-00 00:00:00'),
+('PRDCT-0820-002811', 'Converse Chuck Taylor All Star By You', 'converse-chuck-taylor-all-star-by-you', '8', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 1000000, 200, 0, '2020-08-07 00:30:53', '0000-00-00 00:00:00'),
+('PRDCT-0820-003058', 'Converse Chuck Taylor All Star', 'converse-chuck-taylor-all-star', '8', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 500000, 200, 0, '2020-08-07 00:31:41', '0000-00-00 00:00:00'),
+('PRDCT-0820-003415', 'Converse Wordmark Long Sleeve Black', 'converse-wordmark-long-sleeve-black', '6', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 345000, 200, 0, '2020-08-07 00:34:45', '0000-00-00 00:00:00'),
+('PRDCT-0820-003451', 'Converse Wordmark Long Sleeve White', 'converse-wordmark-long-sleeve-white', '6', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 345000, 200, 0, '2020-08-07 00:35:28', '0000-00-00 00:00:00'),
+('PRDCT-0820-003633', 'Converse Chuck Taylor Patch Tee', 'converse-chuck-taylor-patch-tee', '6', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 50, 345000, 200, 0, '2020-08-07 00:36:59', '0000-00-00 00:00:00'),
+('PRDCT-0820-003722', 'Converse Carpenter Crew', 'converse-carpenter-crew', '9', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 44, 356000, 200, 0, '2020-08-07 00:37:43', '2020-09-10 13:35:51'),
+('PRDCT-0820-003802', 'Converse Removeable Hooded Crew', 'converse-removeable-hooded-crew', '9', 'SPL0007', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 44, 500000, 200, 0, '2020-08-07 00:38:25', '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -2539,6 +2578,12 @@ ALTER TABLE `customer_purchase_order_details`
   ADD KEY `purchase_order_id` (`purchase_order_id`,`product_id`,`status_order_id`);
 
 --
+-- Indexes for table `customer_purchase_order_shipping`
+--
+ALTER TABLE `customer_purchase_order_shipping`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `customer_purchase_returns`
 --
 ALTER TABLE `customer_purchase_returns`
@@ -2551,6 +2596,12 @@ ALTER TABLE `customer_purchase_returns`
 ALTER TABLE `customer_purchase_return_details`
   ADD PRIMARY KEY (`id`),
   ADD KEY `purchase_return_id` (`purchase_return_id`,`product_id`,`status_order_id`);
+
+--
+-- Indexes for table `customer_purchase_return_shipping`
+--
+ALTER TABLE `customer_purchase_return_shipping`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `customer_token`
@@ -2864,13 +2915,25 @@ ALTER TABLE `customer_comment_details`
 -- AUTO_INCREMENT for table `customer_purchase_order_details`
 --
 ALTER TABLE `customer_purchase_order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `customer_purchase_order_shipping`
+--
+ALTER TABLE `customer_purchase_order_shipping`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `customer_purchase_return_details`
 --
 ALTER TABLE `customer_purchase_return_details`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `customer_purchase_return_shipping`
+--
+ALTER TABLE `customer_purchase_return_shipping`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `customer_token`
@@ -2882,7 +2945,7 @@ ALTER TABLE `customer_token`
 -- AUTO_INCREMENT for table `customer_wishlists`
 --
 ALTER TABLE `customer_wishlists`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
 
 --
 -- AUTO_INCREMENT for table `dashboards`
