@@ -17,6 +17,12 @@
             <div><?php echo $company_address['street_name'] ?>, <?php echo $company_address['city_name'] ?>, <?php echo $company_address['province'] ?></div>
             <div>Email: <?php echo $company['business_email'] ?></div>
             <div>Phone: <?php echo $company['phone'] ?></div>
+
+            <?php if ($company_bank != null) : ?>
+              <?php foreach ($company_bank as $val) : ?>
+                <div><strong><?php echo $val['bank_name'] ?>: <?php echo $val['account'] ?> (<?php echo $val['account_holder_name'] ?>)</strong></div>
+              <?php endforeach; ?>
+            <?php endif; ?>
           </div>
 
           <div class="col-sm-6">

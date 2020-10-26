@@ -84,6 +84,9 @@
 <!-- Custom JS for its Product -->
 <script src="<?php echo base_url(); ?>front-assets/js/product-shop.js"></script>
 
+<!-- Custom JS for Payment DUe -->
+<script src="<?php echo base_url(); ?>front-assets/js/payment-shop.js"></script>
+
 <!-- Alert auto fade out -->
 <script>
   window.setTimeout(function() {

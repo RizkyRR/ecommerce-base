@@ -243,6 +243,56 @@
         </div>
         <!-- /.box -->
 
+        <!-- SET EMAIL  -->
+        <div class="box box-info">
+          <div class="box-header with-border">
+            <h3 class="box-title">Set Email</h3>
+            <h5 style="color: red;">This email will be used for payment reminders that are sent automatically to customers.</h5>
+          </div>
+
+          <!-- form start -->
+          <form role="form" action="" method="POST" enctype="multipart/form-data" id="set-email">
+            <div class="box-body">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="email_registry">Email*</label>
+
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                      <input type="text" class="form-control" name="email_registry" id="email_registry" placeholder="Enter email">
+                    </div>
+
+                    <span class="help-block"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="password_registry">Password*</label>
+
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                      <input type="password" class="form-control" name="password_registry" id="password_registry" placeholder="Enter password">
+                    </div>
+
+                    <span class="help-block"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+              <button type="submit" class="btn btn-primary btn-submit-email">Submit</button>
+            </div>
+          </form>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+
         <!-- SET DASHBOARDS -->
         <div class="box box-info">
           <div class="box-header with-border">
@@ -277,6 +327,7 @@
     show_social_media();
     show_charge_value();
     show_bank_account();
+    show_email();
 
     // for dashbaord purposes
     show_select_title();
@@ -362,22 +413,6 @@
           minlength: 50
         }
       },
-      messages: {
-        name: {
-          required: true,
-        },
-        email: {
-          required: true,
-        },
-        phone: {
-          required: true,
-          number: true
-        },
-        about: {
-          required: true,
-          minlength: 50
-        }
-      },
     });
 
     var $validatorAddress = $("#company-address").validate({
@@ -443,6 +478,20 @@
         bank_account_holder: {
           required: "Bank account holder's name is required!",
         },
+      },
+    });
+
+    var $validatorSetEmail = $("#set-email").validate({
+      focusInvalid: false,
+      rules: {
+        email_registry: {
+          required: true,
+          email: true,
+          regex: /^\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i
+        },
+        password_registry: {
+          required: true
+        }
       },
     });
 
@@ -987,6 +1036,81 @@
 
             $('.btn-submit-bankaccount').text('Submit'); //change button text
             $('.btn-submit-bankaccount').attr('disabled', false); //set button enable 
+          }
+        });
+      }
+    });
+
+    // SET EMAIL
+    function show_email() {
+      $.ajax({
+        url: "<?php echo base_url(); ?>company/getEmail",
+        type: "GET",
+        dataType: "JSON",
+        success: function(data) {
+          $('#email_registry').val(data.email);
+          $('#password_registry').val(data.password);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          Swal.fire({
+            icon: "error",
+            title: textStatus,
+            showConfirmButton: false,
+            timer: 3000,
+          });
+        },
+      });
+    }
+
+    $(".btn-submit-email").click(function(e) {
+      $('.btn-submit-email').text('Submitting...'); //change button text
+      $('.btn-submit-email').attr('disabled', true); //set button disable 
+
+      var $valid = $("#set-email").valid();
+      if (!$valid) {
+        $(".btn-submit-email").text("Submit"); //change button text
+        $(".btn-submit-email").attr("disabled", false); //set button enable
+        return false;
+      } else {
+        $.ajax({
+          url: '<?php echo base_url(); ?>company/actionSetEmail',
+          type: "POST",
+          data: $('#set-email').serialize(),
+          dataType: "JSON",
+          success: function(data) {
+            if (data.status == 'update') //if success close modal and reload ajax table
+            {
+              Swal.fire({
+                icon: "success",
+                title: 'Charge value has been updated!',
+                showConfirmButton: false,
+                timer: 3000,
+              });
+            } else {
+              Swal.fire({
+                icon: "success",
+                title: 'Charge value has been set!',
+                showConfirmButton: false,
+                timer: 3000,
+              });
+            }
+
+            show_email();
+
+            $('.btn-submit-email').text('Submit'); //change button text
+            $('.btn-submit-email').attr('disabled', false); //set button enable 
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            Swal.fire({
+              icon: "error",
+              title: textStatus,
+              showConfirmButton: false,
+              timer: 3000,
+            });
+
+            $('.btn-submit-email').text('Submit'); //change button text
+            $('.btn-submit-email').attr('disabled', false); //set button enable 
+
           }
         });
       }

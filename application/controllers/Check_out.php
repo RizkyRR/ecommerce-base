@@ -345,6 +345,8 @@ class Check_out extends CI_Controller
         'net_amount' => $this->input->post('check_out_total'),
         'created_date' => date('Y-m-d H:i:s'),
         'status_order_id' => 2,
+        'reminder_payment' => 0,
+        'reminder_cancel' => 0
       ];
 
       $data_order_shipping = [
@@ -366,7 +368,7 @@ class Check_out extends CI_Controller
       // kalo tidak ada maka dikondisikan dengan qty product
       if ($getProduct['qty'] >= $qtyProduct) {
         // store data into purchase order
-        $this->customerPurchase_m->insertPurchaseOrders($data_order);
+        $insert = $this->customerPurchase_m->insertPurchaseOrders($data_order);
 
         // store data into purchase order shipping
         $this->customerPurchase_m->insertPurchaseOrderShipping($data_order_shipping);

@@ -85,7 +85,7 @@ function setShoppingCart(id) {
 						icon: "success",
 						title: "Successfully added to your shopping cart!",
 						showConfirmButton: false,
-						timer: 1500,
+						timer: 5000,
 					});
 				}
 
@@ -94,7 +94,7 @@ function setShoppingCart(id) {
 						icon: "success",
 						title: "Successfully updated from your shopping cart!",
 						showConfirmButton: false,
-						timer: 1500,
+						timer: 5000,
 					});
 				}
 
@@ -129,7 +129,7 @@ function showShoppingCart() {
 				icon: "error",
 				title: textStatus,
 				showConfirmButton: false,
-				timer: 1500,
+				timer: 5000,
 			});
 		},
 	});
@@ -158,7 +158,7 @@ function showDetailCart() {
 				icon: "error",
 				title: "Show detail cart error!",
 				showConfirmButton: false,
-				timer: 1500,
+				timer: 5000,
 			});
 		}, */
 	});
@@ -214,7 +214,7 @@ function getTotal(row = null) {
 			icon: "error",
 			title: "No row, please refresh the page!",
 			showConfirmButton: false,
-			timer: 1500,
+			timer: 5000,
 		});
 	}
 }
@@ -565,14 +565,14 @@ function setDetailButtonCart() {
 								icon: "success",
 								title: "Successfully added to your shopping cart!",
 								showConfirmButton: false,
-								timer: 1500,
+								timer: 5000,
 							});
 						} else if (data.status == "update") {
 							Swal.fire({
 								icon: "success",
 								title: "Successfully updated to your shopping cart!",
 								showConfirmButton: false,
-								timer: 1500,
+								timer: 5000,
 							});
 						}
 
@@ -629,7 +629,7 @@ function deleteShoppingCart(id) {
 						icon: "success",
 						title: "Successfully deleted to your shopping cart!",
 						showConfirmButton: false,
-						timer: 1500,
+						timer: 5000,
 					});
 				} else {
 					Swal.fire({
@@ -637,7 +637,7 @@ function deleteShoppingCart(id) {
 						title:
 							"Unsuccessfully deleted to your shopping cart, please try again!",
 						showConfirmButton: false,
-						timer: 1500,
+						timer: 5000,
 					});
 				}
 

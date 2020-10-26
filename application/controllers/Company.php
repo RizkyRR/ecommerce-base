@@ -428,6 +428,44 @@ class Company extends CI_Controller
     echo json_encode($response);
   }
 
+  // EMAIL PURPOSES 
+  public function getEmail()
+  {
+    $dataEmail = $this->company_m->getEmail(1);
+
+    if ($dataEmail != null) {
+      $data = $dataEmail;
+    } else {
+      $data = [];
+    }
+
+    echo json_encode($data);
+  }
+
+  public function actionSetEmail()
+  {
+    $response = array();
+    $dataEmail = $this->company_m->getEmail(1);
+
+    if ($dataEmail != null) {
+      // update
+      $update = $this->company_m->updateSetEmail(1, ['email' => $this->input->post('email_registry'), 'password' => $this->input->post('password_registry')]);
+
+      if ($update > 0) {
+        $response['status'] = 'update';
+      }
+    } else {
+      // insert
+      $insert = $this->company_m->insertSetEmail(['company_profile_id' => 1, 'email' => $this->input->post('email_registry'), 'password' => $this->input->post('password_registry')]);
+
+      if ($insert > 0) {
+        $response['status'] = 'insert';
+      }
+    }
+
+    echo json_encode($response);
+  }
+
   // DASHBOARD PURPOSES
   public function getAllDashDetail()
   {

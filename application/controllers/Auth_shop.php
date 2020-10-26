@@ -108,7 +108,7 @@ class Auth_shop extends CI_Controller
       $user_token = $this->db->get_where('customer_token', ['token' => $token])->row_array();
 
       if ($user_token) {
-        if (time() - $user_token['created_at'] < (60 * 60 + 24)) {
+        if (time() - $user_token['created_at'] < (60 * 60 * 24)) {
           $this->authShop_m->updateCustomer($email);
           $this->authShop_m->insertAddress($email);
           $this->authShop_m->deleteCustomerToken($email);

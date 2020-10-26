@@ -161,6 +161,9 @@ $route['customer-history-purchase-order'] = 'Customer_purchase/index';
 $route['get-data-customer-purchase'] = 'Customer_purchase/showPurchaseOrder';
 $route['get-detail-customer-purchase/(:any)'] = 'Customer_purchase/detailPurchaseOrder/$1';
 $route['print-customer-purchase/(:any)'] = 'Customer_purchase/printPurchaseOrder/$1';
+$route['get-payment-due'] = 'Customer_reminder/getPaymentDue';
+$route['get-reminder-cancel-from-payment-due'] = 'Customer_reminder/getReminderCancelFromPaymentDue';
+$route['get-reminder-payment'] = 'Customer_reminder/getReminderPayment';
 
 
 $route['customer-history-purchase-return'] = 'Customer_return/index';

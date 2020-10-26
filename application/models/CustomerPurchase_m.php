@@ -19,7 +19,7 @@ class CustomerPurchase_m extends CI_Model
 
     $this->db->group_by('customer_purchase_order_details.purchase_order_id');
 
-    $this->db->where_not_in('customer_purchase_orders.status_order_id', 1);
+    // $this->db->where_not_in('customer_purchase_orders.status_order_id', 1);
     $this->db->where('customer_purchase_orders.customer_email', $email);
 
     $i = 0;
@@ -115,6 +115,7 @@ class CustomerPurchase_m extends CI_Model
   public function insertPurchaseOrders($data)
   {
     $this->db->insert('customer_purchase_orders', $data);
+    return $this->db->insert_id();
   }
 
   public function insertPurchaseOrderShipping($data)
@@ -125,6 +126,148 @@ class CustomerPurchase_m extends CI_Model
   public function insertPurchaseOrderDetails($data)
   {
     $this->db->insert('customer_purchase_order_details', $data);
+  }
+
+  public function getDataPaymentUnpaidByEmail($email)
+  {
+    $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status');
+
+    $this->db->from('customer_purchase_orders');
+    $this->db->join('status_orders', 'status_orders.id = customer_purchase_orders.status_order_id', 'left');
+
+    $this->db->where('status_order_id', 2);
+    $this->db->where('customer_email', $email);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getDataPaymentUnpaid()
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('status_order_id', 2);
+    // $this->db->where('reminder_cancel', 0);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getDataPaymentUnpaidByRows()
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('status_order_id', 2);
+
+    $query = $this->db->get();
+    return $query->num_rows();
+  }
+
+  public function updateDataPaymentUnpaidByID($id, $data)
+  {
+    $this->db->where('id', $id);
+    $this->db->update('customer_purchase_orders', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function getDataPaymentUnsendByEmail($email)
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('reminder_payment', 0);
+    $this->db->where('customer_email', $email);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getDataPaymentUnsend()
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('status_order_id', 2);
+    $this->db->where('reminder_payment', 0);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getDataPaymentUnsendByRows()
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('status_order_id', 2);
+    $this->db->where('reminder_payment', 0);
+
+    $query = $this->db->get();
+    return $query->num_rows();
+  }
+
+  public function updateDataPaymentUnsendByID($id, $data)
+  {
+    $this->db->where('id', $id);
+    $this->db->update('customer_purchase_orders', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function getDataPaymentCancelByEmail($email)
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('reminder_cancel', 0);
+    $this->db->where('status_order_id', 1);
+    $this->db->where('customer_email', $email);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getDataPaymentCancel()
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('reminder_cancel', 0);
+    $this->db->where('status_order_id', 1);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getDataPaymentCancelByRows()
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('reminder_cancel', 0);
+    $this->db->where('status_order_id', 1);
+
+    $query = $this->db->get();
+    return $query->num_rows();
+  }
+
+  public function updateDataPaymentCancelByID($id, $data)
+  {
+    $this->db->where('id', $id);
+    $this->db->update('customer_purchase_orders', $data);
+
+    return $this->db->affected_rows();
   }
 }
   

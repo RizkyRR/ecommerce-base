@@ -157,6 +157,34 @@ class Company_m extends CI_Model
     return $this->db->insert_id();
   }
 
+  // SET EMAIL
+  public function getEmail($id)
+  {
+    $this->db->select('*');
+
+    $this->db->from('company_profile_email');
+
+    $this->db->where('company_profile_id', $id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function insertSetEmail($data)
+  {
+    $this->db->insert('company_profile_email', $data);
+
+    return $this->db->insert_id();
+  }
+
+  public function updateSetEmail($id, $data)
+  {
+    $this->db->where('company_profile_id', $id);
+    $this->db->update('company_profile_email', $data);
+
+    return $this->db->affected_rows();
+  }
+
   // DASHBOARD
   public function getAllDash()
   {

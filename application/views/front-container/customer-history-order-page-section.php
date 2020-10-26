@@ -24,6 +24,15 @@
     </div>
 
     <div class="row">
+      <div class="card-body mb-3">
+        <h5 class="card-title"><i class="fa fa-info-circle" aria-hidden="true"></i> Attention</h5>
+        <p class="card-text">1. Please complete your payment before it's due or less than one day.</p>
+        <p class="card-text">2. After you complete the payment, please include proof of transfer via your email by clicking the "contact admin" button or via our WhatsApp.</p>
+        <a href="#" class="btn btn-sm btn-info"><i class="fa fa-phone" aria-hidden="true"></i> Contact admin</a>
+      </div>
+    </div>
+
+    <div class="row">
 
       <div class="table-responsive">
         <table class="table" id="table-data-purchase-order">
@@ -51,62 +60,3 @@
 </div>
 </section>
 <!-- Main content from side menu customer section end -->
-
-<script>
-  $(document).ready(function() {
-    table = $('#table-data-purchase-order').DataTable({
-      "processing": true,
-      "serverSide": true,
-      "ajax": {
-        "url": "<?= base_url(); ?>get-data-customer-purchase",
-        "type": "POST"
-      },
-      dom: 'Bfrtip',
-      "columnDefs": [{
-        "targets": [0, 3, 4, 6],
-        "orderable": false,
-        "searchable": false
-      }],
-      'order': []
-    });
-  });
-
-  function deleteReview(id) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Delete'
-    }).then((result) => {
-      if (result.value) {
-        $.ajax({
-          url: '<?php echo base_url() ?>delete-comment-review/' + id,
-          type: 'POST',
-          dataType: 'JSON',
-          success: function(data) {
-            if (data.status == true) {
-              Swal.fire({
-                icon: "success",
-                title: "Successfully deleted your comment!",
-                showConfirmButton: false,
-                timer: 5000,
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Failed deleted your comment, please try again!",
-                showConfirmButton: false,
-                timer: 5000,
-              });
-            }
-
-            table.ajax.reload(null, false);
-          }
-        });
-      }
-    });
-  }
-</script>
