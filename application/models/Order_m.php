@@ -5,28 +5,29 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Order_m extends CI_Model
 {
   // DataTables Model Setup
-
-  var $column_order = array(null, 'id', 'customer_name', 'customer_phone', 'order_date', null, 'paid_status', null, null); //set column field database for datatable orderable 
-
-  var $column_search = array('id', 'customer_name', 'customer_phone', 'order_date', 'paid_status', 'user_create', 'user_update'); //set column field database for datatable searchable
-
-  var $order = array('order_date' => 'desc');  // default order
+  var $column_order = array(null, 'customer_purchase_orders.id', 'customer_purchase_orders.invoice_order', 'customer_purchase_orders.created_date', null, null, 'status_orders.status_name', null); //set column field database for datatable orderable 
+  var $column_search = array('customer_purchase_orders.id', 'customer_purchase_orders.invoice_order', 'customer_purchase_orders.created_date', 'status_orders.status_name'); //set column field database for datatable searchable
+  var $order = array('customer_purchase_orders.created_date' => 'desc');  // default order
 
   private function _get_datatables_query()
   {
-    $this->db->select('*, COUNT(order_id) as total');
-    $this->db->from('orders');
-    $this->db->join('order_details', 'order_details.order_id = orders.id');
-    $this->db->group_by('order_id');
+    $this->db->select('*, SUM(customer_purchase_order_details.qty) as total_product, customer_purchase_orders.id AS id_order, customer_purchase_order_details.id AS id_order_detail, status_orders.id AS id_status, customer_purchase_orders.status_order_id AS status_order, customer_purchase_order_details.status_order_id AS status_order_detail');
+
+    $this->db->from('customer_purchase_orders');
+    $this->db->join('customer_purchase_order_details', 'customer_purchase_order_details.purchase_order_id = customer_purchase_orders.id', 'left');
+    $this->db->join('status_orders', 'status_orders.id = customer_purchase_orders.status_order_id', 'left');
+    $this->db->join('customers', 'customers.customer_email = customer_purchase_orders.customer_email', 'left');
+
+    $this->db->group_by('customer_purchase_order_details.purchase_order_id');
 
     $i = 0;
-    foreach ($this->column_search as $order) { // loop column
+    foreach ($this->column_search as $purchase) { // loop column
       if (@$_POST['search']['value']) { // if datatable send POST for search
         if ($i === 0) { // first loop
           $this->db->group_start(); // open bracket. query Where with OR clause better with bracket. because maybe can combine with other WHERE with AND.
-          $this->db->like($order, $_POST['search']['value']);
+          $this->db->like($purchase, $_POST['search']['value']);
         } else {
-          $this->db->or_like($order, $_POST['search']['value']);
+          $this->db->or_like($purchase, $_POST['search']['value']);
         }
         if (count($this->column_search) - 1 == $i) //last loop
           $this->db->group_end(); //close bracket
@@ -60,10 +61,170 @@ class Order_m extends CI_Model
 
   function count_all()
   {
-    $this->db->from('orders');
+    $this->db->from('customer_purchase_orders');
     return $this->db->count_all_results();
   }
   // DataTables Model End Setup
+
+  // Check order in order_approve AND FOR APPROVAL PURPOSES
+  public function getCheckPurchaseOrderPending($order_id)
+  {
+    $this->db->select('*');
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('id', $order_id);
+    $this->db->where('status_order_id', 2);
+
+    $query = $this->db->get();
+
+    if ($query->num_rows() > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public function getCheckPurchaseOrderApproved($order_id)
+  {
+    $this->db->select('*');
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('id', $order_id);
+    $this->db->where('status_order_id = 3');
+
+    $query = $this->db->get();
+
+    if ($query->num_rows() > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public function getCheckPurchaseOrderCancel($order_id)
+  {
+    $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status');
+
+    $this->db->from('customer_purchase_orders');
+    $this->db->join('status_orders', 'status_orders.id = customer_purchase_orders.status_order_id', 'left');
+
+    $this->db->where('customer_purchase_orders.id', $order_id);
+    $this->db->where('status_order_id = 2 OR status_order_id = 3');
+
+    $query = $this->db->get();
+
+    if ($query->num_rows() > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public function getCheckPurchaseOrderOnProcess($order_id)
+  {
+    $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status');
+
+    $this->db->from('customer_purchase_orders');
+    $this->db->join('status_orders', 'status_orders.id = customer_purchase_orders.status_order_id', 'left');
+
+    $this->db->where('customer_purchase_orders.id', $order_id);
+    $this->db->where('status_order_id', 3);
+
+    $query = $this->db->get();
+
+    if ($query->num_rows() > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public function getPurchaseOrderForApprove($order_id)
+  {
+    $this->db->select('*, customer_purchase_orders.id AS id_order, customer_purchase_order_shipping.id AS id_order_shipping, customers.customer_email AS email');
+
+    $this->db->from('customer_purchase_orders');
+    $this->db->join('customer_purchase_order_shipping', 'customer_purchase_order_shipping.purchase_order_id = customer_purchase_orders.id', 'left');
+    $this->db->join('customers', 'customers.customer_email = customer_purchase_orders.customer_email', 'left');
+
+    $this->db->where('customer_purchase_orders.id', $order_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function getPurchaseOrderApproved($order_id)
+  {
+    $this->db->select('*, customer_purchase_orders.id AS id_order, customer_purchase_order_shipping.id AS id_order_shipping, customer_purchase_order_approves.id AS id_order_approves, customers.customer_email AS email');
+
+    $this->db->from('customer_purchase_orders');
+    $this->db->join('customer_purchase_order_shipping', 'customer_purchase_order_shipping.purchase_order_id = customer_purchase_orders.id', 'left');
+    $this->db->join('customer_purchase_order_approves', 'customer_purchase_order_approves.purchase_order_id = customer_purchase_orders.id', 'left');
+    $this->db->join('customers', 'customers.customer_email = customer_purchase_orders.customer_email', 'left');
+
+    $this->db->where('customer_purchase_orders.id', $order_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function insertPaymentApprove($data)
+  {
+    $this->db->insert('customer_purchase_order_approves', $data);
+    return $this->db->insert_id();
+  }
+
+  public function updatePurchaseOrderApprove($order_id, $data)
+  {
+    $this->db->where('purchase_order_id', $order_id);
+    $this->db->update('customer_purchase_order_approves', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function updatePurchaseOrderFromApprove($order_id, $data)
+  {
+    $this->db->where('id', $order_id);
+    $this->db->update('customer_purchase_orders', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function updatePurchaseOrderShipping($order_id, $data)
+  {
+    $this->db->where('purchase_order_id', $order_id);
+    $this->db->update('customer_purchase_order_shipping', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function getPurchaseOrderDetail($order_id)
+  {
+    $this->db->select('*, customer_purchase_order_details.id AS id_order_detail, products.id AS id_product, customer_purchase_order_details.qty AS qty_order_detail, products.qty AS qty_product');
+
+    $this->db->from('customer_purchase_order_details');
+    $this->db->join('products', 'products.id = customer_purchase_order_details.product_id', 'left');
+
+    $this->db->where('customer_purchase_order_details.purchase_order_id', $order_id);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+  // Check order in order_approve AND FOR APPROVAL PURPOSES
+
+  // CANCEL PAYMENT 
+  public function getCheckPaymentApprovedByID($order_id)
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_order_approves');
+
+    $this->db->where('purchase_order_id', $order_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+  // CANCEL PAYMENT
 
   public function getPiutangCountPage()
   {

@@ -388,20 +388,19 @@ class Check_out extends CI_Controller
           $this->customerPurchase_m->insertPurchaseOrderDetails($data_order_detail);
 
           // Update product to decrease stock after doing new order especially in products
-          $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
+          /* $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
           $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
 
           $update_product = array(
             'qty' => $qty
           );
 
-          $this->product_m->update($this->input->post('product_id')[$i], $update_product);
+          $this->product_m->update($this->input->post('product_id')[$i], $update_product); */
         }
 
         $this->customerCart_m->deleteCart($email, null);
 
         $response['status'] = true;
-        $response['qty'] = $qty;
         $response['message'] = 'Your order has been added, please make a payment immediately!';
         // redirect('order', 'refresh');
       } else {

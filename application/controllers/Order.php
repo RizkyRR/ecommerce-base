@@ -21,22 +21,21 @@ class Order extends CI_Controller
 
     $company = $this->company_m->getCompanyById(1);
     $info['company_data'] = $company;
-    $info['is_vat_enabled'] = ($company['vat_charge_value'] > 0) ? true : false;
-    $info['is_service_enabled'] = ($company['service_charge_value'] > 0) ? true : false;
 
-    // $info['product'] = $this->product_m->getActiveProduct();
+    $info['user'] = $this->auth_m->getUserSession();
+    $info['company'] = $this->company_m->getCompanyById(1);
+    $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
 
-
-    // $info[] = $this->load->view('modals/modal-order', $info);
-    renderBackTemplate('orders/index', $info);
-
-    $this->load->view('modals/modal-order-edit', $info);
-    $this->load->view('modals/modal-repayment-order');
+    $this->load->view('back-templates/header', $info);
+    $this->load->view('back-templates/topbar', $info);
+    $this->load->view('back-templates/navbar', $info);
+    $this->load->view('orders/index', $info);
+    $this->load->view('modals/modal-payment-approve', $info);
     $this->load->view('modals/modal-delete');
+    $this->load->view('back-templates/footer', $info);
   }
 
   // DataTables Controller Setup
-
   function show_ajax_order()
   {
     $list = $this->order_m->get_datatables();
@@ -44,274 +43,373 @@ class Order extends CI_Controller
     $no = @$_POST['start'];
     foreach ($list as $item) {
       $no++;
-      $id = htmlspecialchars(json_encode($item->id));
+      $id = htmlspecialchars(json_encode($item->id_order));
       $row = array();
       $row[] = $no . ".";
-      $row[] = $item->id;
+      $row[] = $item->invoice_order;
+      $row[] = $item->customer_email;
       $row[] = $item->customer_name;
-      $row[] = $item->customer_phone;
-      $row[] = date('d M Y', strtotime($item->order_date));
-      $row[] = $item->total;
+      $row[] = date('d M Y H:i:s', strtotime($item->created_date));
+      $row[] = $item->total_product;
       $row[] = "Rp " . number_format($item->net_amount, 0, ',', '.');
-      $row[] = $item->paid_status;
-      if ($this->session->userdata('role_id') == 'tOBawuCPBAhAZzmyT10F1UbCIc7I42OwLBRmnRhS8e8=') {
-        $row[] = $item->user_create;
+      $row[] = '<span class="label label-' . $item->status_color . '">' . $item->status_name . '</span>';
+
+      // CHECKING ORDER APPROVE
+      $checkOrderPending = $this->order_m->getCheckPurchaseOrderPending($item->id_order);
+
+      if ($checkOrderPending == true) {
+        $btnApprovePayment = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="payment_approve(' . $id . ')" title="approve payment"><i class="fa fa-check" aria-hidden="true"></i> Approve Payment</a> ';
+      } else {
+        $btnApprovePayment = '';
       }
 
-      if ($item->paid_status == "Belum Lunas") {
-        $paid_status = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="repayment_order(' . $id . ')" title="repayment data"><i class="fa fa-usd"></i> Repayment</a>';
+      // CONDITION FOR SHOW UPDATE BUTTON 
+      $checkOrderApproved = $this->order_m->getCheckPurchaseOrderApproved($item->id_order);
+
+      if ($checkOrderApproved == true) {
+        $btnUpdatePayment = '<a href="javascript:void(0)" class="btn btn-warning btn-xs" onclick="update_approve(' . $id . ')" title="update approvement"><i class="fa fa-check" aria-hidden="true"></i> Update Approvement</a> ';
       } else {
-        $paid_status = '';
+        $btnUpdatePayment = '';
+      }
+
+      // CONDITION FOR SHOW CANCEL BUTTON 
+      $checkStatusOrer = $this->order_m->getCheckPurchaseOrderCancel($item->id_order);
+
+      if ($checkStatusOrer == true) {
+        $btnOrerCancel = '<a href="javascript:void(0)" onclick="cancel_order(' . $id . ')" class="btn btn-danger btn-xs" id="btnCancelOrder" title="cancel order"><i class="fa fa-trash-o"></i> Cancel Order</a> ';
+      } else {
+        $btnOrerCancel = '';
+      }
+
+      // CONDITION FOR COMPLETE THE ORDER 
+      $checkStatusOrer = $this->order_m->getCheckPurchaseOrderOnProcess($item->id_order);
+
+      if ($checkStatusOrer == true) {
+        $btnOrerComplete = '<a href="javascript:void(0)" onclick="complete_order(' . $id . ')" class="btn btn-success btn-xs" id="btnCompleteOrder" title="complete order"><i class="fa fa-cart-arrow-down"></i> Complete Order</a> ';
+      } else {
+        $btnOrerComplete = '';
       }
 
       // add html for action
-      $row[] =
-        '' . $paid_status . '
-        <a href="javascript:void(0)" class="btn btn-warning btn-xs" onclick="edit_order(' . $id . ')" title="edit data"><i class="fa fa-pencil"></i> Update</a>
-        <a href="javascript:void(0)" onclick="delete_order(' . $id . ')" class="btn btn-danger btn-xs" title="delete data"><i class="fa fa-trash-o"></i> Delete</a>
-        <a target="__blank" href="' . base_url('order/print_order/' . $item->id) . '" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a>
-      ';
+      $row[] = '<input type="hidden" name="email_customer" id="email_customer" value="' . $item->customer_email . '" readonly><a href="" class="btn btn-info btn-xs" title="detail order"><i class="fa fa-info" aria-hidden="true"></i> Info</a> ' .
+
+        $btnApprovePayment .
+
+        $btnUpdatePayment .
+
+        $btnOrerCancel .
+
+        $btnOrerComplete .
+
+        '<a target="__blank" href="' . base_url('order/print_order/' . $item->id) . '" class="btn btn-default btn-xs" title="print order"><i class="fa fa-print"></i> Print</a>';
+
       $data[] = $row;
     }
+
     $output = array(
       "draw" => @$_POST['draw'],
       "recordsTotal" => $this->order_m->count_all(),
       "recordsFiltered" => $this->order_m->count_filtered(),
       "data" => $data,
     );
+
     // output to json format
     echo json_encode($output);
   }
-
   // DataTables Cntroller End Setup
 
-  public function getTableProductRow()
+  // FOR PAYMENT APPROVAL 
+  public function getPurchaseOrderForApprove()
   {
-    $data = $this->product_m->getActiveProduct();
-    echo json_encode($data);
+    $order_id = $this->input->post('order_id');
+
+    $dataPurchaseOrderForApprove = $this->order_m->getPurchaseOrderForApprove($order_id);
+    echo json_encode($dataPurchaseOrderForApprove);
   }
 
-  public function getProduct()
+  public function getUpdatePurchaseOrderForApprove()
   {
-    $data = $this->category_m->getAllCategory();
-    echo json_encode($data);
+    $order_id = $this->input->post('order_id');
+
+    $dataPurchaseOrderApproved = $this->order_m->getPurchaseOrderApproved($order_id);
+    echo json_encode($dataPurchaseOrderApproved);
   }
 
-  public function getProductValueById()
+  private function _uploadResizeImage()
   {
-    $product_id = $this->input->post('product_id');
-    if ($product_id) {
-      $data = $this->product_m->getActiveProductByID($product_id);
-      echo json_encode($data);
-    }
-  }
+    $config['upload_path']    = './image/customer_payment/';
+    $config['allowed_types']  = 'gif|jpg|png';
+    $config['max_size']       = '1024';
+    $config['maintain_ratio'] = TRUE;
+    $config['quality'] = '90%';
+    $config['encrypt_name'] = TRUE; // md5(uniqid(mt_rand())).$this->file_ext;
 
-  public function create_code()
-  {
-    $this->db->select('RIGHT(orders.id,4) as kode', FALSE);
-    $this->db->order_by('id', 'DESC');
-    $this->db->limit(1);
+    $this->load->library('upload', $config);
 
-    $query = $this->db->get('orders');      //cek dulu apakah ada sudah ada kode di tabel.    
-
-    if ($query->num_rows() <> 0) {
-      //jika kode ternyata sudah ada.      
-      $data = $query->row();
-      $kode = intval($data->kode) + 1;
+    if ($this->upload->do_upload('image')) {
+      return $this->upload->data('file_name');
     } else {
-      //jika kode belum ada      
-      $kode = 1;
+      return $this->upload->display_errors();
     }
-
-    $max_code = str_pad($kode, 4, "0", STR_PAD_LEFT); // angka 4 menunjukkan jumlah digit angka 0
-    $generate = "ORDER" . $max_code;
-
-    // return $generate;
-    echo json_encode($generate);
   }
 
-  public function addOrder()
+  private function _uploadUpdateResizeImage()
   {
-    $info['title'] = "Add New Order";
+    $config['upload_path']    = './image/customer_payment/';
+    $config['allowed_types']  = 'gif|jpg|png';
+    $config['max_size']       = '1024';
+    $config['maintain_ratio'] = TRUE;
+    $config['quality'] = '90%';
+    $config['encrypt_name'] = TRUE; // md5(uniqid(mt_rand())).$this->file_ext;
 
-    date_default_timezone_set('Asia/Jakarta');
+    $this->load->library('upload', $config);
 
-    $company = $this->company_m->getCompanyById(1);
-    $info['company_data'] = $company;
-    $info['is_vat_enabled'] = ($company['vat_charge_value'] > 0) ? true : false;
-    $info['is_service_enabled'] = ($company['service_charge_value'] > 0) ? true : false;
+    if ($this->upload->do_upload('image_new')) {
+      return $this->upload->data('file_name');
+    } else {
+      return $this->upload->display_errors();
+    }
+  }
 
-    $order_date = $this->input->post('order_date', true);
+  private function _setDecreaseStockProduct($order_id)
+  {
+    $dataPurchaseOrderDetail = $this->order_m->getPurchaseOrderDetail($order_id);
 
-    $this->form_validation->set_rules('c_name', 'customer name', 'trim|required|min_length[5]');
-    $this->form_validation->set_rules('c_phone', 'phone number', 'trim|required|min_length[7]|max_length[12]|numeric');
-    $this->form_validation->set_rules('c_bankname', 'bank name', 'trim|min_length[2]');
-    $this->form_validation->set_rules('c_norek', 'nomor rekening', 'trim|numeric|min_length[5]');
+    if ($dataPurchaseOrderDetail != null) {
+      foreach ($dataPurchaseOrderDetail as $val) {
+        $getProductID = $val['id_product'];
+        $getQtyOrder = $val['qty_order_detail'];
+        $getQtyProduct = $val['qty_product'];
 
-    $this->form_validation->set_rules('c_address', 'address', 'trim|required|min_length[5]');
-    $this->form_validation->set_rules('order_date', 'order date', 'required');
+        // $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
+        // $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
+        $qty = (int) $getQtyProduct - (int) $getQtyOrder;
 
-    $this->form_validation->set_rules('product[]', 'product', 'trim|required');
+        $update_product = array(
+          'qty' => $qty
+        );
 
-    // PIUTANG ORDER LOGIC
-    if ($this->input->post('net_amount_value', true) > $this->input->post('amount_paid', true)) {
-      $paid_info = "Belum Lunas";
+        $this->product_m->update($getProductID, $update_product);
+      }
+    }
+  }
 
-      $piutang_id = "PIUTANG" . "-";
-      $custom_piutang_id = $piutang_id . date('His') . date("m") . date('y');
+  public function setPurchaseOrderForApprove()
+  {
+    $response = array();
+    $order_id = $this->input->post('order_id');
 
-      $remaining_paid = abs((int) $this->input->post('net_amount_value', true) - (int) $this->input->post('amount_paid', true));
+    $this->form_validation->set_rules('airwaybill_number', 'Airwaybill number can not be empty', 'trim|required');
 
-      $data_piutang = [
-        'piutang_id' => $custom_piutang_id,
-        'order_id' => $this->input->post('id'),
-        'piutang_paid_history' => $order_date,
-        'amount_paid' => $this->input->post('amount_paid', true),
-        'remaining_paid' => $remaining_paid,
-        'user_create' => $this->session->userdata('email'),
+    if ($this->form_validation->run() == TRUE) {
+      $dataPurchaseOrder = [
+        'status_order_id' => 3,
+        'reminder_cancel' => 1
       ];
 
-      $this->order_m->insertPiutang($data_piutang);
+      $dataApproval = [
+        'purchase_order_id' => $order_id,
+        'approve_date' => date('Y-m-d H:i:s'),
+        'image' => $this->_uploadResizeImage(),
+        'responsible_admin' => $this->session->userdata('email'),
+      ];
+
+      $dataShippingOrder = [
+        'delivery_receipt_number' => $this->input->post('airwaybill_number')
+      ];
+
+      $insert = $this->order_m->insertPaymentApprove($dataApproval);
+
+      if ($insert > 0) {
+        // update purchase order
+        $this->order_m->updatePurchaseOrderFromApprove($order_id, $dataPurchaseOrder);
+
+        // update purchase order shipping
+        $this->order_m->updatePurchaseOrderShipping($order_id, $dataShippingOrder);
+
+        // space for decrease stock from product stock
+        $this->_setDecreaseStockProduct($order_id);
+
+        $response['status'] = TRUE;
+        $response['message'] = 'Payment has been approved!';
+      } else {
+        $response['status'] = FALSE;
+        $response['message'] = 'Failed to accept payment!';
+      }
     } else {
-      $paid_info = "Lunas";
+      $response['status'] = FALSE;
+      $response['message'] = validation_errors();
     }
 
-    $file = [
-      'id' => $this->input->post('id'),
-      'customer_name' => $this->input->post('c_name', true),
-      'customer_phone' => $this->input->post('c_phone', true),
-      'bank_name' => $this->input->post('c_bankname', true),
-      'no_rek' => $this->input->post('c_norek', true),
-      'customer_address' => $this->input->post('c_address', true),
-      'order_date' => $order_date,
-      'gross_amount' => $this->input->post('gross_amount_value', true),
-      'ship_amount' => $this->input->post('ship_amount', true),
-      'service_charge_rate' => $this->input->post('service_charge_rate', true),
-      'service_charge' => ($this->input->post('service_charge_value') > 0) ? $this->input->post('service_charge_value') : 0,
-      'vat_charge_rate' => $this->input->post('vat_charge_rate', true),
-      'vat_charge' => ($this->input->post('vat_charge_value') > 0) ? $this->input->post('vat_charge_value') : 0,
-      'net_amount' => $this->input->post('net_amount_value', true),
-      'discount' => $this->input->post('discount', true),
-      'after_discount' => $this->input->post('after_discount', true),
-      'paid_status' => $paid_info,
-      'created_at' => date('Y-m-d H:i:s'),
-      'user_create' => $this->session->userdata('email')
-    ];
+    echo json_encode($response);
+  }
 
-    if ($this->form_validation->run() == FALSE) {
-      renderBackTemplate('orders/add-order', $info);
-    } else {
-      $count_product = count($this->input->post('product'));
-      for ($j = 0; $j < $count_product; $j++) {
-        $getProduct = $this->product_m->getProductById($this->input->post('product')[$j]);
-        $qtyProduct = $this->input->post('qty')[$j];
+  public function updatePurchaseOrderForApprove()
+  {
+    $response = array();
+    $order_id = $this->input->post('order_id');
+
+    $this->form_validation->set_rules('airwaybill_number', 'Airwaybill number can not be empty', 'trim|required');
+
+    if ($this->form_validation->run() == TRUE) {
+      if (empty($_FILES['image_new']['name'])) {
+        $data = [
+          'responsible_admin' => $this->session->userdata('email')
+        ];
+      } else {
+        $data = [
+          'image' => $this->_uploadUpdateResizeImage(),
+          'responsible_admin' => $this->session->userdata('email')
+        ];
+
+        @unlink('./image/customer_payment/' . $this->input->post('old_image'));
       }
 
-      if ($getProduct['qty'] >= $qtyProduct) {
-        $this->order_m->insertOrders($file);
+      $dataShippingOrder = [
+        'delivery_receipt_number' => $this->input->post('airwaybill_number')
+      ];
 
-        // Store to sales_order_details
-        for ($i = 0; $i < $count_product; $i++) {
-          $products = array(
-            'order_id' => $this->input->post('id'),
-            'product_id' => $this->input->post('product')[$i],
-            'qty' => $this->input->post('qty')[$i],
-            'unit_price' => $this->input->post('price_value')[$i],
-            'amount' => $this->input->post('amount_value')[$i]
-          );
+      $updateShipping = $this->order_m->updatePurchaseOrderShipping($order_id, $dataShippingOrder);
 
-          $this->order_m->insertOrderDetails($products);
+      $updateApproves = $this->order_m->updatePurchaseOrderApprove($order_id, $data);
 
-          // Update product to decrease stock after doing new order 
-          $data_product = $this->product_m->getProductById($this->input->post('product')[$i]);
-          $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
+      if ($updateApproves > 0 || $updateShipping > 0) {
+        $response['status'] = TRUE;
+        $response['message'] = 'Payment approve has been updated!';
+      } else {
+        $response['status'] = FALSE;
+        $response['message'] = 'There is something wrong, please update again!';
+      }
+    } else {
+      $response['status'] = FALSE;
+      $response['message'] = validation_errors();
+    }
+
+    echo json_encode($response);
+  }
+  // FOR PAYMENT APPROVAL 
+
+  // FOR CANCEL PAYMENT BY ADMIN
+  private function _sendEmail($type, $data)
+  {
+    $dataEmail = $this->company_m->getEmail(1);
+
+    $config = [
+      'protocol' => 'smtp',
+      'smtp_host' => 'ssl://smtp.googlemail.com',
+      'smtp_user' => $dataEmail['email'],
+      'smtp_pass' => $dataEmail['password'],
+      'smtp_port' => 465,
+      'mailtype' => 'html',
+      'charset' => 'utf-8',
+      'newline' => "\r\n"
+    ];
+
+    $this->load->library('email', $config);
+    $this->email->initialize($config);
+
+    $this->email->from($dataEmail['email'], $data['company_name']);
+    $this->email->to($data['customer_email']);
+
+    if ($type == 'complete') {
+      $this->email->subject('Pembayaran_' . $data['invoice_order'] . '_Telah_Selesai_Oleh_Admin');
+      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->set_mailtype("html");
+    } else if ($type == 'cancel') {
+      $this->email->subject('Pembatalan_Pesanan_' . $data['invoice_order'] . '_Oleh_Admin');
+      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->set_mailtype("html");
+    }
+
+    if ($this->email->send()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  public function cancelPayment()
+  {
+    $response = array();
+    $email = $this->input->post('email');
+    $order_id = $this->input->post('order_id');
+
+    // JIKA TERDETEKSI CANCEL SUDAH MEMBAYAR MAKA ADA KONDISI DIMANA STOCK BARANG DIKEMBALIKAN
+    $checkPaymentApproved = $this->order_m->getCheckPaymentApprovedByID($order_id);
+
+    if ($checkPaymentApproved != null) {
+      $data = [
+        'status_order_id' => 10,
+        'reminder_cancel' => 1
+      ];
+
+      $updatePaymentDue = $this->customerPurchase_m->updateDataPaymentUnpaidByID($order_id, $data);
+
+      if ($updatePaymentDue > 0) {
+        $response['status'] = true;
+        $response['message'] = 'Successfully canceled the order ' . $order_id . ' and, please confirm the refund!';
+      } else {
+        $response['status'] = false;
+        $response['message'] = 'Sorry, there was an error regarding the cancel order!';
+      }
+
+      $dataPurchaseOrderDetail = $this->order_m->getPurchaseOrderDetail($order_id);
+
+      if ($dataPurchaseOrderDetail != null) {
+        foreach ($dataPurchaseOrderDetail as $val) {
+          $getProductID = $val['id_product'];
+          $getQtyOrder = $val['qty_order_detail'];
+          $getQtyProduct = $val['qty_product'];
+
+          // $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
+          // $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
+          $qty = (int) $getQtyProduct + (int) $getQtyOrder;
 
           $update_product = array(
             'qty' => $qty
           );
 
-          $this->product_m->update($this->input->post('product')[$i], $update_product);
+          $this->product_m->update($getProductID, $update_product);
         }
+      }
+    } else {
+      $data = [
+        'status_order_id' => 1,
+        'reminder_cancel' => 1
+      ];
 
-        $this->session->set_flashdata('success', 'Your order has been added !');
-        redirect('order', 'refresh');
+      $updatePaymentDue = $this->customerPurchase_m->updateDataPaymentUnpaidByID($order_id, $data);
+
+      if ($updatePaymentDue > 0) {
+        $response['status'] = true;
+        $response['message'] = 'Successfully canceled the order ' . $order_id;
       } else {
-        $this->session->set_flashdata('error', 'Your quantity of ' . $getProduct['product_name'] . ' is limited !');
-        redirect('orders/addorder', 'refresh');
+        $response['status'] = false;
+        $response['message'] = 'Sorry, there was an error regarding the cancel order!';
       }
     }
+
+    // email purposes
+    $dataCompany = $this->company_m->getCompanyById(1);
+    $info['company'] = $dataCompany;
+    $info['company_name'] = $dataCompany['company_name'];
+    $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+    $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+
+    $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
+    $info['data_order'] = $dataOrder;
+    $info['invoice_order'] = $dataOrder['invoice_order'];
+    $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+    $info['customer_email'] = $dataCustomer['email'];
+    $info['customer'] = $dataCustomer;
+    $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($order_id);
+
+    $this->_sendEmail('cancel', $info);
+    // email purposes
+
+    echo json_encode($response);
   }
-
-  /* public function add_order()
-  {
-    date_default_timezone_set('Asia/Jakarta');
-
-    $rules = [
-      [
-        'field' => 'name',
-        'label' => 'product name',
-        'rules' => 'trim|required|min_length[3]'
-      ],
-      [
-        'field' => 'category',
-        'label' => 'product category',
-        'rules' => 'trim|required'
-      ],
-      [
-        'field' => 'supplier',
-        'label' => 'product supplier',
-        'rules' => 'trim|required'
-      ],
-      [
-        'field' => 'description',
-        'label' => 'product description',
-        'rules' => 'trim|required|min_length[15]'
-      ],
-      [
-        'field' => 'price',
-        'label' => 'product price',
-        'rules' => 'trim|required|numeric'
-      ]
-    ];
-    $this->form_validation->set_rules($rules);
-    $this->form_validation->set_message('required', '{field} tidak boleh kosong');
-
-    if ($this->form_validation->run() == FALSE) {
-      $data = [
-        'name' => form_error('name'),
-        'category' => form_error('category'),
-        'supplier' => form_error('supplier'),
-        'image' => form_error('image'),
-        'description' => form_error('description'),
-        'price' => form_error('price')
-      ];
-
-      echo json_encode($data);
-    } else {
-
-      $data = [
-        'id' => $this->input->post('id'),
-        'product_name' => $this->input->post('name', true),
-        'category_id' => $this->input->post('category', true),
-        'supplier_id' => $this->input->post('supplier', true),
-        'description' => $this->input->post('description', true),
-        'price' => $this->input->post('price', true),
-        'qty' => 0,
-        'availability' => 0,
-        'created_at' => date('Y-m-d H:i:s')
-      ];
-
-      $this->order_m->insert($data);
-
-      echo json_encode('success');
-    }
-  } */
-
-  public function edit_order($id)
-  {
-    $data = $this->order_m->getOrdersById($id);
-    echo json_encode($data);
-  }
+  // FOR CANCEL PAYMENT BY ADMIN
 
   public function detail_order($id)
   {

@@ -196,6 +196,7 @@
   $(document).ready(function() {
     $('#btnCancelPayment').on("click", function(e) {
       var order_id = $('#order_id').val();
+      $("#btnCancelPayment").prop("disabled", true); //set button disable
 
       Swal.fire({
         icon: 'warning',
@@ -207,6 +208,8 @@
         confirmButtonText: 'Cancel Payment'
       }).then((result) => {
         if (result.value) {
+          $("#btnCancelPayment").hide(); //set button disable
+
           $.ajax({
             url: '<?php echo base_url() ?>customer_purchase/cancelPayment',
             type: 'POST',
@@ -223,7 +226,8 @@
                   timer: 5000,
                 });
 
-                window.location.href = "<?php echo base_url() ?>customer-history-purchase-order";
+                window.location.reload(false);
+                // window.location.href = "<?php echo base_url() ?>customer-history-purchase-order";
               } else {
                 Swal.fire({
                   icon: "error",
@@ -231,6 +235,9 @@
                   showConfirmButton: false,
                   timer: 5000,
                 });
+
+                $("#btnCancelPayment").show();
+                $("#btnCancelPayment").prop("disabled", false); //set button disable
               }
             }
           })

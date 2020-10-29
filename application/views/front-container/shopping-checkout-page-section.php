@@ -112,11 +112,6 @@
 <!-- Shopping Cart Section End -->
 
 <script>
-  $(document).ready(function() {
-
-
-  });
-
   getInfoFullAddress();
 
   function getInfoFullAddress() {

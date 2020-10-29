@@ -56,18 +56,50 @@ class Customer_reminder extends CI_Controller
 
     $dataPayment = $this->customerPurchase_m->getDataPaymentUnpaid();
 
+    /* $countRow = count($dataPayment);
+
+    for ($i = 0; $i < $countRow; $i++) {
+
+      if ($dataPayment != null) {
+        foreach ($dataPayment as $val) {
+          $getOrderID = $val['id'];
+          $email = $val['customer_email'];
+          $getPurchaseTime = $val['purchase_order_date'];
+
+          if (time() - $getPurchaseTime[$i] > (60 * 60 * 24)) {
+            $data = [
+              'status_order_id' => 1,
+            ];
+
+            $this->customerPurchase_m->updateDataPaymentUnpaidByID($getOrderID, $data);
+          }
+        }
+      }
+    } */
+
+    /* if(time() - strtotime("2010-06-19 09:39:23") > 60*60*24) {
+      // timestamp is older than one day
+    } */
+
+
     if ($dataPayment != null) {
       foreach ($dataPayment as $val) {
         $getOrderID = $val['id'];
-        $email = $val['customer_email'];
-        $getPurchaseTime = $val['purchase_order_date'];
 
-        if (time() - $getPurchaseTime > (60 * 60 * 24)) {
-          $data = [
-            'status_order_id' => 1,
-          ];
+        $countRow = count($dataPayment);
 
-          $this->customerPurchase_m->updateDataPaymentUnpaidByID($getOrderID, $data);
+        for ($i = 0; $i < $countRow; $i++) {
+          $order = $this->db->get_where('customer_purchase_orders', ['id' => $getOrderID])->row_array();
+
+          if (time() - $order['purchase_order_date'] > (60 * 60 * 24)) { // SELECT * FROM my_table WHERE timestamp < NOW() - INTERVAL 1 DAY;
+            $data = [
+              'status_order_id' => 1,
+            ];
+
+            $this->customerPurchase_m->updateDataPaymentUnpaidByID($getOrderID[$i], $data);
+          } else {
+            return false;
+          }
         }
       }
     }
@@ -78,7 +110,6 @@ class Customer_reminder extends CI_Controller
   public function getReminderCancelFromPaymentDue()
   {
     $response = array();
-
     $dataPayment = $this->customerPurchase_m->getDataPaymentCancel();
 
     if ($dataPayment != null) {

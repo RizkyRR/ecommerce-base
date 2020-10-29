@@ -32,6 +32,9 @@
 <!-- stock notification -->
 <!-- <script src="<?php echo base_url(); ?>back-assets/plugins/custom-notification/stock-notif.js"></script> -->
 
+<!-- payment auto -->
+<script src="<?php echo base_url(); ?>back-assets/plugins/custom-notification/payment-purchase-order.js"></script>
+
 <!-- main-js -->
 <!-- <script src="<?php echo base_url(); ?>back-assets/main-js/event-calendar.js"></script> -->
 

@@ -49,6 +49,9 @@
     }
   </style>
 
+  <!-- Google Font -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="<?php echo base_url(); ?>back-assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
 
@@ -126,6 +129,11 @@
   <script src="<?php echo base_url(); ?>back-assets/plugins/DataTables/Buttons-1.5.1/js/buttons.html5.min.js"></script>
   <script src="<?php echo base_url(); ?>back-assets/plugins/DataTables/Buttons-1.5.1/js/buttons.print.min.js"></script>
 
+  <!-- ZoomImage -->
+  <!--  https://www.npmjs.com/package/js-image-zoom -->
+  <!-- <script src="https://unpkg.com/js-image-zoom@0.4.1/js-image-zoom.js" type="application/javascript"></script> -->
+  <script src="<?php echo base_url(); ?>back-assets/plugins/zoom-master/jquery.zoom.js"></script>
+
   <!-- Sweet Alert Js -->
   <!-- <script src="<?php echo base_url(); ?>back-assets/plugins/sweet_alert/dist/sweetalert2.min.js"></script> -->
   <script src="<?php echo base_url(); ?>front-assets/js/sweetalert2.all.min.js"></script>
@@ -166,9 +174,6 @@
 
   <!-- AutoNumeric -->
   <script src="<?php echo base_url(); ?>back-assets/plugins/auto-numeric/autoNumeric.js"></script>
-
-  <!-- Google Font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
