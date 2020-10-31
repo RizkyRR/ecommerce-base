@@ -101,6 +101,23 @@ class Order_m extends CI_Model
     }
   }
 
+  public function getCheckPurchaseOrderComplete($order_id)
+  {
+    $this->db->select('*');
+    $this->db->from('customer_purchase_orders');
+
+    $this->db->where('id', $order_id);
+    $this->db->where('status_order_id = 4');
+
+    $query = $this->db->get();
+
+    if ($query->num_rows() > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public function getCheckPurchaseOrderCancel($order_id)
   {
     $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status');

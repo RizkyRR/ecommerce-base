@@ -86,20 +86,14 @@ class Customer_reminder extends CI_Controller
       foreach ($dataPayment as $val) {
         $getOrderID = $val['id'];
 
-        $countRow = count($dataPayment);
+        $order = $this->db->get_where('customer_purchase_orders', ['id' => $getOrderID])->row_array();
 
-        for ($i = 0; $i < $countRow; $i++) {
-          $order = $this->db->get_where('customer_purchase_orders', ['id' => $getOrderID])->row_array();
+        if (time() - $order['purchase_order_date'] > (60 * 60 * 24)) { // SELECT * FROM my_table WHERE timestamp < NOW() - INTERVAL 1 DAY;
+          $data = [
+            'status_order_id' => 1,
+          ];
 
-          if (time() - $order['purchase_order_date'] > (60 * 60 * 24)) { // SELECT * FROM my_table WHERE timestamp < NOW() - INTERVAL 1 DAY;
-            $data = [
-              'status_order_id' => 1,
-            ];
-
-            $this->customerPurchase_m->updateDataPaymentUnpaidByID($getOrderID[$i], $data);
-          } else {
-            return false;
-          }
+          $this->customerPurchase_m->updateDataPaymentUnpaidByID($getOrderID, $data);
         }
       }
     }

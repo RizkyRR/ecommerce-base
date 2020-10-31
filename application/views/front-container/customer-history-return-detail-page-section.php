@@ -27,7 +27,7 @@
       <div class="container">
         <div class="card mb-3 shadow">
           <div class="card-body">
-            <a href="<?php echo base_url(); ?>print-customer-return/<?php echo $data_return['id_return'] ?>" target="__blank" class="btn btn-sm btn-secondary"><i class="fa fa-print" aria-hidden="true"></i> Print return</a>
+            <a href="<?php echo base_url(); ?>print-customer-return/<?php echo $data_return['id_return'] ?>" target="__blank" rel="noreferrer noopener" class="btn btn-sm btn-secondary"><i class="fa fa-print" aria-hidden="true"></i> Print return</a>
             <a href="#" class="btn btn-sm btn-info"><i class="fa fa-phone" aria-hidden="true"></i> Contact admin</a>
           </div>
         </div>

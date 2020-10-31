@@ -86,7 +86,7 @@
                     <td class="left">
                       <strong>Shipping cost</strong>
                     </td>
-                    <td class="right">Rp. <?php echo number_format($data_order['ship_amount'], 0, ',', '.') ?></td>
+                    <td class="right">Rp. <?php echo number_format($data_order['ship_amount'], 0, ',', '.') ?> (<?php echo $data_order['courier'] ?> - <?php echo $data_order['service'] ?>)</td>
                   </tr>
                 <?php endif; ?>
 

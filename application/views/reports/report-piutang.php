@@ -90,12 +90,12 @@
       success: function(response) {
 
         if (response.cetak) {
-          $("#show-print").html('<a target="__blank" href="#" class="btn btn-default btn-sm"><i class="fa fa-print"></i> Print All</a>');
+          $("#show-print").html('<a target="__blank" rel="noreferrer noopener" href="#" class="btn btn-default btn-sm"><i class="fa fa-print"></i> Print All</a>');
           $("#show-print a").attr("href", response.cetak);
 
           $('#table_report_piutang').html(response.data);
         } else {
-          $("#show-print").html('<a target="__blank" href="#" class="btn btn-default btn-sm disabled"><i class="fa fa-print"></i> Print All</a>');
+          $("#show-print").html('<a target="__blank" rel="noreferrer noopener" href="#" class="btn btn-default btn-sm disabled"><i class="fa fa-print"></i> Print All</a>');
 
           $('#table_report_piutang').html(response.data);
         }

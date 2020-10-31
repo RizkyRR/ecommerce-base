@@ -48,7 +48,7 @@ class Piutang extends CI_Controller
       $row[] =
         '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="repayment_order(' . $id . ')" title="repayment data"><i class="fa fa-usd"></i> Repayment</a>
         <!-- <a href="javascript:void(0)" onclick="print_order(' . $id . ')" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a> -->
-        <a target="__blank" href="' . base_url('piutang/print_piutang/' . $item->order_id) . '" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a>
+        <a target="__blank" href="' . base_url('piutang/print_piutang/' . $item->order_id) . '" rel="noreferrer noopener" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a>
       ';
       $data[] = $row;
     }

@@ -37,7 +37,7 @@
             <div class="card-body">
               <h5 class="card-title"><i class="fa fa-info-circle" aria-hidden="true"></i> Attention</h5>
               <p class="card-text">You can cancel your order while the order status is still pending. Apart from that you have to contact the Admin.</p>
-              <a href="<?php echo base_url(); ?>print-customer-purchase/<?php echo $data_order['id_order'] ?>" target="__blank" class="btn btn-sm btn-secondary"><i class="fa fa-print" aria-hidden="true"></i> Print order</a>
+              <a href="<?php echo base_url(); ?>print-customer-purchase/<?php echo $data_order['id_order'] ?>" target="__blank" rel="noreferrer noopener" class="btn btn-sm btn-secondary"><i class="fa fa-print" aria-hidden="true"></i> Print order</a>
 
               <?php if ($data_order['status_order_id'] == 2) : ?>
                 <input type="hidden" name="order_id" id="order_id" value="<?php echo $data_order['id_order'] ?>" readonly>
@@ -146,7 +146,7 @@
                           <td class="left">
                             <strong>Shipping cost</strong>
                           </td>
-                          <td class="right">Rp. <?php echo number_format($data_order['ship_amount'], 0, ',', '.') ?></td>
+                          <td class="right">Rp. <?php echo number_format($data_order['ship_amount'], 0, ',', '.') ?> (<?php echo $data_order['courier'] ?> - <?php echo $data_order['service'] ?>)</td>
                         </tr>
                       <?php endif; ?>
 

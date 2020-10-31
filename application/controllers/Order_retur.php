@@ -61,7 +61,7 @@ class Order_retur extends CI_Controller
         '
         <!-- <a href="javascript:void(0)" onclick="delete_retur(' . $id . ')" class="btn btn-danger btn-xs" title="delete data"><i class="fa fa-trash-o"></i> Delete</a> -->
 
-        <a target="__blank" href="' . base_url('order_retur/print_retur/' . $item->order_id) . '" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a>
+        <a target="__blank" href="' . base_url('order_retur/print_retur/' . $item->order_id) . '" rel="noreferrer noopener" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a>
       ';
       $data[] = $row;
     }

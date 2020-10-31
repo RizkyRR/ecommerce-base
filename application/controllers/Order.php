@@ -31,7 +31,7 @@ class Order extends CI_Controller
     $this->load->view('back-templates/navbar', $info);
     $this->load->view('orders/index', $info);
     $this->load->view('modals/modal-payment-approve', $info);
-    $this->load->view('modals/modal-delete');
+    $this->load->view('modals/modal-detail-order');
     $this->load->view('back-templates/footer', $info);
   }
 
@@ -58,7 +58,7 @@ class Order extends CI_Controller
       $checkOrderPending = $this->order_m->getCheckPurchaseOrderPending($item->id_order);
 
       if ($checkOrderPending == true) {
-        $btnApprovePayment = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="payment_approve(' . $id . ')" title="approve payment"><i class="fa fa-check" aria-hidden="true"></i> Approve Payment</a> ';
+        $btnApprovePayment = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="payment_approve(' . $id . ')" id="btnModalPaymentApprove" title="approve payment"><i class="fa fa-check" aria-hidden="true"></i> Approve Payment</a> ';
       } else {
         $btnApprovePayment = '';
       }
@@ -70,6 +70,15 @@ class Order extends CI_Controller
         $btnUpdatePayment = '<a href="javascript:void(0)" class="btn btn-warning btn-xs" onclick="update_approve(' . $id . ')" title="update approvement"><i class="fa fa-check" aria-hidden="true"></i> Update Approvement</a> ';
       } else {
         $btnUpdatePayment = '';
+      }
+
+      // CONDITION FOR SHOW APPROVED DETAIL AFTER COMPLETE ORDER 
+      $checkOrderComplete = $this->order_m->getCheckPurchaseOrderComplete($item->id_order);
+
+      if ($checkOrderComplete == true) {
+        $btnDetailApproved = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="detail_approve(' . $id . ')" title="approved detail"><i class="fa fa-check" aria-hidden="true"></i> Approved Detail</a> ';
+      } else {
+        $btnDetailApproved = '';
       }
 
       // CONDITION FOR SHOW CANCEL BUTTON 
@@ -90,18 +99,20 @@ class Order extends CI_Controller
         $btnOrerComplete = '';
       }
 
-      // add html for action
-      $row[] = '<input type="hidden" name="email_customer" id="email_customer" value="' . $item->customer_email . '" readonly><a href="" class="btn btn-info btn-xs" title="detail order"><i class="fa fa-info" aria-hidden="true"></i> Info</a> ' .
+      // ADD HTML BUTTON ACTION
+      $row[] = '<input type="hidden" name="email_customer" id="email_customer_' . $item->id_order . '" value="' . $item->customer_email . '" readonly><a href="javascript:void(0)" class="btn btn-info btn-xs" onclick="detail_order(' . $id . ')" id="btnDetailOrder" title="detail order"><i class="fa fa-info" aria-hidden="true"></i> Info</a> ' .
 
         $btnApprovePayment .
 
         $btnUpdatePayment .
 
+        $btnDetailApproved .
+
         $btnOrerCancel .
 
         $btnOrerComplete .
 
-        '<a target="__blank" href="' . base_url('order/print_order/' . $item->id) . '" class="btn btn-default btn-xs" title="print order"><i class="fa fa-print"></i> Print</a>';
+        '<a href=" ' . base_url() . 'order/printOrder/' . $item->id_order . '/' . $item->customer_email . '" target="__blank" class="btn btn-default btn-xs" id="btnPrintOrder" title="print order"><i class="fa fa-print"></i> Print Order</a>';
 
       $data[] = $row;
     }
@@ -113,7 +124,7 @@ class Order extends CI_Controller
       "data" => $data,
     );
 
-    // output to json format
+    // OUTPUT TO JSON FORMAT
     echo json_encode($output);
   }
   // DataTables Cntroller End Setup
@@ -194,10 +205,53 @@ class Order extends CI_Controller
     }
   }
 
+  private function _sendEmail($type, $data)
+  {
+    $dataEmail = $this->company_m->getEmail(1);
+
+    $config = [
+      'protocol' => 'smtp',
+      'smtp_host' => 'ssl://smtp.googlemail.com',
+      'smtp_user' => $dataEmail['email'],
+      'smtp_pass' => $dataEmail['password'],
+      'smtp_port' => 465,
+      'mailtype' => 'html',
+      'charset' => 'utf-8',
+      'newline' => "\r\n"
+    ];
+
+    $this->load->library('email', $config);
+    $this->email->initialize($config);
+
+    $this->email->from($dataEmail['email'], $data['company_name']);
+    $this->email->to($data['customer_email']);
+
+    if ($type == 'approve') {
+      $this->email->subject('Pembayaran_' . $data['invoice_order'] . '_Telah_Selesai_Oleh_Admin');
+      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->set_mailtype("html");
+    } else if ($type == 'complete') {
+      $this->email->subject('Pesanan_' . $data['invoice_order'] . '_Telah_Selesai_Oleh_Admin');
+      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->set_mailtype("html");
+    } else if ($type == 'cancel') {
+      $this->email->subject('Pembatalan_Pesanan_' . $data['invoice_order'] . '_Oleh_Admin');
+      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->set_mailtype("html");
+    }
+
+    if ($this->email->send()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
   public function setPurchaseOrderForApprove()
   {
     $response = array();
     $order_id = $this->input->post('order_id');
+    $email = $this->input->post('customer_email');
 
     $this->form_validation->set_rules('airwaybill_number', 'Airwaybill number can not be empty', 'trim|required');
 
@@ -232,6 +286,24 @@ class Order extends CI_Controller
 
         $response['status'] = TRUE;
         $response['message'] = 'Payment has been approved!';
+
+        // email purposes
+        $dataCompany = $this->company_m->getCompanyById(1);
+        $info['company'] = $dataCompany;
+        $info['company_name'] = $dataCompany['company_name'];
+        $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+        $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+
+        $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
+        $info['data_order'] = $dataOrder;
+        $info['invoice_order'] = $dataOrder['invoice_order'];
+        $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+        $info['customer_email'] = $dataCustomer['email'];
+        $info['customer'] = $dataCustomer;
+        $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($order_id);
+
+        $this->_sendEmail('approve', $info);
+        // email purposes
       } else {
         $response['status'] = FALSE;
         $response['message'] = 'Failed to accept payment!';
@@ -290,44 +362,6 @@ class Order extends CI_Controller
   // FOR PAYMENT APPROVAL 
 
   // FOR CANCEL PAYMENT BY ADMIN
-  private function _sendEmail($type, $data)
-  {
-    $dataEmail = $this->company_m->getEmail(1);
-
-    $config = [
-      'protocol' => 'smtp',
-      'smtp_host' => 'ssl://smtp.googlemail.com',
-      'smtp_user' => $dataEmail['email'],
-      'smtp_pass' => $dataEmail['password'],
-      'smtp_port' => 465,
-      'mailtype' => 'html',
-      'charset' => 'utf-8',
-      'newline' => "\r\n"
-    ];
-
-    $this->load->library('email', $config);
-    $this->email->initialize($config);
-
-    $this->email->from($dataEmail['email'], $data['company_name']);
-    $this->email->to($data['customer_email']);
-
-    if ($type == 'complete') {
-      $this->email->subject('Pembayaran_' . $data['invoice_order'] . '_Telah_Selesai_Oleh_Admin');
-      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
-      $this->email->set_mailtype("html");
-    } else if ($type == 'cancel') {
-      $this->email->subject('Pembatalan_Pesanan_' . $data['invoice_order'] . '_Oleh_Admin');
-      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
-      $this->email->set_mailtype("html");
-    }
-
-    if ($this->email->send()) {
-      return TRUE;
-    } else {
-      return FALSE;
-    }
-  }
-
   public function cancelPayment()
   {
     $response = array();
@@ -336,58 +370,6 @@ class Order extends CI_Controller
 
     // JIKA TERDETEKSI CANCEL SUDAH MEMBAYAR MAKA ADA KONDISI DIMANA STOCK BARANG DIKEMBALIKAN
     $checkPaymentApproved = $this->order_m->getCheckPaymentApprovedByID($order_id);
-
-    if ($checkPaymentApproved != null) {
-      $data = [
-        'status_order_id' => 10,
-        'reminder_cancel' => 1
-      ];
-
-      $updatePaymentDue = $this->customerPurchase_m->updateDataPaymentUnpaidByID($order_id, $data);
-
-      if ($updatePaymentDue > 0) {
-        $response['status'] = true;
-        $response['message'] = 'Successfully canceled the order ' . $order_id . ' and, please confirm the refund!';
-      } else {
-        $response['status'] = false;
-        $response['message'] = 'Sorry, there was an error regarding the cancel order!';
-      }
-
-      $dataPurchaseOrderDetail = $this->order_m->getPurchaseOrderDetail($order_id);
-
-      if ($dataPurchaseOrderDetail != null) {
-        foreach ($dataPurchaseOrderDetail as $val) {
-          $getProductID = $val['id_product'];
-          $getQtyOrder = $val['qty_order_detail'];
-          $getQtyProduct = $val['qty_product'];
-
-          // $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
-          // $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
-          $qty = (int) $getQtyProduct + (int) $getQtyOrder;
-
-          $update_product = array(
-            'qty' => $qty
-          );
-
-          $this->product_m->update($getProductID, $update_product);
-        }
-      }
-    } else {
-      $data = [
-        'status_order_id' => 1,
-        'reminder_cancel' => 1
-      ];
-
-      $updatePaymentDue = $this->customerPurchase_m->updateDataPaymentUnpaidByID($order_id, $data);
-
-      if ($updatePaymentDue > 0) {
-        $response['status'] = true;
-        $response['message'] = 'Successfully canceled the order ' . $order_id;
-      } else {
-        $response['status'] = false;
-        $response['message'] = 'Sorry, there was an error regarding the cancel order!';
-      }
-    }
 
     // email purposes
     $dataCompany = $this->company_m->getCompanyById(1);
@@ -403,316 +385,282 @@ class Order extends CI_Controller
     $info['customer_email'] = $dataCustomer['email'];
     $info['customer'] = $dataCustomer;
     $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($order_id);
-
-    $this->_sendEmail('cancel', $info);
     // email purposes
+
+    if ($checkPaymentApproved != null) {
+
+      $data = [
+        'status_order_id' => 10,
+        'reminder_cancel' => 1
+      ];
+
+      $updatePaymentDue = $this->customerPurchase_m->updateDataPaymentUnpaidByID($order_id, $data); // karena memiliki table yang sama maka hiraukan nama
+
+      if ($updatePaymentDue > 0) {
+        $response['status'] = true;
+        $response['message'] = 'Successfully canceled the order ' . $order_id . ' and, please confirm the refund!';
+
+        $dataPurchaseOrderDetail = $this->order_m->getPurchaseOrderDetail($order_id);
+
+        if ($dataPurchaseOrderDetail != null) {
+          foreach ($dataPurchaseOrderDetail as $val) {
+            $getProductID = $val['id_product'];
+            $getQtyOrder = $val['qty_order_detail'];
+            $getQtyProduct = $val['qty_product'];
+
+            // $data_product = $this->product_m->getProductById($this->input->post('product_id')[$i]);
+            // $qty = (int) $data_product['qty'] - (int) $this->input->post('qty')[$i];
+            $qty = (int) $getQtyProduct + (int) $getQtyOrder;
+
+            $update_product = array(
+              'qty' => $qty
+            );
+
+            $this->product_m->update($getProductID, $update_product);
+          }
+        }
+
+        $this->_sendEmail('cancel', $info);
+      } else {
+        $response['status'] = false;
+        $response['message'] = 'Sorry, there was an error regarding the cancel order!';
+      }
+    } else {
+      $data = [
+        'status_order_id' => 1,
+        'reminder_cancel' => 1
+      ];
+
+      $updatePaymentDue = $this->customerPurchase_m->updateDataPaymentUnpaidByID($order_id, $data); // karena memiliki table yang sama maka hiraukan nama
+
+      if ($updatePaymentDue > 0) {
+        $response['status'] = true;
+        $response['message'] = 'Successfully canceled the order ' . $order_id;
+
+        $this->_sendEmail('cancel', $info);
+      } else {
+        $response['status'] = false;
+        $response['message'] = 'Sorry, there was an error regarding the cancel order!';
+      }
+    }
 
     echo json_encode($response);
   }
   // FOR CANCEL PAYMENT BY ADMIN
 
-  public function detail_order($id)
+  // COMPLETE ORDER
+  public function completeOrder()
   {
-    // $id = $this->input->post('id');
-    $data = $this->order_m->getProductById($id);
-    echo json_encode($data);
-  }
+    $response = array();
+    $email = $this->input->post('email');
+    $order_id = $this->input->post('order_id');
 
-  public function update_order()
-  {
-    date_default_timezone_set('Asia/Jakarta');
-
-    $rules = [
-      [
-        'field' => 'order_date',
-        'label' => 'order date',
-        'rules' => 'trim|required'
-      ],
-      [
-        'field' => 'c_name',
-        'label' => 'customer name',
-        'rules' => 'trim|required|min_length[5]'
-      ],
-      [
-        'field' => 'c_phone',
-        'label' => 'customer phone',
-        'rules' => 'trim|required|min_length[7]|max_length[12]|numeric'
-      ],
-      [
-        'field' => 'c_bankname',
-        'label' => 'customer bank name',
-        'rules' => 'trim|min_length[2]'
-      ],
-      [
-        'field' => 'c_norek',
-        'label' => 'customer no. rek',
-        'rules' => 'trim|numeric|min_length[5]'
-      ],
-      [
-        'field' => 'c_address',
-        'label' => 'customer address',
-        'rules' => 'trim|required|min_length[5]'
-      ]
+    $data = [
+      'status_order_id' => 4
     ];
-    $this->form_validation->set_rules($rules);
-    $this->form_validation->set_message('required', '{field} tidak boleh kosong');
 
-    if ($this->form_validation->run() == FALSE) {
-      $data = [
-        'order_date' => form_error('order_date'),
-        'c_name' => form_error('c_name'),
-        'c_phone' => form_error('c_phone'),
-        'c_bankname' => form_error('c_bankname'),
-        'c_norek' => form_error('c_norek'),
-        'c_address' => form_error('c_address')
-      ];
+    $updatePaymentDue = $this->customerPurchase_m->updateDataPaymentUnpaidByID($order_id, $data);
 
-      echo json_encode($data);
+    if ($updatePaymentDue > 0) {
+      $response['status'] = true;
+      $response['message'] = 'Congratulations the order ' . $order_id . ' process has been completed!';
+
+      // email purposes
+      $dataCompany = $this->company_m->getCompanyById(1);
+      $info['company'] = $dataCompany;
+      $info['company_name'] = $dataCompany['company_name'];
+      $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+      $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+
+      $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
+      $info['data_order'] = $dataOrder;
+      $info['invoice_order'] = $dataOrder['invoice_order'];
+      $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+      $info['customer_email'] = $dataCustomer['email'];
+      $info['customer'] = $dataCustomer;
+      $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($order_id);
+
+      $this->_sendEmail('complete', $info);
+      // email purposes
     } else {
-
-      $data = array(
-        'customer_name' => $this->input->post('c_name', true),
-        'customer_phone' => $this->input->post('c_phone', true),
-        'bank_name' => $this->input->post('c_bankname', true),
-        'no_rek' => $this->input->post('c_norek', true),
-        'customer_address' => $this->input->post('c_address', true),
-        'order_date' => $this->input->post('order_date', true),
-        'updated_at' => date('Y-m-d H:i:s'),
-        'user_update' => $this->session->userdata('email')
-      );
-      $this->order_m->update($this->input->post('id'), $data);
-      echo json_encode('success');
+      $response['status'] = false;
+      $response['message'] = 'Sorry, there was an error regarding the complete order!';
     }
+
+    echo json_encode($response);
   }
+  // COMPLETE ORDER
 
-  public function delete_order()
+  // DETAIL ORDER
+  public function getDetailCustomerOrder()
   {
-    // Update to order_details
-    $get_order_details = $this->order_m->getOrderDetailsById($this->input->post('id'));
-    foreach ($get_order_details as $v) {
-      $product_id = $v['product_id'];
-      $qty = $v['qty'];
+    $response = array();
+    $order_id = $this->input->post('order_id');
+    $email = $this->input->post('email');
 
-      // get the product
-      $product_data = $this->product_m->getProductById($product_id);
-      $update_qty = $qty + $product_data['qty'];
-      $update_product_data = array('qty' => $update_qty);
+    $company = $this->company_m->getCompanyById(1);
+    $company_address = $this->company_m->getFullAdressCustomer(1);
+    $company_bank = $this->company_m->getCompanyBankAccount(1);
 
-      // update product quantity
-      $this->product_m->update($product_id, $update_product_data);
-    }
+    $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
+    $customer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+    $detail_order = $this->customerPurchase_m->getDetailPurchaseOrderByID($order_id);
 
-    $this->order_m->deleteOrder($this->input->post('id'));
-    $this->session->set_flashdata('success', 'Deleted !');
-  }
+    $html = '';
 
-  // public function print_order($id)
-  // {
-  //   $result = array();
-  //   $order_data = $this->order_m->getOrdersById($id);
-  //   $data['order'] = $order_data;
-
-  //   /* $getIdProduct = $this->order_m->getOrderDetailsById($order_data['product_id']);
-
-  //   foreach ($getIdProduct as $val) {
-  //     $result['order_detail'][] = $val;
-  //   }
-  //   // foreach ($data_detail['order_detail'] as $val) : 
-  //   $data['data_detail'] = $result; */
-
-  //   $data['order_detail'] = $this->order_m->getOrderDetailsById($order_data['product_id']);
-
-  //   $company_info = $this->company_m->getCompanyById(1);
-  //   $data['company_data'] = $company_info;
-  //   $data['is_vat_enabled'] = ($company_info['vat_charge_value'] > 0) ? true : false;
-  //   $data['is_service_enabled'] = ($company_info['service_charge_value'] > 0) ? true : false;
-
-  //   $html = $this->load->view('orders/report-order', $data, true);
-
-  //   $this->pdfgenerator->generate($html, 'report_order_' . $id);
-  // }
-
-  public function print_order($id)
-  {
-    $order_data = $this->order_m->getOrdersById($id);
-
-    $order_detail_data = $this->order_m->getOrderDetailsById($id);
-
-    $company_data = $this->company_m->getCompanyById(1);
-
-    // Checking for discount exist order_data['discount']
-    if ($order_data['discount']) {
-      $discount  = $order_data['discount'] . '%';
-    } else {
-      $discount = '-';
-    }
-
-    $html = '<!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <title>Screen Printing | Invoice ' . $order_data['id'] . '</title>
-      <!-- Tell the browser to be responsive to screen width -->
-      <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-      <!-- Bootstrap 3.3.7 -->
-      <link rel="stylesheet" href="' . base_url() . 'back-assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
-      <!-- Font Awesome -->
-      <link rel="stylesheet" href="' . base_url() . 'back-assets/bower_components/font-awesome/css/font-awesome.min.css">
-      <!-- Ionicons -->
-      <link rel="stylesheet" href="' . base_url() . 'back-assets/bower_components/Ionicons/css/ionicons.min.css">
-      <!-- Theme style -->
-      <link rel="stylesheet" href="' . base_url() . 'back-assets/dist/css/AdminLTE.min.css">
-    
-      <!-- Google Font -->
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-    </head>
-    <body onload="window.print();">
-    <div class="wrapper">
-      <!-- Main content -->
-      <section class="invoice">
-        <!-- title row -->
-        <div class="row">
-          <div class="col-xs-12">
-            <h2 class="page-header">
-              <i class="fa fa-globe"></i> ' . $company_data['company_name'] . '.
-              <small class="pull-right">Date: ' . date('d M Y', strtotime($order_data['order_date'])) . '</small>
-            </h2>
-          </div>
-          <!-- /.col -->
-        </div>
-        <!-- info row -->
-        <div class="row invoice-info">
-          <div class="col-sm-4 invoice-col">
-            From
-            <address>
-              <strong>' . $company_data['company_name'] . '.</strong><br>
-              ' . $company_data['address'] . '<br>
-              Phone: ' . $company_data['phone'] . '<br>
-              Email: ' . $company_data['business_email'] . '
-            </address>
-          </div>
-          <!-- /.col -->
-          <div class="col-sm-4 invoice-col">
-            To
-            <address>
-              <strong>' . $order_data['customer_name'] . '</strong><br>
-              ' . $order_data['customer_address'] . '<br>
-              Phone: ' . $order_data['customer_phone'] . '<br>
-              <!-- Email: john.doe@example.com -->
-            </address>
-          </div>
-          <!-- /.col -->
-          <div class="col-sm-4 invoice-col">
-            <b>Invoice #' . substr($order_data['id'], 5, 8) . '</b><br>
-            <br>
-            <b>Order ID:</b> ' . $order_data['id'] . '<br>
-            <!-- <b>Payment Due:</b> 2/22/2014<br> -->
-            <b>Account:</b> 968-34567
-          </div>
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
-    
-        <!-- Table row -->
-        <div class="row">
-          <div class="col-xs-12 table-responsive">
-            <table class="table table-striped">
-              <thead>
-              <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Amount</th>
-              </tr>
-              </thead>
-              <tbody>';
-    foreach ($order_detail_data as $val) {
-      $product_data = $this->product_m->getProductById($val['product_id']);
-
-      $html .= '<tr>
-                  <td>' . $val['product_id'] . '</td>
-                  <td>' . $product_data['product_name'] . '</td>
-                  <td>Rp. ' . number_format($val['unit_price'], 0, ',', '.') . '</td>
-                  <td>' . $val['qty'] . '</td>
-                  <td>Rp. ' . number_format($val['amount'], 0, ',', '.') . '</td>
-                </tr>';
-    }
-
-    $html .= '</tbody>
-            </table>
-          </div>
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
-    
-        <div class="row">
-          <!-- accepted payments column -->
-          <div class="col-xs-6">
-            <p class="lead">Payment Methods:</p>
-            <img src="' . base_url() . 'back-assets/dist/img/credit/visa.png" alt="Visa">
-            <img src="' . base_url() . 'back-assets/dist/img/credit/mastercard.png" alt="Mastercard">
-            <img src="' . base_url() . 'back-assets/dist/img/credit/american-express.png" alt="American Express">
-            <img src="' . base_url() . 'back-assets/dist/img/credit/paypal2.png" alt="Paypal">
-    
-            <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
-              Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles, weebly ning heekya handango imeem plugg dopplr
-              jibjab, movity jajah plickers sifteo edmodo ifttt zimbra.
-            </p>
-          </div>
-          <!-- /.col -->
-          <div class="col-xs-6">
-            <!-- <p class="lead">Amount Due 2/22/2014</p> -->
-    
-            <div class="table-responsive">
-              <table class="table">
-                <tr>
-                  <th style="width:50%">Gross Amount:</th>
-                  <td>Rp. ' . number_format($order_data['gross_amount'], 0, ',', '.') . '</td>
-                </tr>';
-
-    if ($order_data['service_charge'] > 0) {
-      $html .= '<tr>
-                  <th>Service Charge (' . $order_data['service_charge_rate'] . '%):</th>
-                  <td>Rp. ' . number_format($order_data['service_charge'], 0, ',', '.') . '</td>
-                </tr>';
-    }
-
-    if ($order_data['vat_charge'] > 0) {
-      $html .= '<tr>
-                  <th>Vat Charge (' . $order_data['vat_charge_rate'] . '%):</th>
-                  <td>Rp. ' . number_format($order_data['vat_charge'], 0, ',', '.') . '</td>
-                </tr>';
-    }
-
-    $html .= '<tr>
-                  <th>Discount:</th>
-                  <td>' . $discount . '</td>
-                </tr>';
-
-    $html .= '<tr>
-                  <th>Net Amount:</th>
-                  <td>Rp. ' . number_format($order_data['net_amount'], 0, ',', '.') . '</td>
-                </tr>
-
-                <tr>
-                  <th>Paid Status:</th>
-                  <td>' . $order_data['paid_status'] . '</td>
-                </tr>
-              </table>
+    if ($dataOrder != null) {
+      $html .= '
+      <div class="box-body">
+        <div class="row mb-4">
+          <div class="col-sm-6">
+            <h6 class="mb-3">From:</h6>
+            <div>
+              <strong>' . $company['company_name'] . '</strong>
             </div>
+            <div>' . $company_address['street_name'] . ', ' . $company_address['city_name'] . ', ' . $company_address['province'] . '</div>
+            <div>Email: ' . $company['business_email'] . '</div>
+            <div>Phone: ' . $company['phone'] . '</div>';
+
+      if ($company_bank != null) {
+        foreach ($company_bank as $val) {
+          $html .= '<div><strong>' . $val['bank_name'] . ': ' . $val['account'] . ' (' . $val['account_holder_name'] . ')</strong></div>';
+        }
+      }
+      $html .= '</div>
+
+          <div class="col-sm-6">
+            <h6 class="mb-3">To:</h6>
+            <div>
+              <strong>' . $customer['customer_name'] . '</strong>
+            </div>
+            <div>' . $customer['street_name'] . ', ' . $customer['city_name'] . ', ' . $customer['province'] . '</div>
+            <div>Email: ' . $customer['email'] . '</div>
+            <div>Phone: ' . $customer['customer_phone'] . '</div>
           </div>
-          <!-- /.col -->
         </div>
-        <!-- /.row -->
-      </section>
-      <!-- /.content -->
-    </div>
-    <!-- ./wrapper -->
-    </body>
-    </html>';
-    echo $html;
+
+        <div class="table-responsive-sm">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="center">#</th>
+                <th>Item Name</th>
+                <th>Weight</th>
+                <th class="right">Price</th>
+                <th class="center">Qty</th>
+                <th class="right">Total</th>
+              </tr>
+            </thead>
+            <tbody>';
+
+      if ($detail_order != null && $detail_order != 0) {
+        $no = 1;
+        foreach ($detail_order as $val) {
+          $html .= '<tr>
+                    <td class="center">' . $no++ . '</td>
+
+                    <td class="left strong">' . $val['product_name'] . '</td>
+
+                    <td class="center">' . $val['weight_order'] . ' Gram</td>
+                    <td class="right">Rp. ' . number_format($val['price'], 0, ',', '.') . '</td>
+                    <td class="center">' . $val['qty_order'] . '</td>
+                    <td class="right">Rp. ' . number_format($val['amount'], 0, ',', '.') . '</td>
+                  </tr>';
+        }
+      }
+
+      $html .= '</tbody>
+          </table>
+        </div>
+        <div class="row">
+        <div class="col-xs-6 ml-auto"></div>
+
+          <div class="col-xs-6 ml-auto">
+            <table class="table table-clear">
+              <tbody>
+                <tr>
+                  <td class="left">
+                    <strong>Sub-total</strong>
+                  </td>
+                  <td class="right">Rp. ' . number_format($dataOrder['gross_amount'], 0, ',', '.') . '</td>
+                </tr>';
+
+      if ($dataOrder['ship_amount'] != null && $dataOrder['ship_amount'] != 0) {
+        $html .= '<tr>
+                    <td class="left">
+                      <strong>Shipping cost</strong>
+                    </td>
+                    <td class="right">Rp. ' . number_format($dataOrder['ship_amount'], 0, ',', '.') . '  (' . $dataOrder['courier'] . ' - ' . $dataOrder['service'] . ')</td>
+                  </tr>';
+      }
+
+      $html .= '<tr>
+                  <td class="left">
+                    <strong>VAT (' . $dataOrder['vat_charge_rate'] . '%)</strong>
+                  </td>
+                  <td class="right">Rp. ' . number_format($dataOrder['vat_charge_val'], 0, ',', '.') . '</td>
+                </tr>';
+
+      if ($dataOrder['coupon_charge_rate'] != null && $dataOrder['coupon_charge_rate'] != 0) {
+        $html .= '<tr>
+                    <td class="left">
+                      <strong>Coupon (' . $dataOrder['coupon_charge_rate'] . '%)</strong>
+                    </td>
+                    <td class="right">Rp. ' . number_format($dataOrder['coupon_charge'], 0, ',', '.') . '</td>
+                  </tr>';
+      }
+
+      $html .= '<tr>
+                  <td class="left">
+                    <strong>Total</strong>
+                  </td>
+                  <td class="right">
+                    <strong>Rp. ' . number_format($dataOrder['net_amount'], 0, ',', '.') . '</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>';
+    } else {
+      $response['html'] = [];
+    }
+
+    $response['html'] = $html;
+    $response['invoice'] = $dataOrder['invoice_order'];
+    echo json_encode($response);
+  }
+  // DETAIL ORDER
+
+  public function printOrder($order_id, $email)
+  {
+    $info['title'] = "Print Customer Order Page";
+
+    $info['company'] = $this->company_m->getCompanyById(1);
+    $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+    $info['detail_company'] = $this->company_m->getLinkCompany();
+    $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+
+    $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
+    $getUnixTime = $dataOrder['purchase_order_date'] + 86400;
+    $info['order_date'] = date('d M Y H:i:s', $dataOrder['purchase_order_date']);
+    $info['order_date_due'] = date('d M Y H:i:s', $getUnixTime);
+    $info['data_order'] = $dataOrder;
+    $info['customer'] = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+    $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($order_id);
+
+    if ($dataOrder != null) {
+      $this->load->view('back-prints/header', $info);
+      $this->load->view('back-prints/print-customer-order', $info);
+      $this->load->view('back-prints/footer', $info);
+    } else {
+      $this->load->view('back-prints/header', $info);
+      $this->load->view('back-prints/footer', $info);
+    }
   }
 }
   

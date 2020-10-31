@@ -6,6 +6,7 @@
           <span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">User Form</h4>
       </div>
+
       <div class="modal-body form">
         <form role="form" id="form-payment-approve" action="" method="post" enctype="multipart/form-data">
           <div class="row">
@@ -98,8 +99,9 @@
           <!-- /.box-body -->
         </form>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-default pull-left btnCancelApprove" data-dismiss="modal">Cancel</button>
         <a href="javascript:void(0)" class="btn btn-primary" id="btnPaymentApprove">Submit</a>
       </div>
     </div>

@@ -85,10 +85,11 @@ class CustomerPurchase_m extends CI_Model
 
   public function getDataPurchaseOrderByID($order_id, $email)
   {
-    $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status');
+    $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status, customer_purchase_order_shipping.id AS id_order_shipping');
 
     $this->db->from('customer_purchase_orders');
     $this->db->join('status_orders', 'status_orders.id = customer_purchase_orders.status_order_id', 'left');
+    $this->db->join('customer_purchase_order_shipping', 'customer_purchase_order_shipping.purchase_order_id = customer_purchase_orders.id', 'left');
 
     $this->db->where('customer_purchase_orders.id', $order_id);
     $this->db->where('customer_email', $email);

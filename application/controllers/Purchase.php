@@ -56,7 +56,7 @@ class Purchase extends CI_Controller
       $row[] =
         '' . $paid_status . '
           <!-- <a href="javascript:void(0)" onclick="delete_purchase(' . $id . ')" class="btn btn-danger btn-xs" title="delete data"><i class="fa fa-trash-o"></i> Delete</a> -->
-          <a target="__blank" href="' . base_url('purchase/print_purchase/' . $item->id_purchase) . '" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a>
+          <a target="__blank" href="' . base_url('purchase/print_purchase/' . $item->id_purchase) . '" rel="noreferrer noopener" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a>
         ';
       $data[] = $row;
     }
