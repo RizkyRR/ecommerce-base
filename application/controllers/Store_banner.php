@@ -26,7 +26,7 @@ class Store_banner extends CI_Controller
 
   public function getAllStoreBanner()
   {
-    $data = $this->storebanner_m->getAllStoreBanner();
+    $data = $this->storeBanner_m->getAllStoreBanner();
     echo json_encode($data);
   }
 
@@ -89,14 +89,14 @@ class Store_banner extends CI_Controller
       'button_link_url' => $this->input->post('link', true)
     ];
 
-    $getTitleBanner = $this->storebanner_m->getDetailTitleBanner($this->input->post('title'));
+    $getTitleBanner = $this->storeBanner_m->getDetailTitleBanner($this->input->post('title'));
     $query = $this->db->get_where('store_banner', ['title' => $this->input->post('title')]);
 
     if ($query->num_rows() > 0) {
       $response['status'] = false;
       $response['notif'] = "Sorry, for the " . $getTitleBanner['title'] . " is already set in the banner.";
     } else {
-      $insert = $this->storebanner_m->insertStoreBanner($data);
+      $insert = $this->storeBanner_m->insertStoreBanner($data);
 
       if ($insert > 0) {
         $response['status'] = true;
@@ -152,14 +152,14 @@ class Store_banner extends CI_Controller
             'button_link_url' => $this->input->post('link', true)
           ];
 
-          $getTitleBanner = $this->storebanner_m->getDetailTitleBanner($this->input->post('title'));
+          $getTitleBanner = $this->storeBanner_m->getDetailTitleBanner($this->input->post('title'));
           $query = $this->db->get_where('store_banner', ['title' => $this->input->post('title')]);
 
           if ($query->num_rows() > 0) {
             $response['status'] = false;
             $response['notif'] = "Sorry, for the " . $getTitleBanner['title'] . " is already set in the banner.";
           } else {
-            $insert = $this->storebanner_m->insertStoreBanner($data);
+            $insert = $this->storeBanner_m->insertStoreBanner($data);
 
             if ($insert > 0) {
               $response['status'] = true;
@@ -187,7 +187,7 @@ class Store_banner extends CI_Controller
 
   public function getDataStoreBanner($id)
   {
-    $data = $this->storebanner_m->getDataStoreBanner($id);
+    $data = $this->storeBanner_m->getDataStoreBanner($id);
     echo json_encode($data);
   }
 
@@ -219,7 +219,7 @@ class Store_banner extends CI_Controller
       }
 
       $id = $this->input->post('id');
-      $update = $this->storebanner_m->updateStoreBanner($id, $data);
+      $update = $this->storeBanner_m->updateStoreBanner($id, $data);
 
       if ($update > 0) {
         $response['status'] = true;
@@ -247,7 +247,7 @@ class Store_banner extends CI_Controller
       @unlink('./image/gallery/' . $row->image);
     }
 
-    $data = $this->storebanner_m->deleteStoreBanner($id);
+    $data = $this->storeBanner_m->deleteStoreBanner($id);
 
     echo json_encode($data);
   }

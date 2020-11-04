@@ -58,7 +58,7 @@ class Order extends CI_Controller
       $checkOrderPending = $this->order_m->getCheckPurchaseOrderPending($item->id_order);
 
       if ($checkOrderPending == true) {
-        $btnApprovePayment = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="payment_approve(' . $id . ')" id="btnModalPaymentApprove" title="approve payment"><i class="fa fa-check" aria-hidden="true"></i> Approve Payment</a> ';
+        $btnApprovePayment = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="payment_approve(' . $id . ')" id="btnApproveOrder_' . $item->id_order . '" title="approve payment"><i class="fa fa-check" aria-hidden="true"></i> Approve Payment</a> ';
       } else {
         $btnApprovePayment = '';
       }
@@ -67,7 +67,7 @@ class Order extends CI_Controller
       $checkOrderApproved = $this->order_m->getCheckPurchaseOrderApproved($item->id_order);
 
       if ($checkOrderApproved == true) {
-        $btnUpdatePayment = '<a href="javascript:void(0)" class="btn btn-warning btn-xs" onclick="update_approve(' . $id . ')" title="update approvement"><i class="fa fa-check" aria-hidden="true"></i> Update Approvement</a> ';
+        $btnUpdatePayment = '<a href="javascript:void(0)" class="btn btn-warning btn-xs" id="btnUpdateApproveOrder_' . $item->id_order . '" onclick="update_approve(' . $id . ')" title="update approvement"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Update Approvement</a> ';
       } else {
         $btnUpdatePayment = '';
       }
@@ -75,32 +75,32 @@ class Order extends CI_Controller
       // CONDITION FOR SHOW APPROVED DETAIL AFTER COMPLETE ORDER 
       $checkOrderComplete = $this->order_m->getCheckPurchaseOrderComplete($item->id_order);
 
-      if ($checkOrderComplete == true) {
+      if ($checkOrderComplete != null && ($checkOrderComplete['status_order_id'] == 1 || $checkOrderComplete['status_order_id'] == 4  || $checkOrderComplete['status_order_id'] == 10)) {
         $btnDetailApproved = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="detail_approve(' . $id . ')" title="approved detail"><i class="fa fa-check" aria-hidden="true"></i> Approved Detail</a> ';
       } else {
         $btnDetailApproved = '';
       }
 
       // CONDITION FOR SHOW CANCEL BUTTON 
-      $checkStatusOrer = $this->order_m->getCheckPurchaseOrderCancel($item->id_order);
+      $checkStatusCancelOrder = $this->order_m->getCheckPurchaseOrderCancel($item->id_order);
 
-      if ($checkStatusOrer == true) {
-        $btnOrerCancel = '<a href="javascript:void(0)" onclick="cancel_order(' . $id . ')" class="btn btn-danger btn-xs" id="btnCancelOrder" title="cancel order"><i class="fa fa-trash-o"></i> Cancel Order</a> ';
+      if ($checkStatusCancelOrder['status_order_id'] == 2 || $checkStatusCancelOrder['status_order_id'] == 3) {
+        $btnOrderCancel = '<a href="javascript:void(0)" onclick="cancel_order(' . $id . ')" class="btn btn-danger btn-xs" id="btnCancelOrder_' . $item->id_order . '" title="cancel order"><i class="fa fa-trash-o"></i> Cancel Order</a> ';
       } else {
-        $btnOrerCancel = '';
+        $btnOrderCancel = '';
       }
 
       // CONDITION FOR COMPLETE THE ORDER 
-      $checkStatusOrer = $this->order_m->getCheckPurchaseOrderOnProcess($item->id_order);
+      $checkStatusOrderProcess = $this->order_m->getCheckPurchaseOrderOnProcess($item->id_order);
 
-      if ($checkStatusOrer == true) {
-        $btnOrerComplete = '<a href="javascript:void(0)" onclick="complete_order(' . $id . ')" class="btn btn-success btn-xs" id="btnCompleteOrder" title="complete order"><i class="fa fa-cart-arrow-down"></i> Complete Order</a> ';
+      if ($checkStatusOrderProcess == true) {
+        $btnOrderComplete = '<a href="javascript:void(0)" onclick="complete_order(' . $id . ')" class="btn btn-success btn-xs" id="btnCompleteOrder_' . $item->id_order . '" title="complete order"><i class="fa fa-check"></i> Complete Order</a> ';
       } else {
-        $btnOrerComplete = '';
+        $btnOrderComplete = '';
       }
 
       // ADD HTML BUTTON ACTION
-      $row[] = '<input type="hidden" name="email_customer" id="email_customer_' . $item->id_order . '" value="' . $item->customer_email . '" readonly><a href="javascript:void(0)" class="btn btn-info btn-xs" onclick="detail_order(' . $id . ')" id="btnDetailOrder" title="detail order"><i class="fa fa-info" aria-hidden="true"></i> Info</a> ' .
+      $row[] = '<input type="hidden" name="email_customer" id="email_customer_' . $item->id_order . '" value="' . $item->customer_email . '" readonly><a href="javascript:void(0)" class="btn btn-info btn-xs" onclick="detail_order(' . $id . ')" id="btnDetailOrder_' . $item->id_order . '" title="detail order"><i class="fa fa-info" aria-hidden="true"></i> Info</a> ' .
 
         $btnApprovePayment .
 
@@ -108,11 +108,11 @@ class Order extends CI_Controller
 
         $btnDetailApproved .
 
-        $btnOrerCancel .
+        $btnOrderCancel .
 
-        $btnOrerComplete .
+        $btnOrderComplete .
 
-        '<a href=" ' . base_url() . 'order/printOrder/' . $item->id_order . '/' . $item->customer_email . '" target="__blank" class="btn btn-default btn-xs" id="btnPrintOrder" title="print order"><i class="fa fa-print"></i> Print Order</a>';
+        '<a href=" ' . base_url() . 'order/printOrder/' . $item->id_order . '/' . $item->customer_email . '" target="__blank" class="btn btn-default btn-xs" id="btnPrintOrder_' . $item->id_order . '" title="print order"><i class="fa fa-print"></i> Print Order</a>';
 
       $data[] = $row;
     }
@@ -227,16 +227,16 @@ class Order extends CI_Controller
     $this->email->to($data['customer_email']);
 
     if ($type == 'approve') {
-      $this->email->subject('Pembayaran_' . $data['invoice_order'] . '_Telah_Selesai_Oleh_Admin');
-      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->subject('Pembayaran_' . $data['invoice_order'] . '_Diproses_Oleh_Admin');
+      $this->email->message($this->load->view('email-templates/email-customer-order', $data, true));
       $this->email->set_mailtype("html");
     } else if ($type == 'complete') {
       $this->email->subject('Pesanan_' . $data['invoice_order'] . '_Telah_Selesai_Oleh_Admin');
-      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->message($this->load->view('email-templates/email-customer-order', $data, true));
       $this->email->set_mailtype("html");
     } else if ($type == 'cancel') {
       $this->email->subject('Pembatalan_Pesanan_' . $data['invoice_order'] . '_Oleh_Admin');
-      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->message($this->load->view('email-templates/email-customer-order', $data, true));
       $this->email->set_mailtype("html");
     }
 
@@ -636,24 +636,33 @@ class Order extends CI_Controller
   }
   // DETAIL ORDER
 
-  public function printOrder($order_id, $email)
+  public function printOrder($order_id = null, $email = null)
   {
-    $info['title'] = "Print Customer Order Page";
+    $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
 
     $info['company'] = $this->company_m->getCompanyById(1);
     $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
     $info['detail_company'] = $this->company_m->getLinkCompany();
     $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
 
-    $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
-    $getUnixTime = $dataOrder['purchase_order_date'] + 86400;
-    $info['order_date'] = date('d M Y H:i:s', $dataOrder['purchase_order_date']);
-    $info['order_date_due'] = date('d M Y H:i:s', $getUnixTime);
-    $info['data_order'] = $dataOrder;
     $info['customer'] = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
     $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($order_id);
 
     if ($dataOrder != null) {
+      $info['title'] = $dataOrder['invoice_order'];
+
+      $getUnixTime = $dataOrder['purchase_order_date'] + 86400;
+
+      if ($dataOrder['approve_date'] != null) {
+        $order_date = date('d M Y H:i:s', strtotime($dataOrder['approve_date']));
+      } else {
+        $order_date = date('d M Y H:i:s', $dataOrder['purchase_order_date']);
+      }
+
+      $info['order_date'] = $order_date;
+      $info['order_date_due'] = date('d M Y H:i:s', $getUnixTime);
+      $info['data_order'] = $dataOrder;
+
       $this->load->view('back-prints/header', $info);
       $this->load->view('back-prints/print-customer-order', $info);
       $this->load->view('back-prints/footer', $info);

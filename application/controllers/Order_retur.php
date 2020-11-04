@@ -20,55 +20,102 @@ class Order_retur extends CI_Controller
 
     $company = $this->company_m->getCompanyById(1);
     $info['company_data'] = $company;
-    $info['is_vat_enabled'] = ($company['vat_charge_value'] > 0) ? true : false;
-    $info['is_service_enabled'] = ($company['service_charge_value'] > 0) ? true : false;
+    $info['user'] = $this->auth_m->getUserSession();
+    $info['company'] = $this->company_m->getCompanyById(1);
+    $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
 
-    // $info['product'] = $this->product_m->getActiveProduct();
-
-
-    // $info[] = $this->load->view('modals/modal-order', $info);
-    // $info[] = $this->load->view('modals/modal-order-edit', $info);
-
-    // $info[] = $this->load->view('modals/modal-retur-order');
-    $info[] = $this->load->view('modals/modal-delete');
-
-    renderBackTemplate('retur_orders/index', $info);
+    $this->load->view('back-templates/header', $info);
+    $this->load->view('back-templates/topbar', $info);
+    $this->load->view('back-templates/navbar', $info);
+    $this->load->view('retur_orders/index', $info);
+    $this->load->view('modals/modal-return-approve', $info);
+    $this->load->view('modals/modal-detail-return');
+    $this->load->view('back-templates/footer', $info);
   }
 
   // DataTables Controller Setup
   function show_ajax_retur()
   {
-    $list = $this->returorder_m->get_datatables();
+    $list = $this->returOrder_m->get_datatables();
     $data = array();
     $no = @$_POST['start'];
     foreach ($list as $item) {
       $no++;
-      $id = htmlspecialchars(json_encode($item->order_id));
+      $id = htmlspecialchars(json_encode($item->id_return));
       $row = array();
       $row[] = $no . ".";
-      $row[] = $item->id;
-      $row[] = date('d M Y', strtotime($item->retur_date));
-      $row[] = $item->order_id;
-      $row[] = $item->total;
-      $row[] = $item->discount;
+      $row[] = $item->invoice_return;
+      $row[] = $item->invoice_order;
+      $row[] = $item->customer_email;
+      $row[] = $item->customer_name;
+      $row[] = date('d M Y H:i:s', strtotime($item->purchase_return_date));
+      $row[] = $item->total_product;
       $row[] = "Rp " . number_format($item->net_amount, 0, ',', '.');
-      if ($this->session->userdata('role_id') == 'tOBawuCPBAhAZzmyT10F1UbCIc7I42OwLBRmnRhS8e8=') {
-        $row[] = $item->user_create;
+      $row[] = '<span class="label label-' . $item->status_color . '">' . $item->status_name . '</span>';
+
+      // SHOW BUTTON APPROVE RETURN SETELAH TAMBAH RETURN
+      $dataStatusPendingForApprove = $this->returOrder_m->getReturnStatusPendingForApproveByID($item->id_return); // BY ID DAN STATUS ORDER 5 (PENDING)
+
+      if ($dataStatusPendingForApprove == true) {
+        $btnApproveReturn = '<a href="javascript:void(0)" onclick="approve_return(' . $id . ')" class="btn btn-success btn-xs" id="btnApproveReturn_' . $item->id_return . '" title="approve return"><i class="fa fa-check"></i> Approve Return</a> ';
+      } else {
+        $btnApproveReturn = '';
+      }
+
+      // SHOW BUTTON CANCEL SETELAH TAMBAH RETURN SAMPAI DATA APPROVED
+      $dataStatusPendingForCancel = $this->returOrder_m->getReturnStatusPendingForCancelByID($item->id_return); // BY ID DAN STATUS ORDER 5 (PENDING)
+
+      if ($dataStatusPendingForCancel['status_order_id'] == 5 || $dataStatusPendingForCancel['status_order_id'] == 6) {
+        $btnCancelReturn = '<a href="javascript:void(0)" onclick="cancel_return(' . $id . ')" class="btn btn-danger btn-xs" id="btnCancelReturn_' . $item->id_return . '" title="cancel return"><i class="fa fa-ban"></i> Cancel</a> ';
+      } else {
+        $btnCancelReturn = '';
+      }
+
+      // SHOW BUTTON UPDATE APPROVE SETELAH APPROVE RETURN SELESAI
+      $dataStatusProcess = $this->returOrder_m->getReturnStatusProcessByID($item->id_return); // BY ID DAN STATUS ORDER 6 (ON PROCESS)
+
+      if ($dataStatusProcess == true) {
+        $btnUpdateApproveReturn = '<a href="javascript:void(0)" onclick="update_approved_return(' . $id . ')" class="btn btn-warning btn-xs" id="btnUpdateApproveReturn_' . $item->id_return . '" title="update approved return"><i class="fa fa-exclamation-triangle"></i> Update Approved</a> ';
+      } else {
+        $btnUpdateApproveReturn = '';
+      }
+
+      // SHOW BUTTON COMPLETE APPROVE SETELAH APPROVE RETURN SELESAI
+      if ($dataStatusProcess == true) {
+        $btnApprovedCompleteReturn = '<a href="javascript:void(0)" onclick="complete_return(' . $id . ')" class="btn btn-success btn-xs" id="btnCompleteReturn_' . $item->id_return . '" title="complete return"><i class="fa fa-check"></i> Complete Return</a> ';
+      } else {
+        $btnApprovedCompleteReturn = '';
+      }
+
+      // SHOW BUTTON DETAIL APPROVE SETELAH RETURN SELESAI
+      $dataStatusSuccess = $this->returOrder_m->getReturnStatusSuccessByID($item->id_return); // BY ID DAN STATUS ORDER 7 (SUCCESS)
+
+      if ($dataStatusSuccess != null && ($dataStatusSuccess['status_order_id'] == 1 || $dataStatusSuccess['status_order_id'] == 7 || $dataStatusSuccess['status_order_id'] == 10)) {
+        $btnApprovedDetailReturn = '<a href="javascript:void(0)" onclick="detail_approved_return(' . $id . ')" class="btn btn-success btn-xs" title="detail approved return"><i class="fa fa-check"></i> Detail Approved</a> ';
+      } else {
+        $btnApprovedDetailReturn = '';
       }
 
       // add html for action
-      $row[] =
-        '
-        <!-- <a href="javascript:void(0)" onclick="delete_retur(' . $id . ')" class="btn btn-danger btn-xs" title="delete data"><i class="fa fa-trash-o"></i> Delete</a> -->
+      $row[] = '<input type="hidden" name="email_customer" id="email_customer_' . $item->id_return . '" value="' . $item->customer_email . '" readonly><a href="javascript:void(0)" class="btn btn-info btn-xs" onclick="detail_return(' . $id . ')" id="btnDetailReturn_' . $item->id_return . '" title="detail return"><i class="fa fa-info" aria-hidden="true"></i> Info</a> ' .
 
-        <a target="__blank" href="' . base_url('order_retur/print_retur/' . $item->order_id) . '" rel="noreferrer noopener" class="btn btn-default btn-xs" title="print data"><i class="fa fa-print"></i> Print</a>
-      ';
+        $btnApproveReturn .
+
+        $btnUpdateApproveReturn .
+
+        $btnCancelReturn .
+
+        $btnApprovedCompleteReturn .
+
+        $btnApprovedDetailReturn .
+
+        '<a target="__blank" href="' . base_url() . 'order_retur/printReturn/' . $item->id_return . '/' . $item->customer_email . '" rel="noreferrer noopener" id="btnPrintReturn_' . $item->id_return . '" class="btn btn-default btn-xs" title="print return"><i class="fa fa-print"></i> Print</a>';
       $data[] = $row;
     }
     $output = array(
       "draw" => @$_POST['draw'],
-      "recordsTotal" => $this->returorder_m->count_all(),
-      "recordsFiltered" => $this->returorder_m->count_filtered(),
+      "recordsTotal" => $this->returOrder_m->count_all(),
+      "recordsFiltered" => $this->returOrder_m->count_filtered(),
       "data" => $data,
     );
     // output to json format
@@ -76,9 +123,484 @@ class Order_retur extends CI_Controller
   }
   // DataTables Cntroller End Setup
 
+  private function _sendEmail($type, $data)
+  {
+    $dataEmail = $this->company_m->getEmail(1);
+
+    $config = [
+      'protocol' => 'smtp',
+      'smtp_host' => 'ssl://smtp.googlemail.com',
+      'smtp_user' => $dataEmail['email'],
+      'smtp_pass' => $dataEmail['password'],
+      'smtp_port' => 465,
+      'mailtype' => 'html',
+      'charset' => 'utf-8',
+      'newline' => "\r\n"
+    ];
+
+    $this->load->library('email', $config);
+    $this->email->initialize($config);
+
+    $this->email->from($dataEmail['email'], $data['company_name']);
+    $this->email->to($data['customer_email']);
+
+    if ($type == 'approve') {
+      $this->email->subject('Order_Return_' . $data['invoice_return'] . '_Diproses_Oleh_Admin');
+      $this->email->message($this->load->view('email-templates/email-customer-return', $data, true));
+      $this->email->set_mailtype("html");
+    } else if ($type == 'complete') {
+      $this->email->subject('Order_Return_' . $data['invoice_return'] . '_Telah_Selesai_Oleh_Admin');
+      $this->email->message($this->load->view('email-templates/email-customer-return', $data, true));
+      $this->email->set_mailtype("html");
+    } else if ($type == 'cancel') {
+      $this->email->subject('Pembatalan_Return_' . $data['invoice_return'] . '_Oleh_Admin');
+      $this->email->message($this->load->view('email-templates/email-customer-return', $data, true));
+      $this->email->set_mailtype("html");
+    }
+
+    if ($this->email->send()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  private function _uploadResizeImage()
+  {
+    $config['upload_path']    = './image/customer_return/';
+    $config['allowed_types']  = 'gif|jpg|png';
+    $config['max_size']       = '1024';
+    $config['maintain_ratio'] = TRUE;
+    $config['quality'] = '90%';
+    $config['encrypt_name'] = TRUE; // md5(uniqid(mt_rand())).$this->file_ext;
+
+    $this->load->library('upload', $config);
+
+    if ($this->upload->do_upload('image')) {
+      return $this->upload->data('file_name');
+    } else {
+      return $this->upload->display_errors();
+    }
+  }
+
+  private function _uploadUpdateResizeImage()
+  {
+    $config['upload_path']    = './image/customer_return/';
+    $config['allowed_types']  = 'gif|jpg|png';
+    $config['max_size']       = '1024';
+    $config['maintain_ratio'] = TRUE;
+    $config['quality'] = '90%';
+    $config['encrypt_name'] = TRUE; // md5(uniqid(mt_rand())).$this->file_ext;
+
+    $this->load->library('upload', $config);
+
+    if ($this->upload->do_upload('image_new')) {
+      return $this->upload->data('file_name');
+    } else {
+      return $this->upload->display_errors();
+    }
+  }
+
+  // FOR APPROVE RETURN MODAL
+  public function getPurchaseReturnForApprove()
+  {
+    $return_id = $this->input->post('return_id');
+
+    $dataPurchaseReturnForApprove = $this->returOrder_m->getPurchaseReturnForApprove($return_id);
+    echo json_encode($dataPurchaseReturnForApprove);
+  }
+
+  public function setPurchaseReturnForApprove()
+  {
+    $response = array();
+    $return_id = $this->input->post('return_id');
+    $email = $this->input->post('customer_email');
+
+    $this->form_validation->set_rules('airwaybill_number', 'Airwaybill number can not be empty', 'trim|required');
+
+    if ($this->form_validation->run() == TRUE) {
+      $dataPurchaseReturn = [
+        'status_order_id' => 6,
+        'reminder_process' => 1
+      ];
+
+      $dataApproval = [
+        'purchase_return_id' => $return_id,
+        'approve_date' => date('Y-m-d H:i:s'),
+        'image' => $this->_uploadResizeImage(),
+        'responsible_admin' => $this->session->userdata('email'),
+      ];
+
+      $dataShippingReturn = [
+        'delivery_receipt_number' => $this->input->post('airwaybill_number')
+      ];
+
+      $insert = $this->returOrder_m->insertPaymentApprove($dataApproval);
+
+      if ($insert > 0) {
+        // update order return
+        $this->returOrder_m->updatePurchaseReturnFromApprove($return_id, $dataPurchaseReturn);
+
+        // update order return shipping
+        $this->returOrder_m->updatePurchaseReturnShipping($return_id, $dataShippingReturn);
+
+        $response['status'] = TRUE;
+        $response['message'] = 'Return has been approved!';
+
+        // email purposes
+        $dataCompany = $this->company_m->getCompanyById(1);
+        $info['company'] = $dataCompany;
+        $info['company_name'] = $dataCompany['company_name'];
+        $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+        $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+
+        $dataReturn = $this->customerPurchase_m->getDataPurchaseReturnByID($return_id, $email);
+        $info['data_return'] = $dataReturn;
+        $info['invoice_return'] = $dataReturn['invoice_return'];
+        $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+        $info['customer_email'] = $dataCustomer['email'];
+        $info['customer'] = $dataCustomer;
+        $info['detail_return'] = $this->customerPurchase_m->getDetailPurchaseReturnByID($return_id);
+
+        $this->_sendEmail('approve', $info);
+        // email purposes
+      } else {
+        $response['status'] = FALSE;
+        $response['message'] = 'Failed to accept return order!';
+      }
+    } else {
+      $response['status'] = FALSE;
+      $response['message'] = validation_errors();
+    }
+
+    echo json_encode($response);
+  }
+
+  public function getUpdatePurchaseReturnForApprove()
+  {
+    $return_id = $this->input->post('return_id');
+
+    $dataPurchaseReturnApproved = $this->returOrder_m->getPurchaseReturnApproved($return_id);
+    echo json_encode($dataPurchaseReturnApproved);
+  }
+
+  public function updatePurchaseReturnForApprove()
+  {
+    $response = array();
+    $return_id = $this->input->post('return_id');
+
+    $this->form_validation->set_rules('airwaybill_number', 'Airwaybill number can not be empty', 'trim|required');
+
+    if ($this->form_validation->run() == TRUE) {
+      if (empty($_FILES['image_new']['name'])) {
+        $data = [
+          'responsible_admin' => $this->session->userdata('email')
+        ];
+      } else {
+        $data = [
+          'image' => $this->_uploadUpdateResizeImage(),
+          'responsible_admin' => $this->session->userdata('email')
+        ];
+
+        @unlink('./image/customer_return/' . $this->input->post('old_image'));
+      }
+
+      $dataShippingReturn = [
+        'delivery_receipt_number' => $this->input->post('airwaybill_number')
+      ];
+
+      $updateShipping = $this->returOrder_m->updatePurchaseReturnShipping($return_id, $dataShippingReturn);
+
+      $updateApproves = $this->returOrder_m->updatePurchaseReturnApprove($return_id, $data);
+
+      if ($updateApproves > 0 || $updateShipping > 0) {
+        $response['status'] = TRUE;
+        $response['message'] = 'Return order approve has been updated!';
+      } else {
+        $response['status'] = FALSE;
+        $response['message'] = 'There is something wrong, please update again!';
+      }
+    } else {
+      $response['status'] = FALSE;
+      $response['message'] = validation_errors();
+    }
+
+    echo json_encode($response);
+  }
+
+  public function completeReturn()
+  {
+    $response = array();
+    $email = $this->input->post('email');
+    $return_id = $this->input->post('return_id');
+
+    $data = [
+      'status_order_id' => 7,
+      'reminder_complete' => 1
+    ];
+
+    $updateCustomerReturn = $this->customerPurchase_m->updateDataCustomerReturnByID($return_id, $data);
+
+    if ($updateCustomerReturn > 0) {
+      $response['status'] = true;
+      $response['message'] = 'Congratulations the order return ' . $return_id . ' process has been completed!';
+
+      // email purposes
+      $dataCompany = $this->company_m->getCompanyById(1);
+      $info['company'] = $dataCompany;
+      $info['company_name'] = $dataCompany['company_name'];
+      $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+      $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+
+      $dataReturn = $this->customerPurchase_m->getDataPurchaseReturnByID($return_id, $email);
+      $info['data_return'] = $dataReturn;
+      $info['invoice_return'] = $dataReturn['invoice_return'];
+      $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+      $info['customer_email'] = $dataCustomer['email'];
+      $info['customer'] = $dataCustomer;
+      $info['detail_return'] = $this->customerPurchase_m->getDetailPurchaseReturnByID($return_id);
+
+      $this->_sendEmail('complete', $info);
+      // email purposes
+    } else {
+      $response['status'] = false;
+      $response['message'] = 'Sorry, there was an error regarding the complete return!';
+    }
+
+    echo json_encode($response);
+  }
+
+  public function getDetailCustomerReturn()
+  {
+    $response = array();
+    $return_id = $this->input->post('return_id');
+    $email = $this->input->post('email');
+
+    $company = $this->company_m->getCompanyById(1);
+    $company_address = $this->company_m->getFullAdressCustomer(1);
+    $company_bank = $this->company_m->getCompanyBankAccount(1);
+
+    $dataReturn = $this->customerPurchase_m->getDataPurchaseReturnByID($return_id, $email);
+    $customer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+    $detail_return = $this->customerPurchase_m->getDetailPurchaseReturnByID($return_id);
+
+    $html = '';
+
+    if ($dataReturn != null) {
+      $html .= '
+      <div class="box-body">
+        <div class="row mb-4">
+          <div class="col-sm-6">
+            <h6 class="mb-3">From:</h6>
+            <div>
+              <strong>' . $company['company_name'] . '</strong>
+            </div>
+            <div>' . $company_address['street_name'] . ', ' . $company_address['city_name'] . ', ' . $company_address['province'] . '</div>
+            <div>Email: ' . $company['business_email'] . '</div>
+            <div>Phone: ' . $company['phone'] . '</div>';
+
+      if ($company_bank != null) {
+        foreach ($company_bank as $val) {
+          $html .= '<div><strong>' . $val['bank_name'] . ': ' . $val['account'] . ' (' . $val['account_holder_name'] . ')</strong></div>';
+        }
+      }
+      $html .= '</div>
+
+          <div class="col-sm-6">
+            <h6 class="mb-3">To:</h6>
+            <div>
+              <strong>' . $customer['customer_name'] . '</strong>
+            </div>
+            <div>' . $customer['street_name'] . ', ' . $customer['city_name'] . ', ' . $customer['province'] . '</div>
+            <div>Email: ' . $customer['email'] . '</div>
+            <div>Phone: ' . $customer['customer_phone'] . '</div>
+          </div>
+        </div>
+
+        <div class="table-responsive-sm">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="center">#</th>
+                <th>Item Name</th>
+                <th>Weight</th>
+                <th class="right">Price</th>
+                <th class="center">Qty</th>
+                <th class="right">Total</th>
+              </tr>
+            </thead>
+            <tbody>';
+
+      if ($detail_return != null && $detail_return != 0) {
+        $no = 1;
+        foreach ($detail_return as $val) {
+          $html .= '<tr>
+                    <td class="center">' . $no++ . '</td>
+
+                    <td class="left strong">' . $val['product_name'] . '</td>
+
+                    <td class="center">' . $val['weight_return'] . ' Gram</td>
+                    <td class="right">Rp. ' . number_format($val['price'], 0, ',', '.') . '</td>
+                    <td class="center">' . $val['qty_return'] . '</td>
+                    <td class="right">Rp. ' . number_format($val['amount'], 0, ',', '.') . '</td>
+                  </tr>';
+        }
+      }
+
+      $html .= '</tbody>
+          </table>
+        </div>
+        <div class="row">
+        <div class="col-xs-6 ml-auto"></div>
+
+          <div class="col-xs-6 ml-auto">
+            <table class="table table-clear">
+              <tbody>
+                <tr>
+                  <td class="left">
+                    <strong>Sub-total</strong>
+                  </td>
+                  <td class="right">Rp. ' . number_format($dataReturn['gross_amount'], 0, ',', '.') . '</td>
+                </tr>';
+
+      if ($dataReturn['ship_amount'] != null && $dataReturn['ship_amount'] != 0) {
+        $html .= '<tr>
+                    <td class="left">
+                      <strong>Shipping cost</strong>
+                    </td>
+                    <td class="right">Rp. ' . number_format($dataReturn['ship_amount'], 0, ',', '.') . '  (' . $dataReturn['courier'] . ' - ' . $dataReturn['service'] . ')</td>
+                  </tr>';
+      }
+
+      $html .= '<tr>
+                  <td class="left">
+                    <strong>Total</strong>
+                  </td>
+                  <td class="right">
+                    <strong>Rp. ' . number_format($dataReturn['net_amount'], 0, ',', '.') . '</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>';
+    } else {
+      $response['html'] = [];
+    }
+
+    $response['html'] = $html;
+    $response['invoice'] = $dataReturn['invoice_return'];
+    echo json_encode($response);
+  }
+
+  public function printReturn($return_id, $email)
+  {
+    $dataReturn = $this->customerPurchase_m->getDataPurchaseReturnByID($return_id, $email);
+
+
+    $info['company'] = $this->company_m->getCompanyById(1);
+    $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+    $info['detail_company'] = $this->company_m->getLinkCompany();
+    $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+
+
+    $info['customer'] = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+    $info['detail_return'] = $this->customerPurchase_m->getDetailPurchaseReturnByID($return_id);
+
+    if ($dataReturn != null) {
+      $info['title'] = $dataReturn['invoice_return'];
+
+      if ($dataReturn['approve_date'] != null) {
+        $return_date = date('d M Y H:i:s', strtotime($dataReturn['approve_date']));
+      } else {
+        $return_date = date('d M Y H:i:s', strtotime($dataReturn['purchase_return_date']));
+      }
+
+      $info['return_date'] = $return_date;
+      $info['data_return'] = $dataReturn;
+
+      $this->load->view('back-prints/header', $info);
+      $this->load->view('back-prints/print-customer-return', $info);
+      $this->load->view('back-prints/footer', $info);
+    } else {
+      $this->load->view('back-prints/header', $info);
+      $this->load->view('back-prints/footer', $info);
+    }
+  }
+
+  public function cancelReturn()
+  {
+    $response = array();
+    $email = $this->input->post('email');
+    $return_id = $this->input->post('return_id');
+
+    // JIKA TERDETEKSI CANCEL SUDAH MEMBAYAR MAKA ADA KONDISI DIMANA STOCK BARANG DIKEMBALIKAN
+    $checkReturnApproved = $this->returOrder_m->getCheckReturnApprovedByID($return_id);
+
+    // email purposes
+    $dataCompany = $this->company_m->getCompanyById(1);
+    $info['company'] = $dataCompany;
+    $info['company_name'] = $dataCompany['company_name'];
+    $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+    $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+
+    $dataReturn = $this->customerPurchase_m->getDataPurchaseReturnByID($return_id, $email);
+    $info['data_return'] = $dataReturn;
+    $info['invoice_return'] = $dataReturn['invoice_return'];
+    $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+    $info['customer_email'] = $dataCustomer['email'];
+    $info['customer'] = $dataCustomer;
+    $info['detail_return'] = $this->customerPurchase_m->getDetailPurchaseReturnByID($return_id);
+    // email purposes
+
+    if ($checkReturnApproved != null) {
+
+      $data = [
+        'status_order_id' => 10,
+        'reminder_cancel' => 1
+      ];
+
+      $updateCancelReturn = $this->customerPurchase_m->updateDataCustomerReturnByID($return_id, $data); // karena memiliki table yang sama maka hiraukan nama
+
+      if ($updateCancelReturn > 0) {
+        $response['status'] = true;
+        $response['message'] = 'Successfully canceled the return ' . $return_id . ' and, please confirm the refund!';
+
+        $this->_sendEmail('cancel', $info);
+      } else {
+        $response['status'] = false;
+        $response['message'] = 'Sorry, there was an error regarding the cancel return!';
+      }
+    } else {
+      $data = [
+        'status_order_id' => 1,
+        'reminder_cancel' => 1
+      ];
+
+      $updateCancelReturn = $this->customerPurchase_m->updateDataCustomerReturnByID($return_id, $data); // karena memiliki table yang sama maka hiraukan nama
+
+      if ($updateCancelReturn > 0) {
+        $response['status'] = true;
+        $response['message'] = 'Successfully canceled the return ' . $return_id;
+
+        $this->_sendEmail('cancel', $info);
+      } else {
+        $response['status'] = false;
+        $response['message'] = 'Sorry, there was an error regarding the cancel return!';
+      }
+    }
+
+    echo json_encode($response);
+  }
+  // FOR APPROVE RETURN MODAL
+
   public function getCustomerOrder()
   {
-    $data = $this->returorder_m->getOrders();
+    $data = $this->returOrder_m->getOrders();
     echo json_encode($data);
   }
 
@@ -90,7 +612,7 @@ class Order_retur extends CI_Controller
 
   public function getTableProductRow()
   {
-    $data = $this->returorder_m->getProductOrder($this->input->post('order_id', true));
+    $data = $this->returOrder_m->getProductOrder($this->input->post('order_id', true));
     echo json_encode($data);
   }
 
@@ -104,7 +626,7 @@ class Order_retur extends CI_Controller
   {
     $product_id = $this->input->post('product_id');
     if ($product_id) {
-      $data = $this->returorder_m->getProductDetailsQtyByID($product_id);
+      $data = $this->returOrder_m->getProductDetailsQtyByID($product_id);
       echo json_encode($data);
     }
   }
@@ -113,7 +635,7 @@ class Order_retur extends CI_Controller
   {
     $product_id = $this->input->post('product_id');
     if ($product_id) {
-      $data = $this->returorder_m->getProductDetailsByID($product_id);
+      $data = $this->returOrder_m->getProductDetailsByID($product_id);
       echo json_encode($data);
     }
   }
@@ -166,12 +688,12 @@ class Order_retur extends CI_Controller
     } else {
       $count_product = count($this->input->post('product'));
       for ($j = 0; $j < $count_product; $j++) {
-        $getProduct = $this->returorder_m->getProductDetailsByID($this->input->post('product')[$j]);
+        $getProduct = $this->returOrder_m->getProductDetailsByID($this->input->post('product')[$j]);
         $qtyProduct = $this->input->post('qty')[$j];
       }
 
       if ($qtyProduct <= $getProduct['order_qty']) {
-        $this->returorder_m->insertOrderRetur($file);
+        $this->returOrder_m->insertOrderRetur($file);
 
         // Store to sales_order_details
         for ($i = 0; $i < $count_product; $i++) {
@@ -185,7 +707,7 @@ class Order_retur extends CI_Controller
             'amount' => $this->input->post('amount_value')[$i]
           );
 
-          $this->returorder_m->insertOrderReturDetails($products);
+          $this->returOrder_m->insertOrderReturDetails($products);
 
           // Update qty product to increase stock after doing new retur 
           $data_product = $this->product_m->getProductById($this->input->post('product')[$i]);
@@ -198,14 +720,14 @@ class Order_retur extends CI_Controller
           $this->product_m->update($this->input->post('product')[$i], $update_product);
 
           // Update qty order details to decrease stock after doing new retur 
-          $data_order_detail = $this->returorder_m->getOrdersById($this->input->post('product')[$i]);
+          $data_order_detail = $this->returOrder_m->getOrdersById($this->input->post('product')[$i]);
           $qty_order_detail = (int) $data_order_detail['qty'] - (int) $this->input->post('qty')[$i];
 
           $update_order_detail = array(
             'qty' => $qty_order_detail
           );
 
-          $this->returorder_m->updateOrderDetail($this->input->post('product')[$i], $update_order_detail);
+          $this->returOrder_m->updateOrderDetail($this->input->post('product')[$i], $update_order_detail);
 
           // Update net amount order after doing new retur 
           $amount_order = (int) $data_order_detail['amount'] - (int) $this->input->post('amount_value')[$i];
@@ -214,10 +736,10 @@ class Order_retur extends CI_Controller
             'amount' => $amount_order
           );
 
-          $this->returorder_m->updateOrderDetail($this->input->post('product')[$i], $update_amount_order);
+          $this->returOrder_m->updateOrderDetail($this->input->post('product')[$i], $update_amount_order);
         }
 
-        $data_order = $this->returorder_m->getSimpleOrdersById($this->input->post('order_id'));
+        $data_order = $this->returOrder_m->getSimpleOrdersById($this->input->post('order_id'));
 
         $net_amount_order = (int) $data_order['net_amount'] - (int) $this->input->post('net_amount_value');
 
@@ -225,7 +747,7 @@ class Order_retur extends CI_Controller
           'net_amount' => $net_amount_order
         );
 
-        $this->returorder_m->update($this->input->post('order_id'), $update_netamount_order);
+        $this->returOrder_m->update($this->input->post('order_id'), $update_netamount_order);
 
         $this->session->set_flashdata('success', 'Your retur order has been added !');
         redirect('order_retur', 'refresh');
@@ -251,9 +773,9 @@ class Order_retur extends CI_Controller
 
   public function print_retur($id)
   {
-    $retur_data = $this->returorder_m->getReturOrdersById($id);
+    $retur_data = $this->returOrder_m->getReturOrdersById($id);
 
-    $retur_detail_data = $this->returorder_m->getReturOrderDetailsById($id);
+    $retur_detail_data = $this->returOrder_m->getReturOrderDetailsById($id);
 
     $company_data = $this->company_m->getCompanyById(1);
 

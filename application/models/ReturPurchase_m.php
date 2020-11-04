@@ -2,7 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class ReturPurchase_m extends CI_Model
+class returPurchase_m extends CI_Model
 {
 
   // DataTables Model Setup
@@ -204,4 +204,4 @@ class ReturPurchase_m extends CI_Model
   }
 }
   
-  /* End of file ReturPurchase_m.php */
+  /* End of file returPurchase_m.php */

@@ -5,6 +5,10 @@ function renderAuthTemplate($page = null, $data = array())
 {
   $ci = &get_instance();
 
+  $data['user'] = $ci->auth_m->getUserSession();
+  $data['company'] = $ci->company_m->getCompanyById(1);
+  $data['company_address'] = $ci->company_m->getFullAdressCustomer(1);
+
   $ci->load->view('back-templates/header_auth', $data);
   $ci->load->view($page, $data);
   $ci->load->view('back-templates/footer_auth', $data);

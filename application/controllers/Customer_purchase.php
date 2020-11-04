@@ -146,11 +146,11 @@ class Customer_purchase extends CI_Controller
 
     if ($type == 'payment') {
       $this->email->subject('Selesaikan_Pembayaran_' . $data['invoice_order']);
-      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->message($this->load->view('email-templates/email-customer-order', $data, true));
       $this->email->set_mailtype("html");
     } else if ($type == 'cancel') {
       $this->email->subject('Pembatalan_Pesanan_' . $data['invoice_order']);
-      $this->email->message($this->load->view('front-email-template/email-customer-order', $data, true));
+      $this->email->message($this->load->view('email-templates/email-customer-order', $data, true));
       $this->email->set_mailtype("html");
     }
 

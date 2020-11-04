@@ -27,7 +27,7 @@ class Purchase_retur extends CI_Controller
   // DataTables Controller Setup
   function show_ajax_retur()
   {
-    $list = $this->returpurchase_m->get_datatables();
+    $list = $this->returPurchase_m->get_datatables();
     $data = array();
     $no = @$_POST['start'];
     foreach ($list as $item) {
@@ -56,8 +56,8 @@ class Purchase_retur extends CI_Controller
     }
     $output = array(
       "draw" => @$_POST['draw'],
-      "recordsTotal" => $this->returpurchase_m->count_all(),
-      "recordsFiltered" => $this->returpurchase_m->count_filtered(),
+      "recordsTotal" => $this->returPurchase_m->count_all(),
+      "recordsFiltered" => $this->returPurchase_m->count_filtered(),
       "data" => $data,
     );
     // output to json format
@@ -67,7 +67,7 @@ class Purchase_retur extends CI_Controller
 
   public function getSupplierOrder()
   {
-    $data = $this->returpurchase_m->getPurchase();
+    $data = $this->returPurchase_m->getPurchase();
     echo json_encode($data);
   }
 
@@ -79,7 +79,7 @@ class Purchase_retur extends CI_Controller
 
   public function getTableProductRow()
   {
-    $data = $this->returpurchase_m->getProductPurchase($this->input->post('purchase_id', true));
+    $data = $this->returPurchase_m->getProductPurchase($this->input->post('purchase_id', true));
     echo json_encode($data);
   }
 
@@ -93,7 +93,7 @@ class Purchase_retur extends CI_Controller
   {
     $product_id = $this->input->post('product_id');
     if ($product_id) {
-      $data = $this->returpurchase_m->getProductDetailsQtyByID($product_id);
+      $data = $this->returPurchase_m->getProductDetailsQtyByID($product_id);
       echo json_encode($data);
     }
   }
@@ -102,7 +102,7 @@ class Purchase_retur extends CI_Controller
   {
     $product_id = $this->input->post('product_id');
     if ($product_id) {
-      $data = $this->returpurchase_m->getProductDetailsByID($product_id);
+      $data = $this->returPurchase_m->getProductDetailsByID($product_id);
       echo json_encode($data);
     }
   }
@@ -155,12 +155,12 @@ class Purchase_retur extends CI_Controller
     } else {
       $count_product = count($this->input->post('product'));
       for ($j = 0; $j < $count_product; $j++) {
-        $getProduct = $this->returpurchase_m->getProductDetailsByID($this->input->post('product')[$j]);
+        $getProduct = $this->returPurchase_m->getProductDetailsByID($this->input->post('product')[$j]);
         $qtyProduct = $this->input->post('qty')[$j];
       }
 
       if ($qtyProduct <= $getProduct['order_qty']) {
-        $this->returpurchase_m->insertPurchaseRetur($file);
+        $this->returPurchase_m->insertPurchaseRetur($file);
 
         // Store to sales_order_details
         for ($i = 0; $i < $count_product; $i++) {
@@ -174,7 +174,7 @@ class Purchase_retur extends CI_Controller
             'amount' => $this->input->post('amount_value')[$i]
           );
 
-          $this->returpurchase_m->insertPurchaseReturDetails($products);
+          $this->returPurchase_m->insertPurchaseReturDetails($products);
 
           // Update qty product to increase stock after doing new retur 
           $data_product = $this->product_m->getProductById($this->input->post('product')[$i]);
@@ -187,14 +187,14 @@ class Purchase_retur extends CI_Controller
           $this->product_m->update($this->input->post('product')[$i], $update_product);
 
           // Update qty order details to decrease stock after doing new retur 
-          $data_purchase_detail = $this->returpurchase_m->getPurchaseById($this->input->post('product')[$i]);
+          $data_purchase_detail = $this->returPurchase_m->getPurchaseById($this->input->post('product')[$i]);
           $qty_order_detail = (int) $data_purchase_detail['qty'] - (int) $this->input->post('qty')[$i];
 
           $update_order_detail = array(
             'qty' => $qty_order_detail
           );
 
-          $this->returpurchase_m->updatePurchaseDetail($this->input->post('product')[$i], $update_order_detail);
+          $this->returPurchase_m->updatePurchaseDetail($this->input->post('product')[$i], $update_order_detail);
 
           // Update net amount order after doing new retur 
           $amount_order = (int) $data_purchase_detail['amount'] - (int) $this->input->post('amount_value')[$i];
@@ -203,10 +203,10 @@ class Purchase_retur extends CI_Controller
             'amount' => $amount_order
           );
 
-          $this->returpurchase_m->updatePurchaseDetail($this->input->post('product')[$i], $update_amount_order);
+          $this->returPurchase_m->updatePurchaseDetail($this->input->post('product')[$i], $update_amount_order);
         }
 
-        $data_order = $this->returpurchase_m->getSimplePurchaseById($this->input->post('purchase_id'));
+        $data_order = $this->returPurchase_m->getSimplePurchaseById($this->input->post('purchase_id'));
 
         $net_amount_order = (int) $data_order['net_amount'] - (int) $this->input->post('net_amount_value');
 
@@ -214,7 +214,7 @@ class Purchase_retur extends CI_Controller
           'net_amount' => $net_amount_order
         );
 
-        $this->returpurchase_m->update($this->input->post('purchase_id'), $update_netamount_order);
+        $this->returPurchase_m->update($this->input->post('purchase_id'), $update_netamount_order);
 
         $this->session->set_flashdata('success', 'Your retur order has been added !');
         redirect('purchase_retur', 'refresh');
@@ -240,8 +240,8 @@ class Purchase_retur extends CI_Controller
 
   public function print_retur($id)
   {
-    $retur_data = $this->returpurchase_m->getReturPurchaseById($id);
-    $retur_detail_data = $this->returpurchase_m->getReturPurchaseDetailsById($id);
+    $retur_data = $this->returPurchase_m->getReturPurchaseById($id);
+    $retur_detail_data = $this->returPurchase_m->getReturPurchaseDetailsById($id);
 
     $company_data = $this->company_m->getCompanyById(1);
     $getSupplier = $this->purchase_m->getPurchaseByID($id);

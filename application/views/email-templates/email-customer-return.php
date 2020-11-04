@@ -22,8 +22,8 @@
       <div class="card mb-3 shadow">
         <div class="card-header">
           Invoice
-          <strong><?php echo $data_order['invoice_order'] ?></strong>
-          <span class="float-right"> <strong>Status:</strong> <?php echo $data_order['status_name'] ?></span>
+          <strong><?php echo $data_return['invoice_return'] ?></strong>
+          <span class="float-right"> <strong>Status:</strong> <?php echo $data_return['status_name'] ?></span>
 
         </div>
         <div class="card-body">
@@ -69,17 +69,17 @@
               </thead>
               <tbody>
 
-                <?php if ($detail_order != null && $detail_order != 0) : ?>
+                <?php if ($detail_return != null && $detail_return != 0) : ?>
                   <?php $no = 1; ?>
-                  <?php foreach ($detail_order as $val) : ?>
+                  <?php foreach ($detail_return as $val) : ?>
                     <tr>
                       <td class="center"><?php echo $no++; ?></td>
 
                       <td class="left strong"><?php echo $val['product_name'] ?></td>
 
-                      <td class="center"><?php echo $val['weight_order'] ?> Gram</td>
+                      <td class="center"><?php echo $val['weight_return'] ?> Gram</td>
                       <td class="right">Rp. <?php echo number_format($val['price'], 0, ',', '.') ?></td>
-                      <td class="center"><?php echo $val['qty_order'] ?></td>
+                      <td class="center"><?php echo $val['qty_return'] ?></td>
                       <td class="right">Rp. <?php echo number_format($val['amount'], 0, ',', '.') ?></td>
                     </tr>
                   <?php endforeach; ?>
@@ -97,31 +97,15 @@
                     <td class="left">
                       <strong>Sub-total</strong>
                     </td>
-                    <td class="right">Rp. <?php echo number_format($data_order['gross_amount'], 0, ',', '.') ?></td>
+                    <td class="right">Rp. <?php echo number_format($data_return['gross_amount'], 0, ',', '.') ?></td>
                   </tr>
 
-                  <?php if ($data_order['ship_amount'] != null && $data_order['ship_amount'] != 0) : ?>
+                  <?php if ($data_return['ship_amount'] != null && $data_return['ship_amount'] != 0) : ?>
                     <tr>
                       <td class="left">
                         <strong>Shipping cost</strong>
                       </td>
-                      <td class="right">Rp. <?php echo number_format($data_order['ship_amount'], 0, ',', '.') ?></td>
-                    </tr>
-                  <?php endif; ?>
-
-                  <tr>
-                    <td class="left">
-                      <strong>VAT (<?php echo $data_order['vat_charge_rate'] ?>%)</strong>
-                    </td>
-                    <td class="right">Rp. <?php echo number_format($data_order['vat_charge_val'], 0, ',', '.') ?></td>
-                  </tr>
-
-                  <?php if ($data_order['coupon_charge_rate'] != null && $data_order['coupon_charge_rate'] != 0) : ?>
-                    <tr>
-                      <td class="left">
-                        <strong>Coupon (<?php echo $data_order['coupon_charge_rate'] ?>%)</strong>
-                      </td>
-                      <td class="right">Rp. <?php echo number_format($data_order['coupon_charge'], 0, ',', '.') ?></td>
+                      <td class="right">Rp. <?php echo number_format($data_return['ship_amount'], 0, ',', '.') ?> (<?php echo $data_order['courier'] ?> - <?php echo $data_order['service'] ?>)</td>
                     </tr>
                   <?php endif; ?>
 
@@ -130,7 +114,7 @@
                       <strong>Total</strong>
                     </td>
                     <td class="right">
-                      <strong>Rp. <?php echo number_format($data_order['net_amount'], 0, ',', '.') ?></strong>
+                      <strong>Rp. <?php echo number_format($data_return['net_amount'], 0, ',', '.') ?></strong>
                     </td>
                   </tr>
                 </tbody>

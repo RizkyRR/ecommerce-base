@@ -5,7 +5,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Order_m extends CI_Model
 {
   // DataTables Model Setup
-  var $column_order = array(null, 'customer_purchase_orders.id', 'customer_purchase_orders.invoice_order', 'customer_purchase_orders.created_date', null, null, 'status_orders.status_name', null); //set column field database for datatable orderable 
+  var $column_order = array(null, 'customer_purchase_orders.invoice_order', 'customer_purchase_orders.customer_email', 'customers.customer_name', 'customer_purchase_orders.created_date', 'SUM(customer_purchase_order_details.qty)', 'customer_purchase_orders.net_amount', 'status_orders.status_name', null); //set column field database for datatable orderable 
   var $column_search = array('customer_purchase_orders.id', 'customer_purchase_orders.invoice_order', 'customer_purchase_orders.created_date', 'status_orders.status_name'); //set column field database for datatable searchable
   var $order = array('customer_purchase_orders.created_date' => 'desc');  // default order
 
@@ -103,38 +103,39 @@ class Order_m extends CI_Model
 
   public function getCheckPurchaseOrderComplete($order_id)
   {
-    $this->db->select('*');
-    $this->db->from('customer_purchase_orders');
+    $this->db->select('*, customer_purchase_orders.id AS id_order, customer_purchase_order_approves.id AS id_order_approves');
 
-    $this->db->where('id', $order_id);
-    $this->db->where('status_order_id = 4');
+    $this->db->from('customer_purchase_order_approves');
+    $this->db->join('customer_purchase_orders', 'customer_purchase_orders.id = customer_purchase_order_approves.purchase_order_id', 'left');
+
+    $this->db->where('customer_purchase_order_approves.purchase_order_id', $order_id);
+    // $this->db->where('status_order_id = 4');
 
     $query = $this->db->get();
+    return $query->row_array();
 
-    if ($query->num_rows() > 0) {
+    /* if ($query->num_rows() > 0) {
       return true;
     } else {
       return false;
-    }
+    } */
   }
 
   public function getCheckPurchaseOrderCancel($order_id)
   {
-    $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status');
+    $this->db->where('id', $order_id);
+    /* $this->db->where('status_order_id = 2');
+    $this->db->where('status_order_id = 3'); */
 
-    $this->db->from('customer_purchase_orders');
-    $this->db->join('status_orders', 'status_orders.id = customer_purchase_orders.status_order_id', 'left');
+    $query = $this->db->get('customer_purchase_orders');
 
-    $this->db->where('customer_purchase_orders.id', $order_id);
-    $this->db->where('status_order_id = 2 OR status_order_id = 3');
+    return $query->row_array();
 
-    $query = $this->db->get();
-
-    if ($query->num_rows() > 0) {
+    /* if ($query->num_rows() > 0) {
       return true;
     } else {
       return false;
-    }
+    } */
   }
 
   public function getCheckPurchaseOrderOnProcess($order_id)

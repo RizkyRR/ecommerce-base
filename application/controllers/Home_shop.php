@@ -18,7 +18,7 @@ class Home_shop extends CI_Controller
     $info['detail_company'] = $this->company_m->getLinkCompany();
 
     // Show store banner for give them info about dicount and anything else 
-    $info['store_banner'] = $this->storebanner_m->getAllStoreBanner();
+    $info['store_banner'] = $this->storeBanner_m->getAllStoreBanner();
 
     // Show Deals of The Day from Server (Deals of The Day means items that get a discounted price)
     $info['check_discount'] = $this->db->get('product_discounts');

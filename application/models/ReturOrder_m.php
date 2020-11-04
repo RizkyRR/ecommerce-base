@@ -5,19 +5,21 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class ReturOrder_m extends CI_Model
 {
   // DataTables Model Setup
-
-  var $column_order = array(null, 'id', 'retur_date', 'order_id', null, 'discount', 'net_amount'); //set column field database for datatable orderable 
-
-  var $column_search = array('id', 'retur_date', 'order_id'); //set column field database for datatable searchable
-
-  var $order = array('retur_date' => 'desc');  // default order
+  var $column_order = array(null, 'customer_purchase_returns.invoice_return', 'customer_purchase_orders.invoice_order', 'customer_purchase_returns.customer_email', 'customers.customer_name', 'customer_purchase_returns.created_date', 'SUM(customer_purchase_return_details.qty)', 'customer_purchase_returns.net_amount', 'status_orders.status_name', null); //set column field database for datatable orderable 
+  var $column_search = array('customer_purchase_returns.invoice_return', 'customer_purchase_orders.invoice_order', 'customer_purchase_returns.customer_email', 'customers.customer_name', 'customer_purchase_returns.created_date', 'status_orders.status_name'); //set column field database for datatable searchable
+  var $order = array('customer_purchase_returns.created_date' => 'desc');  // default order
 
   private function _get_datatables_query()
   {
-    $this->db->select('*, COUNT(retur_id) as total');
-    $this->db->from('order_returns');
-    $this->db->join('order_return_details', 'order_return_details.retur_id = order_returns.id');
-    $this->db->group_by('retur_id');
+    $this->db->select('*, customer_purchase_orders.id AS id_order, SUM(customer_purchase_return_details.qty) as total_product, customer_purchase_returns.id AS id_return, customer_purchase_return_details.id AS id_return_detail, status_orders.id AS id_status, customer_purchase_returns.status_order_id AS status_order, customer_purchase_return_details.status_order_id AS status_order_detail');
+
+    $this->db->from('customer_purchase_returns');
+    $this->db->join('customer_purchase_return_details', 'customer_purchase_return_details.purchase_return_id = customer_purchase_returns.id', 'left');
+    $this->db->join('customer_purchase_orders', 'customer_purchase_orders.id = customer_purchase_returns.purchase_order_id', 'left');
+    $this->db->join('status_orders', 'status_orders.id = customer_purchase_returns.status_order_id', 'left');
+    $this->db->join('customers', 'customers.customer_email = customer_purchase_returns.customer_email', 'left');
+
+    $this->db->group_by('customer_purchase_return_details.purchase_return_id');
 
     $i = 0;
     foreach ($this->column_search as $retur) { // loop column
@@ -60,10 +62,139 @@ class ReturOrder_m extends CI_Model
 
   function count_all()
   {
-    $this->db->from('order_returns');
+    $this->db->from('customer_purchase_returns');
     return $this->db->count_all_results();
   }
   // DataTables Model End Setup
+
+  // CANCEL BUTTON CONDITION
+  public function getReturnStatusPendingForCancelByID($id)
+  {
+    $this->db->where('id', $id);
+
+    $query = $this->db->get('customer_purchase_returns');
+
+    return $query->row_array();
+  }
+
+  // GET RETURN APPROVE BUTTON 
+  public function getReturnStatusPendingForApproveByID($id)
+  {
+    $this->db->where('id', $id);
+    $this->db->where('status_order_id', 5);
+
+    $query = $this->db->get('customer_purchase_returns');
+
+    if ($query->num_rows() > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // GET RETURN STATUS ON PROCESS
+  public function getReturnStatusProcessByID($id)
+  {
+    $this->db->where('id', $id);
+    $this->db->where('status_order_id', 6);
+
+    $query = $this->db->get('customer_purchase_returns');
+
+    if ($query->num_rows() > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // GET RETURN STATUS ON PROCESS
+  public function getReturnStatusSuccessByID($id)
+  {
+    $this->db->select('*, customer_purchase_returns.id AS id_return, customer_purchase_return_approves.id AS id_return_approves');
+
+    $this->db->from('customer_purchase_return_approves');
+    $this->db->join('customer_purchase_returns', 'customer_purchase_returns.id = customer_purchase_return_approves.purchase_return_id', 'left');
+
+    $this->db->where('customer_purchase_return_approves.purchase_return_id', $id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  // FOR APPROVE RETURN MODAL
+  public function getPurchaseReturnForApprove($return_id)
+  {
+    $this->db->select('*, customer_purchase_returns.id AS id_return, customer_purchase_return_shipping.id AS id_return_shipping, customers.customer_email AS email');
+
+    $this->db->from('customer_purchase_returns');
+    $this->db->join('customer_purchase_return_shipping', 'customer_purchase_return_shipping.purchase_return_id = customer_purchase_returns.id', 'left');
+    $this->db->join('customers', 'customers.customer_email = customer_purchase_returns.customer_email', 'left');
+
+    $this->db->where('customer_purchase_returns.id', $return_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function getPurchaseReturnApproved($return_id)
+  {
+    $this->db->select('*, customer_purchase_returns.id AS id_return, customer_purchase_return_shipping.id AS id_return_shipping, customer_purchase_return_approves.id AS id_return_approves, customers.customer_email AS email');
+
+    $this->db->from('customer_purchase_returns');
+    $this->db->join('customer_purchase_return_shipping', 'customer_purchase_return_shipping.purchase_return_id = customer_purchase_returns.id', 'left');
+    $this->db->join('customer_purchase_return_approves', 'customer_purchase_return_approves.purchase_return_id = customer_purchase_returns.id', 'left');
+    $this->db->join('customers', 'customers.customer_email = customer_purchase_returns.customer_email', 'left');
+
+    $this->db->where('customer_purchase_returns.id', $return_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function getCheckReturnApprovedByID($return_id)
+  {
+    $this->db->select('*');
+
+    $this->db->from('customer_purchase_return_approves');
+
+    $this->db->where('purchase_return_id', $return_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+  // FOR APPROVE RETURN MODAL
+
+  // APPROVER PURPOSE
+  public function insertPaymentApprove($data)
+  {
+    $this->db->insert('customer_purchase_return_approves', $data);
+    return $this->db->insert_id();
+  }
+
+  public function updatePurchaseReturnFromApprove($return_id, $data)
+  {
+    $this->db->where('id', $return_id);
+    $this->db->update('customer_purchase_returns', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function updatePurchaseReturnApprove($return_id, $data)
+  {
+    $this->db->where('purchase_return_id', $return_id);
+    $this->db->update('customer_purchase_return_approves', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function updatePurchaseReturnShipping($return_id, $data)
+  {
+    $this->db->where('purchase_return_id', $return_id);
+    $this->db->update('customer_purchase_return_shipping', $data);
+
+    return $this->db->affected_rows();
+  }
+  // APPROVER PURPOSE
 
   public function getProductOrder($id)
   {

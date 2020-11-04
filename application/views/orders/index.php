@@ -31,8 +31,8 @@
               <th>Customer Email</th>
               <th>Customer Name</th>
               <th>Order Date</th>
-              <th class="no-sort">Total Products</th>
-              <th class="no-sort">Total Amount</th>
+              <th>Total Products</th>
+              <th>Total Amount</th>
               <th>Status Order</th>
               <th class="no-sort">Action</th>
             </tr>
@@ -61,19 +61,15 @@
       $(this).parent().parent().removeClass('has-error');
       $(this).next().empty();
     });
+
     $("textarea").change(function() {
       $(this).parent().parent().removeClass('has-error');
       $(this).next().empty();
     });
+
     $("select").change(function() {
       $(this).parent().parent().removeClass('has-error');
       $(this).next().empty();
-    });
-
-    $('#repayment_date').datepicker({
-      todayBtn: "linked",
-      format: "yyyy-mm-dd",
-      autoclose: true
     });
 
     // ZoomImage
@@ -140,6 +136,11 @@
       $('#btnPaymentApprove').text('Submitting...'); //change button text
       $('#btnPaymentApprove').attr('disabled', true); //set button disable 
 
+      var order_id = $('#order_id').val();
+
+      $('#btnCancelOrder_' + order_id).attr('disabled', true); //set button disable
+      $('#btnCompleteOrder_' + order_id).attr('disabled', true); //set button disable
+
       var formData = new FormData($("#form-payment-approve")[0]);
       var $valid = $("#form-payment-approve").valid();
       var url;
@@ -153,6 +154,9 @@
       if (!$valid) {
         $("#btnPaymentApprove").text("Submit"); //change button text
         $("#btnPaymentApprove").attr("disabled", false); //set button enable
+
+        $('#btnCancelOrder_' + order_id).attr('disabled', false); //set button disable
+        $('#btnCompleteOrder_' + order_id).attr('disabled', false); //set button disable
         return false;
       } else {
         $.ajax({
@@ -185,6 +189,9 @@
             $('#modal-payment-approve').modal('hide');
             table_purchase_order.ajax.reload(null, false);
 
+            $('#btnCancelOrder_' + order_id).attr('disabled', false); //set button disable
+            $('#btnCompleteOrder_' + order_id).attr('disabled', false); //set button disable
+
             $('#btnPaymentApprove').text('Submit'); //change button text
             $('#btnPaymentApprove').attr('disabled', false); //set button enable 
           },
@@ -195,6 +202,9 @@
               showConfirmButton: false,
               timer: 3000,
             });
+
+            $('#btnCancelOrder_' + order_id).attr('disabled', false); //set button disable
+            $('#btnCompleteOrder_' + order_id).attr('disabled', false); //set button disable
 
             $('#btnPaymentApprove').text('Submit'); //change button text
             $('#btnPaymentApprove').attr('disabled', false); //set button enable 
@@ -221,9 +231,13 @@
   function payment_approve(id) {
     $('#form-payment-approve')[0].reset(); // reset form on modals
     $('#form-payment-approve').valid();
+
+    $('#btnCancelOrder_' + id).attr('disabled', false); //set button disable
+
     $('.form-group').removeClass('has-error'); // clear error class
     $('.help-block').empty(); // clear error string
 
+    $('#image-container').hide();
     $('#image_new').hide();
     $('#image').show();
 
@@ -246,7 +260,7 @@
         $('[name="customer_name"]').val(data.customer_name);
         $('[name="shipping_courier"]').val(data.courier);
         $('[name="shipping_service"]').val(data.service);
-        $('[name="airwaybill_number"]').val(data.delivery_receipt_number).prop('readonly', false); // tambahan
+        $('[name="airwaybill_number"]').attr('readonly', false); // tambahan
 
         $('#modal-payment-approve').modal('show'); // show bootstrap modal when complete loaded
         $('#btnPaymentApprove').show();
@@ -262,9 +276,14 @@
   function update_approve(id) {
     $('#form-payment-approve')[0].reset(); // reset form on modals
     $('#form-payment-approve').valid();
+
     $('.form-group').removeClass('has-error'); // clear error class
     $('.help-block').empty(); // clear error string
 
+    $('#btnCancelOrder_' + id).attr('disabled', false); //set button disable
+    $('#btnCompleteOrder_' + id).attr('disabled', false); //set button disable
+
+    $('#image-container').show();
     $('#image').hide();
     $('#image_new').show();
 
@@ -297,7 +316,7 @@
 
         $('[name="shipping_courier"]').val(data.courier);
         $('[name="shipping_service"]').val(data.service);
-        $('[name="airwaybill_number"]').val(data.delivery_receipt_number).prop('readonly', false); // tambahan
+        $('[name="airwaybill_number"]').val(data.delivery_receipt_number).attr('readonly', false); // tambahan
 
         $('#modal-payment-approve').modal('show'); // show bootstrap modal when complete loaded
         $('#btnPaymentApprove').show();
@@ -316,6 +335,7 @@
     $('.form-group').removeClass('has-error'); // clear error class
     $('.help-block').empty(); // clear error string
 
+    $('#image-container').show();
     $('#image').hide();
     $('#image_new').hide();
 
@@ -329,7 +349,7 @@
       dataType: "JSON",
       success: function(data) {
 
-        $('[name="invoice_order"]').val(data.invoice_order).prop('readonly', true);
+        $('[name="invoice_order"]').val(data.invoice_order).attr('readonly', true);
         $('[name="order_id"]').val(data.id_order);
         $('#order_date_label').text('Approved date'); // tambahan
         $('[name="order_date"]').val(data.approve_date); // isinya beda
@@ -345,7 +365,7 @@
 
         $('[name="shipping_courier"]').val(data.courier);
         $('[name="shipping_service"]').val(data.service);
-        $('[name="airwaybill_number"]').val(data.delivery_receipt_number).prop('readonly', true); // tambahan
+        $('[name="airwaybill_number"]').val(data.delivery_receipt_number).attr('readonly', true); // tambahan
 
         $('#modal-payment-approve').modal('show'); // show bootstrap modal when complete loaded
         $('#btnPaymentApprove').hide();
@@ -362,7 +382,10 @@
   }
 
   function cancel_order(id) {
-    $("#btnCancelOrder").prop("disabled", true); //set button disable
+    $("#btnCancelOrder_" + id).attr("disabled", true); //set button disable
+    $("#btnCompleteOrder_" + id).attr("disabled", true); //set button disable
+    $("#btnApproveOrder_" + id).attr("disabled", true); //set button disable
+    $("#btnUpdateApproveOrder_" + id).attr("disabled", true); //set button disable
 
     Swal.fire({
       icon: 'warning',
@@ -374,8 +397,7 @@
       confirmButtonText: 'Cancel Payment'
     }).then((result) => {
       if (result.value) {
-        $("#btnCancelOrder").hide(); //set button disable
-        $("#btnModalPaymentApprove").hide();
+        $("#btnCancelOrder_" + id).hide(); //set button disable
 
         $.ajax({
           url: '<?php echo base_url() ?>order/cancelPayment',
@@ -403,18 +425,28 @@
                 timer: 5000,
               });
 
-              $("#btnCancelOrder").show();
-              $("#btnModalPaymentApprove").show();
-              $("#btnCancelOrder").prop("disabled", false); //set button disable
+              $("#btnCancelOrder_" + id).show();
+
+              $("#btnCompleteOrder_" + id).attr("disabled", false); //set button disable
+              $("#btnApproveOrder_" + id).attr("disabled", false); //set button disable
+              $("#btnUpdateApproveOrder_" + id).attr("disabled", false); //set button disable
+              $("#btnCancelOrder_" + id).attr("disabled", false); //set button disable
             }
           }
         })
+      } else {
+        $("#btnCompleteOrder_" + id).attr("disabled", false); //set button disable
+        $("#btnApproveOrder_" + id).attr("disabled", false); //set button disable
+        $("#btnUpdateApproveOrder_" + id).attr("disabled", false); //set button disable
+        $("#btnCancelOrder_" + id).attr("disabled", false); //set button disable
       }
     });
   }
 
   function complete_order(id) {
-    $("#btnCompleteOrder").prop("disabled", true); //set button disable
+    $("#btnCompleteOrder_" + id).attr("disabled", true); //set button disable
+    $("#btnCancelOrder_" + id).attr("disabled", true); //set button disable
+    $("#btnUpdateApproveOrder_" + id).attr("disabled", true); //set button disable
 
     Swal.fire({
       icon: 'warning',
@@ -426,7 +458,7 @@
       confirmButtonText: 'Complete Order'
     }).then((result) => {
       if (result.value) {
-        $("#btnCompleteOrder").hide(); //set button disable
+        $("#btnCompleteOrder_" + id).hide(); //set button disable
 
         $.ajax({
           url: '<?php echo base_url() ?>order/completeOrder',
@@ -454,11 +486,19 @@
                 timer: 5000,
               });
 
-              $("#btnCompleteOrder").show();
-              $("#btnCompleteOrder").prop("disabled", false); //set button disable
+              $("#btnCompleteOrder_" + id).show();
+
+
+              $("#btnCompleteOrder_" + id).attr("disabled", false); //set button disable
+              $("#btnCancelOrder_" + id).attr("disabled", false); //set button disable
+              $("#btnUpdateApproveOrder_" + id).attr("disabled", false); //set button disable
             }
           }
         })
+      } else {
+        $("#btnCompleteOrder_" + id).attr("disabled", false); //set button disable
+        $("#btnCancelOrder_" + id).attr("disabled", false); //set button disable
+        $("#btnUpdateApproveOrder_" + id).attr("disabled", false); //set button disable
       }
     });
   }

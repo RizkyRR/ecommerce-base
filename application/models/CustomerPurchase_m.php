@@ -70,6 +70,7 @@ class CustomerPurchase_m extends CI_Model
   }
   // DataTables Model Setup
 
+  // CUSTOMER PURCHASE ORDER
   public function getDataCustomerPurchaseByID($email)
   {
     $this->db->select('*, customer_address.id AS id_address');
@@ -85,11 +86,12 @@ class CustomerPurchase_m extends CI_Model
 
   public function getDataPurchaseOrderByID($order_id, $email)
   {
-    $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status, customer_purchase_order_shipping.id AS id_order_shipping');
+    $this->db->select('*, customer_purchase_orders.id AS id_order, status_orders.id AS id_status, customer_purchase_order_shipping.id AS id_order_shipping, customer_purchase_order_approves.id AS id_order_approves');
 
     $this->db->from('customer_purchase_orders');
     $this->db->join('status_orders', 'status_orders.id = customer_purchase_orders.status_order_id', 'left');
     $this->db->join('customer_purchase_order_shipping', 'customer_purchase_order_shipping.purchase_order_id = customer_purchase_orders.id', 'left');
+    $this->db->join('customer_purchase_order_approves', 'customer_purchase_order_approves.purchase_order_id = customer_purchase_orders.id', 'left');
 
     $this->db->where('customer_purchase_orders.id', $order_id);
     $this->db->where('customer_email', $email);
@@ -128,6 +130,48 @@ class CustomerPurchase_m extends CI_Model
   {
     $this->db->insert('customer_purchase_order_details', $data);
   }
+  // CUSTOMER PURCHASE ORDER 
+
+  // CUSTOMER PURCHASE RETURN
+  public function getDataPurchaseReturnByID($return_id, $email)
+  {
+    $this->db->select('*, customer_purchase_returns.id AS id_return, status_orders.id AS id_status, customer_purchase_return_shipping.id AS id_return_shipping, customer_purchase_return_approves.id AS id_return_approves');
+
+    $this->db->from('customer_purchase_returns');
+    $this->db->join('status_orders', 'status_orders.id = customer_purchase_returns.status_order_id', 'left');
+    $this->db->join('customer_purchase_return_shipping', 'customer_purchase_return_shipping.purchase_return_id = customer_purchase_returns.id', 'left');
+    $this->db->join('customer_purchase_return_approves', 'customer_purchase_return_approves.purchase_return_id = customer_purchase_returns.id', 'left');
+
+    $this->db->where('customer_purchase_returns.id', $return_id);
+    $this->db->where('customer_email', $email);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function getDetailPurchaseReturnByID($return_id)
+  {
+    $this->db->select('*, customer_purchase_return_details.id AS id_return_detail, products.id AS id_product, status_orders.id AS id_status, customer_purchase_return_details.qty AS qty_return, products.qty AS qty_product, products.weight AS weight_product, customer_purchase_return_details.weight AS weight_return');
+
+    $this->db->from('customer_purchase_return_details');
+    $this->db->join('products', 'products.id = customer_purchase_return_details.product_id', 'left');
+    $this->db->join('status_orders', 'status_orders.id = customer_purchase_return_details.status_order_id', 'left');
+
+    $this->db->where_not_in('customer_purchase_return_details.status_order_id', 1);
+    $this->db->where('customer_purchase_return_details.purchase_return_id', $return_id);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function updateDataCustomerReturnByID($id, $data)
+  {
+    $this->db->where('id', $id);
+    $this->db->update('customer_purchase_returns', $data);
+
+    return $this->db->affected_rows();
+  }
+  // CUSTOMER PURCHASE RETURN
 
   public function getDataPaymentUnpaidByEmail($email)
   {
