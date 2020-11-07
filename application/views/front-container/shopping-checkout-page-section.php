@@ -52,7 +52,7 @@
               </select>
             </div>
 
-            <div class="col-lg-6 mb-">
+            <div class="col-lg-6 mb-3">
               <label for="service">Service<span>*</span></label>
               <select name="service" id="service" style="width: 100%;" required>
               </select>
@@ -63,7 +63,7 @@
             </div>
 
             <div class="col-lg-6 mb-3">
-              <label for="estimate">estimated date<span>*</span></label>
+              <label for="estimate">Estimated Date<span>*</span></label>
               <input type="text" nama="estimate" id="estimate">
             </div>
           </div>

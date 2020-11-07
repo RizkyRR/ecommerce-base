@@ -59,6 +59,7 @@
             <tr>
               <th>No</th>
               <th>Item Name</th>
+              <th>Description</th>
               <th>Weight</th>
               <th>Price</th>
               <th>Qty</th>
@@ -74,6 +75,7 @@
                   <td><?php echo $no++; ?></td>
 
                   <td><?php echo $val['product_name'] ?></td>
+                  <td><?php echo $val['information'] ?></td>
 
                   <td><?php echo $val['weight_return'] ?> Gram</td>
                   <td>Rp. <?php echo number_format($val['price'], 0, ',', '.') ?></td>

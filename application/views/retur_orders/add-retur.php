@@ -46,7 +46,7 @@
     <div class="box">
 
       <!-- form start -->
-      <form role="form" action="" method="POST" enctype="multipart/form-data">
+      <form role="form" action="<?php echo base_url() ?>order_retur/insertDataRetur" method="POST" id="form-add-order-return" enctype="multipart/form-data">
         <div class="box-body">
 
           <div class="row">
@@ -55,29 +55,34 @@
               <div class="row">
                 <div class="col-lg-6">
                   <div class="form-group">
-                    <label for="id">Retur ID</label>
-                    <input type="text" class="form-control" name="id" id="id">
+                    <label for="invoice_return">Invoice Return</label>
+                    <input type="text" class="form-control" name="invoice_return" id="invoice_return" readonly>
+                    <input type="hidden" class="form-control" name="id_return" id="id_return" readonly>
                   </div>
                 </div>
 
                 <div class="col-lg-6">
                   <div class="form-group">
-                    <label for="retur_date">Retur date</label>
+                    <label for="date_return">Date Return*</label>
                     <div class="input-group">
                       <span class="input-group-addon">
                         <i class="fa fa-calendar"></i>
                       </span>
-                      <input type="text" class="form-control" name="retur_date" id="retur_date" value="<?php echo set_value('retur_date'); ?>" readonly>
+                      <input type="text" class="form-control" name="date_return" id="date_return" value="<?php echo set_value('date_return'); ?>" readonly>
                     </div>
-                    <span class="help-block"><?php echo form_error('retur_date') ?></span>
+                    <span class="help-block"><?php echo form_error('date_return') ?></span>
                   </div>
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="order_id">Order ID</label>
-                <select name="order_id" id="order_id" class="form-control select-order" onchange="getOrderData(); show_data_product()" required>
+                <label for="invoice_order">Invoice Order*</label>
+                <select name="invoice_order" id="invoice_order" class="form-control select-invoice-order" onchange="getCustomerOrderData()" required>
                 </select>
+
+                <input type="hidden" name="invoice_order_val" id="invoice_order_val" readonly>
+
+                <span class="help-block"></span>
               </div>
 
               <div class="row">
@@ -89,6 +94,7 @@
                         <i class="fa fa-user"></i>
                       </span>
                       <input type="text" class="form-control" name="c_name" id="c_name" placeholder="Enter customer name" readonly>
+                      <input type="hidden" class="form-control" name="c_email" id="c_email" readonly>
                     </div>
                   </div>
                 </div>
@@ -106,35 +112,11 @@
                 </div>
               </div>
 
-              <div class="row">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="c_bankname">Bank name</label>
-                    <div class="input-group">
-                      <span class="input-group-addon">
-                        <i class="fa fa-university"></i>
-                      </span>
-                      <input type="text" class="form-control" name="c_bankname" id="c_bankname" placeholder="Enter customer bank name" readonly>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="c_norek">No. rek</label>
-                    <div class="input-group">
-                      <span class="input-group-addon">
-                        <i class="fa fa-credit-card"></i>
-                      </span>
-                      <input type="text" class="form-control" name="c_norek" id="c_norek" placeholder="Enter customer nomor rekening" readonly>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <div class="form-group">
                 <label for="c_address">Customer address</label>
                 <textarea class="form-control" name="c_address" id="c_address" cols="10" placeholder="Enter customer address" readonly></textarea>
+                <input type="hidden" name="company_city_id" id="company_city_id" value="<?php echo $company_address['city_id'] ?>" readonly>
+                <input type="hidden" name="customer_city_id" id="customer_city_id" readonly>
               </div>
 
             </div>
@@ -145,9 +127,9 @@
             <table class="table table-bordered" id="product_info_table" width="100%" cellspacing="0">
               <thead>
                 <tr>
-                  <th style="width:20%">Product</th>
+                  <th style="width:20%">Product*</th>
                   <th style="width:30%">Keterangan Retur Product</th>
-                  <th style="width:10%">Quantity</th>
+                  <th style="width:10%">Quantity*</th>
                   <th style="width:15%">Unit Price (Rp.)</th>
                   <th style="width:15%">Amount</th>
                   <th style="width:10%">
@@ -155,18 +137,25 @@
                   </th>
                 </tr>
               </thead>
+
               <tbody>
                 <tr id="row_1">
                   <td>
-                    <select name="product[]" id="product_1" class="form-control select_group product" data-row-id="row_1" style="width: 100%;" onchange="getProductData(1)" required>
+                    <select name="product[]" id="product_1" class="form-control select_product product" data-row-id="row_1" style="width: 100%;" onchange="getProductData(1); countWeightTotal()" required>
                     </select>
+
+                    <span class="help-block"></span>
                   </td>
+
                   <td>
-                    <input type="text" name="description[]" id="description_1" class="form-control">
+                    <input type="text" name="description[]" id="description_1" placeholder="Enter description..." class="form-control">
                   </td>
+
                   <td>
-                    <input type="text" name="qty[]" id="qty_1" class="form-control" required onkeyup="numberFormat(this); getTotal(1)">
+                    <input type="text" name="qty[]" id="qty_1" class="form-control" placeholder="Enter quantity..." required onkeyup="numberFormat(this); getOrderValidityQty(1); getTotal(1)">
+                    <input type="hidden" name="weight_val[]" id="weight_val_1" readonly>
                   </td>
+
                   <td>
                     <div class="input-group">
                       <span class="input-group-addon">Rp</span>
@@ -174,6 +163,7 @@
                       <input type="hidden" name="price_value[]" id="price_value_1" class="form-control" autocomplete="off">
                     </div>
                   </td>
+
                   <td>
                     <div class="input-group">
                       <span class="input-group-addon">Rp</span>
@@ -181,6 +171,7 @@
                       <input type="hidden" name="amount_value[]" id="amount_value_1" class="form-control" autocomplete="off">
                     </div>
                   </td>
+
                   <td>
                     <button type="button" class="btn btn-danger btn-xs" onclick="removeRow('1')"><i class="fa fa-times"></i></button>
                   </td>
@@ -198,22 +189,70 @@
                   <div class="input-group">
                     <span class="input-group-addon">Rp</span>
                     <input type="text" class="form-control" id="gross_amount" name="gross_amount" disabled autocomplete="off">
+
                     <input type="hidden" class="form-control" id="gross_amount_value" name="gross_amount_value" autocomplete="off">
+                    <input type="hidden" name="weight_val_total" id="weight_val_total" readonly>
                   </div>
+
                   <span class="help-block"><?php echo form_error('gross_amount') ?></span>
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="discount" class="col-sm-5 control-label">Discount</label>
+                <label class="col-sm-5 control-label" for="courier">Courier*</label>
                 <div class="col-sm-6">
                   <div class="input-group">
-                    <input type="text" class="form-control" id="discount" name="discount" placeholder="Discount..." onkeyup="subAmount(); numberFormat(this)" autocomplete="off" value="<?php echo set_value('discount'); ?>">
-                    <span class="input-group-addon">
-                      <i class="fa fa-percent"></i>
-                    </span>
+                    <span class="input-group-addon"><i class="fa fa-truck" aria-hidden="true"></i></span>
+                    <select class="form-control select-courier" style="width: 100%;" name="courier" id="courier" required>
+                      <option value="">Select Courier</option>
+                      <option value="jne">JNE (Jalur Nugraha Ekakurir)</option>
+                      <option value="pos">Pos (Pos Indonesia)</option>
+                      <option value="tiki">TIKI (Titipan Kilat)</option>
+                    </select>
                   </div>
-                  <span class="help-block"><?php echo form_error('discount') ?></span>
+
+                  <span class="help-block"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-5 control-label" for="service">Service*</label>
+                <div class="col-sm-6">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-info" aria-hidden="true"></i></span>
+                    <select class="form-control select-courier" name="service" id="service" style="width: 100%;" required>
+                    </select>
+                  </div>
+
+                  <input type="hidden" name="service_val" id="service_val" readonly>
+                  <input type="hidden" name="etd_val" id="etd_val" readonly>
+                  <input type="hidden" name="cost_val" id="cost_val" readonly>
+
+                  <span class="help-block"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-5 control-label" for="estimate">Estimated Date</label>
+                <div class="col-sm-6">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                    <input type="text" class="form-control" nama="estimate" id="estimate" readonly>
+                  </div>
+
+                  <span class="help-block"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="shipping_cost" class="col-sm-5 control-label">Shipping Cost</label>
+                <div class="col-sm-6">
+                  <div class="input-group">
+                    <span class="input-group-addon">Rp</span>
+                    <input type="text" class="form-control" id="shipping-cost-val" name="shipping_cost" readonly>
+                  </div>
+
+                  <span class="help-block"></span>
                 </div>
               </div>
 
@@ -225,6 +264,7 @@
                     <input type="text" class="form-control" id="net_amount" name="net_amount" readonly>
                     <input type="hidden" class="form-control" id="net_amount_value" name="net_amount_value" autocomplete="off">
                   </div>
+
                   <span class="help-block"><?php echo form_error('net_amount') ?></span>
                 </div>
               </div>
@@ -233,10 +273,9 @@
         </div>
 
         <!-- /.box-body -->
-
         <div class="box-footer">
           <a href="<?php echo base_url(); ?>order_retur" class="btn btn-default">Back</a>
-          <input type="submit" name="save" value="Submit" class="btn btn-primary">
+          <input type="submit" class="btn btn-primary" name="save" id="submitFile" value="Submit">
         </div>
       </form>
 
@@ -249,14 +288,12 @@
 <!-- /.content-wrapper -->
 
 <script>
-  create_code();
-  show_data_product();
-  show_data_order();
-
   $(document).ready(function() {
     // FOR TABLE NEW ORDER
-    $(".select_group").select2();
-    // $("#description").wysihtml5();
+    $(".select_product").select2({
+      placeholder: 'Select for a product',
+      allowClear: true
+    });
 
     $("#mainOrdersNav").addClass('active');
     $("#addOrderNav").addClass('active');
@@ -266,13 +303,13 @@
       var table = $("#product_info_table");
       var count_table_tbody_tr = $("#product_info_table tbody tr").length;
       var row_id = count_table_tbody_tr + 1;
-      var order_id = $('#order_id').val();
+      var invoice_order = $("#invoice_order").val();
 
       $.ajax({
-        url: '<?php echo base_url(); ?>' + 'order_retur/getTableProductRow/',
+        url: '<?php echo base_url(); ?>' + 'order_retur/getCustomerOrderProduct',
         type: 'POST',
         data: {
-          order_id: order_id
+          invoice_order: invoice_order
         },
         dataType: 'JSON',
         success: function(response) {
@@ -280,17 +317,17 @@
           // console.log(reponse.x);
           var html = '<tr id="row_' + row_id + '">' +
             '<td>' +
-            '<select class="form-control select_group product" data-row-id="' + row_id + '" id="product_' + row_id + '" name="product[]" style="width:100%;" onchange="getProductData(' + row_id + ')">' +
+            '<select class="form-control select_product product" data-row-id="' + row_id + '" id="product_' + row_id + '" name="product[]" style="width:100%;" onchange="getProductData(' + row_id + '); countWeightTotal()">' +
             '<option value=""></option>';
           $.each(response, function(index, value) {
-            html += '<option value="' + value.product_id + '">' + value.product_name + '</option>';
+            html += '<option value="' + value.id_product + '">' + value.product_name + '</option>';
           });
 
           html += '</select>' +
             '</td>' +
-            '<td><input type="text" name="description[]" id="description_' + row_id + '" class="form-control"></td>' +
+            '<td><input type="text" class="form-control" name="description[]" id="description_' + row_id + '" placeholder="Enter description..."></td>' +
 
-            '<td><input type="text" name="qty[]" id="qty_' + row_id + '" class="form-control" onkeyup="numberFormat(this); getTotal(' + row_id + ')"></td>' +
+            '<td><input type="text" class="form-control" name="qty[]" id="qty_' + row_id + '" placeholder="Enter quantity..." onkeyup="numberFormat(this); getOrderValidityQty(' + row_id + '); getTotal(' + row_id + ')"><input type="hidden" name="weight_val[]" id="weight_val_' + row_id + '" readonly><span class="help-block"></span></td>' +
 
             '<td><div class="input-group"><span class="input-group-addon">Rp</span><input type="text" name="price[]" id="price_' + row_id + '" class="form-control" disabled></div><input type="hidden" name="price_value[]" id="price_value_' + row_id + '" class="form-control"></div></td>' +
 
@@ -305,8 +342,10 @@
             $("#product_info_table tbody").html(html);
           }
 
-          $(".select_group").select2();
-
+          $(".select_product").select2({
+            placeholder: 'Select for a product',
+            allowClear: true
+          });
         }
       });
 
@@ -314,94 +353,216 @@
     });
     // FOR TABLE NEW ORDER
 
-    $('#retur_date').datepicker({
+    /* $('#date_return').datepicker({
       todayBtn: "linked",
       format: "yyyy-mm-dd",
       autoclose: true
-    })
+    }).val();
+
+    let today = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+    $('#date_return').val(today); */
+
+    /* SELECT INVOICE ORDER START */
+    $(".select-invoice-order").select2({
+      ajax: {
+        url: "<?php echo base_url(); ?>order_retur/getCustomerPurchaseOrder",
+        type: "POST",
+        dataType: 'JSON',
+        delay: 250,
+        data: function(params) {
+          return {
+            searchTerm: params.term // search term
+          };
+        },
+        processResults: function(response) {
+          return {
+            results: response
+          };
+        },
+        cache: true
+      },
+      placeholder: 'Select for a invoice order',
+    });
+    /* SELECT INVOICE ORDER END */
+
+    /* START SHOW PRODUCT IN ORDER AFTER TRIGGER SELECT_INVOICE_ORDER */
+    $('.select-invoice-order').on('change', function() {
+      var invoice_order = $(".select-invoice-order option:selected").val();
+      var invoice_order_val = $(".select-invoice-order option:selected").text();
+
+      $('#invoice_order_val').val(invoice_order);
+
+      $('.select_product').empty();
+      $(this).valid();
+
+      if (invoice_order != null && invoice_order != 0) {
+        $.ajax({
+          url: "<?php echo base_url(); ?>order_retur/getCustomerOrderProduct",
+          type: 'POST',
+          data: {
+            invoice_order: invoice_order
+          },
+          dataType: 'JSON',
+          success: function(data) {
+            var html = '<option value=""></option>';
+            var i;
+
+            for (i = 0; i < data.length; i++) {
+              html += '<option value="' + data[i].id_product + '">' + data[i].product_name + '</option>';
+            }
+
+            $('.select_product').html(html);
+          }
+        })
+      }
+    });
+
+    // Untuk menghilangkan pesan validasi jika sudah terisi
+    $('.select_product').on('change', function() {
+      $(this).valid();
+
+      var product_name = $(".select_product option:selected").text();
+      $('#regency_name').val(product_name);
+
+      countWeightTotal();
+    });
+    /* END SHOW PRODUCT IN ORDER AFTER TRIGGER SELECT_INVOICE_ORDER */
   });
 
-  function show_data_order() {
-    $('.select-order').select2();
-    $.ajax({
-      url: "<?php echo base_url(); ?>order_retur/getCustomerOrder",
-      type: 'GET',
-      dataType: 'JSON',
-      success: function(data) {
-        var html = '<option value=""></option>';
-        var i;
+  create_code();
 
-        for (i = 0; i < data.length; i++) {
-          html += '<option class="form-control" value="' + data[i].id + '">' + data[i].id + '</option>';
-        }
-        $('.select-order').html(html);
+  function removeRow(tr_id) {
+    $("#product_info_table tbody tr#row_" + tr_id).remove();
+
+    countWeightTotal();
+    subAmount();
+  }
+
+  /* VALIDATOR START */
+  $.validator.setDefaults({
+    highlight: function(element) {
+      $(element).closest(".form-group").addClass("has-error");
+    },
+    unhighlight: function(element) {
+      $(element).closest(".form-group").removeClass("has-error");
+    },
+    errorElement: "span",
+    errorClass: "error-message",
+    errorPlacement: function(error, element) {
+      if (element.parent('.input-group').length) {
+        error.insertAfter(element.parent()); // radio/checkbox?
       }
-    })
-  }
+      /* else if (element.hasClass('select2')) {
+             error.insertAfter(element.next('span')); // select2
+           } */
+      else if (element.hasClass("select2-hidden-accessible")) {
+        error.insertAfter(element.next('span.select2')); // select2 new ver
+      } else {
+        error.insertAfter(element); // default
+      }
+    },
+  });
 
-  function getOrderData() {
-    var order_id = $("#order_id").val();
-    if (order_id == "") {
-      $("#c_name").val("");
-      $("#c_phone").val("");
-      $("#c_bankname").val("");
-      $("#c_norek").val("");
-      $("#c_address").val("");
-
-    } else {
-      $.ajax({
-        url: '<?php echo base_url(); ?>order_retur/getOrderValueById',
-        type: 'POST',
-        data: {
-          order_id: order_id
-        },
-        dataType: 'JSON',
-        success: function(data) {
-          // setting the price value into the price input field
-          $("#c_name").val(data.customer_name);
-          $("#c_phone").val(data.customer_phone);
-          $("#c_bankname").val(data.bank_name);
-          $("#c_norek").val(data.no_rek);
-          $("#c_address").val(data.customer_address);
-        } // /success
-      }); // /ajax function to fetch the order data
-      return false;
+  var $validator = $("#form-add-order-return").validate({
+    rules: {
+      invoice_order: {
+        required: true
+      },
+      date_return: {
+        required: true
+      },
+      product: {
+        required: true
+      },
+      qty: {
+        required: true
+      },
+      courier: {
+        required: true
+      },
+      service: {
+        required: true
+      }
     }
-  }
+  });
+  /* VALIDATOR END */
 
   function numberFormat(element) {
     element.value = element.value.replace(/[^0-9]+/g, "");
   }
 
-  function getTotal(row = null) {
-    if (row) {
-      var total = Number($("#price_" + row).val()) * Number($("#qty_" + row).val());
-      total = total.toFixed();
-      $("#amount_" + row).val(total);
-      $("#amount_value_" + row).val(total);
+  // AUTOMATIC CREATE CODE INVOICE RETURN
+  function create_code() {
+    $.ajax({
+      url: '<?php echo base_url('order_retur/create_code') ?>',
+      type: 'GET',
+      dataType: 'JSON',
+      success: function(data) {
+        $('#invoice_return').val(data.order_return_invoice);
+        $('#id_return').val(data.order_return_id);
+        $('#date_return').val(data.order_return_datetime);
+      }
+    })
+  }
 
-      subAmount();
+  // GET DATA CUSTOMER ORDER
+  function getCustomerOrderData() {
+    var invoice_order = $("#invoice_order").val();
 
+    if (invoice_order == "") {
+      $("#c_name").val("");
+      $("#c_email").val("");
+      $("#c_phone").val("");
+      $("#c_address").val("");
+      $("#customer_city_id").val("");
     } else {
-      alert('no row !! please refresh the page');
+      $.ajax({
+        url: '<?php echo base_url(); ?>order_retur/getCustomerPurchaseOrderByID',
+        type: 'POST',
+        data: {
+          invoice_order: invoice_order
+        },
+        dataType: 'JSON',
+        success: function(data) {
+          // setting the price value into the price input field
+          $("#c_name").val(data.customer_name);
+          $("#c_email").val(data.customer_email);
+          $("#c_phone").val(data.customer_phone);
+
+          var address = data.street_name + ',' + data.city_name + ',' + data.province;
+          $("#c_address").val(address);
+          $("#customer_city_id").val(data.city_id);
+        }
+      });
+      return false;
     }
   }
 
-  // get the product information from the server
+  // GET PRODUCT DATA FROM ORDER CUSTOMER
   function getProductData(row_id) {
     var product_id = $("#product_" + row_id).val();
+
     if (product_id == "") {
       $("#price_" + row_id).val("");
       $("#price_value_" + row_id).val("");
 
       $("#qty_" + row_id).val("");
+      $("#weight_val_" + row_id).val("");
 
       $("#amount_" + row_id).val("");
       $("#amount_value_" + row_id).val("");
 
+      $("#gross_amount_" + row_id).val("");
+      $("#gross_amount_value_" + row_id).val("");
+
+      $("#net_amount_" + row_id).val("");
+      $("#net_amount_value_" + row_id).val("");
+
+      countWeightTotal();
+      subAmount();
     } else {
       $.ajax({
-        url: '<?php echo base_url(); ?>' + 'order_retur/getProductValueById', //samakan yang ada di details order
+        url: '<?php echo base_url(); ?>' + 'order_retur/getProductDetailValueCustomerOrder', //samakan yang ada di details order
         type: 'POST',
         data: {
           product_id: product_id
@@ -415,90 +576,235 @@
 
           $("#qty_" + row_id).val(1);
           $("#qty_value_" + row_id).val(1);
+          $("#weight_val_" + row_id).val(response.weight_order);
 
           var total = Number(response.unit_price) * 1;
           total = total.toFixed();
           $("#amount_" + row_id).val(total);
           $("#amount_value_" + row_id).val(total);
 
+          countWeightTotal();
           subAmount();
         } // /success
       }); // /ajax function to fetch the product data
     }
   }
 
-  // calculate the total amount of the order
-  function subAmount() {
+  // CHECK QTY INPUT
+  function getOrderValidityQty(row = null) {
+    var qty = $("#qty_" + row).val();
 
+    if (qty != 0) {
+      if (row) {
+        $.ajax({
+          url: "<?php echo base_url(); ?>order_retur/getOrderValidityQty",
+          data: {
+            invoice_order: $("#invoice_order").val(),
+            product_id: $("#product_" + row).val(),
+            qty: qty,
+          },
+          type: "POST",
+          dataType: "JSON",
+          success: function(data) {
+            if (data.status == "true") {
+              console.log(true);
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: data.message,
+                showConfirmButton: false,
+                timer: 5000,
+              });
+
+              // $("#amount_" + row).text(price_val);
+              // $("#amount_val_" + row).val(price_val);
+              $("#qty_" + row).val(1);
+
+              getTotal(row);
+              subAmount();
+            }
+          },
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "No row, please refresh the page!",
+          showConfirmButton: false,
+          timer: 5000,
+        });
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Sorry, for the minimum quantity retur is 1!",
+        showConfirmButton: false,
+        timer: 5000,
+      });
+
+      $("#qty_" + row).val(1);
+    }
+  }
+
+  // USING COURIER FOR SHIPPING START
+  function countWeightTotal() {
     var tableProductLength = $("#product_info_table tbody tr").length;
-    var totalSubAmount = 0;
+    var totalWeight = 0;
+
     for (x = 0; x < tableProductLength; x++) {
       var tr = $("#product_info_table tbody tr")[x];
       var count = $(tr).attr('id');
       count = count.substring(4);
 
-      totalSubAmount = Number(totalSubAmount) + Number($("#amount_" + count).val());
+      totalWeight = Number(totalWeight) + Number($("#weight_val_" + count).val());
     } // /for
 
-    totalSubAmount = totalSubAmount.toFixed();
+    totalWeight = totalWeight.toFixed();
+
+    $('#weight_val_total').val(totalWeight);
+  }
+
+  $("#courier").on("change", function() {
+    var courier_id = $("#courier option:selected").val();
+    var origin_id = $("#company_city_id").val();
+    var destination_id = $("#customer_city_id").val();
+    var weight_val = $("#weight_val_total").val();
+    $(this).valid();
+
+    if (courier_id != null && courier_id != 0) {
+      $.ajax({
+        url: "<?php echo base_url(); ?>order_retur/getCostShippingRajaOngkir",
+        type: "GET",
+        data: {
+          origin: origin_id,
+          destination: destination_id,
+          weight: weight_val,
+          courier: courier_id,
+        },
+        dataType: "JSON",
+        success: function(data) {
+          console.log(data);
+
+          var result = data[0].costs;
+          var html = '<option value="">Select Service</option>';
+          var i;
+
+          for (i = 0; i < result.length; i++) {
+            var text = result[i].description + " (" + result[i].service + ")";
+            html +=
+              '<option value="' +
+              result[i].cost[0].value +
+              '" etd="' +
+              result[i].cost[0].etd +
+              '">' +
+              text +
+              "</option>";
+          }
+
+          $("#service").html(html);
+        },
+      });
+    } else {
+      $("#service").html([]);
+      $("#service").val([]).trigger("change");
+      // $("#service").val([]);
+      // $('#estimate').val('');
+    }
+  });
+
+  var ongkir = 0;
+
+  $("#service").on("change", function() {
+    var estimate = $("#service option:selected").attr("etd");
+    var service_val = $("#service option:selected").text();
+    ongkir = parseInt($(this).val());
+
+    if ($(this).val() != null && $(this).val() != 0) {
+      $("#estimate").val(estimate).prop("readonly", true);
+
+      $("#service_val").val(service_val).prop("readonly", true);
+      $("#etd_val").val(estimate).prop("readonly", true);
+      $("#cost_val").val(ongkir).prop("readonly", true);
+
+      $("#shipping-cost-val").val(ongkir);
+    } else {
+      $("#estimate").val("").prop("readonly", true);
+
+      $("#service_val").val("").prop("readonly", true);
+      $("#etd_val").val("").prop("readonly", true);
+      $("#cost_val").val(0).prop("readonly", true);
+
+      $("#shipping-cost-val").val(0);
+    }
+
+    subAmount();
+  });
+  // USING COURIER FOR SHIPPING END
+
+  function getTotal(row = null) {
+    if (row) {
+      var total = Number($("#price_" + row).val()) * Number($("#qty_" + row).val());
+      total = total.toFixed();
+      $("#amount_" + row).val(total);
+      $("#amount_value_" + row).val(total);
+
+      subAmount();
+
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: 'No row!! please refresh the page',
+        showConfirmButton: false,
+        timer: 5000,
+      });
+    }
+  }
+
+  // calculate the total amount of the order
+  function subAmount() {
+    var tableProductLength = $("#product_info_table tbody tr").length;
+    var totalSubAmount = 0;
+
+    for (x = 0; x < tableProductLength; x++) {
+      var tr = $("#product_info_table tbody tr")[x];
+      var count = $(tr).attr('id');
+      count = count.substring(4);
+
+      totalSubAmount = parseInt(totalSubAmount) + parseInt($("#amount_" + count).val());
+    } // /for
+
+    totalSubAmount = parseInt(totalSubAmount);
 
     // sub total
     $("#gross_amount").val(totalSubAmount);
     $("#gross_amount_value").val(totalSubAmount);
 
-    var discount = Number($("#discount").val());
-    if (discount) {
-      // own condition
-      var getDiscount = totalSubAmount * (discount / 100);
-      var grandTotal = totalSubAmount - getDiscount;
+    var shipping_cost = parseInt($("#cost_val").val());
 
-      // var grandTotal = Number(totalAmount) - Number(discount);
-      grandTotal = grandTotal.toFixed();
+    if (shipping_cost) {
+      var grandTotal = parseInt(totalSubAmount + shipping_cost);
+
       $("#net_amount").val(grandTotal);
       $("#net_amount_value").val(grandTotal);
     } else {
       $("#net_amount").val(totalSubAmount);
       $("#net_amount_value").val(totalSubAmount);
-
-    } // /else discount
-
-  } // /sub total amount
-
-  function removeRow(tr_id) {
-    $("#product_info_table tbody tr#row_" + tr_id).remove();
-    subAmount();
+    }
   }
 
-  function create_code() {
-    $.ajax({
-      url: '<?php echo base_url('order_retur/create_code') ?>',
-      type: 'GET',
-      dataType: 'JSON',
-      success: function(data) {
-        $('#id').val(data).prop("readonly", true);
-      }
-    })
-  }
+  // SUBMIT ORDER INTO THE SERVER 
+  $('#submitFile').click(function() {
+    $('#submitFile').text('Submitting...'); //change button text
+    $('#submitFile').attr('disabled', true); //set button disable 
 
-  function show_data_product() {
-    var order_id = $('#order_id').val();
+    var $valid = $("#form-add-order-return").valid();
 
-    $.ajax({
-      url: "<?php echo base_url(); ?>order_retur/getTableProductRow",
-      type: 'POST',
-      data: {
-        order_id: order_id
-      },
-      dataType: 'JSON',
-      success: function(data) {
-        var html = '<option value=""></option>';
-        var i;
-
-        for (i = 0; i < data.length; i++) {
-          html += '<option class="form-control" value="' + data[i].product_id + '">' + data[i].product_name + '</option>';
-        }
-        $('.select_group').html(html);
-      }
-    })
-  }
+    if (!$valid) {
+      $("#submitFile").text("Submit"); //change button text
+      $("#submitFile").attr("disabled", false); //set button enable
+      return false;
+    } else {
+      $('#submitFile').text('Submit'); //change button text
+      $('#submitFile').attr('disabled', false); //set button enable 
+    }
+  });
 </script>

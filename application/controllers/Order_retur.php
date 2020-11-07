@@ -4,6 +4,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Order_retur extends CI_Controller
 {
+  private $url = "https://api.rajaongkir.com/starter/";
+  private $apiKey = "9a7210468b5c06925a600b0c0404af50";
+
   public function __construct()
   {
     parent::__construct();
@@ -244,6 +247,25 @@ class Order_retur extends CI_Controller
         // update order return shipping
         $this->returOrder_m->updatePurchaseReturnShipping($return_id, $dataShippingReturn);
 
+        // DECREASE STOCK IN STOCK PRODUCT 
+        $dataPurchaseReturnDetail = $this->returOrder_m->getCustomerReturnProductByID($return_id);
+
+        if ($dataPurchaseReturnDetail != null) {
+          foreach ($dataPurchaseReturnDetail as $val) {
+            $getProductID = $val['id_product'];
+            $getQtyOrder = $val['qty_order'];
+            $getQtyProduct = $val['qty_product'];
+
+            $qty = (int) $getQtyProduct - (int) $getQtyOrder;
+
+            $update_product = array(
+              'qty' => $qty
+            );
+
+            $this->product_m->update($getProductID, $update_product);
+          }
+        }
+
         $response['status'] = TRUE;
         $response['message'] = 'Return has been approved!';
 
@@ -423,6 +445,7 @@ class Order_retur extends CI_Controller
               <tr>
                 <th class="center">#</th>
                 <th>Item Name</th>
+                <th>Description</th>
                 <th>Weight</th>
                 <th class="right">Price</th>
                 <th class="center">Qty</th>
@@ -438,6 +461,7 @@ class Order_retur extends CI_Controller
                     <td class="center">' . $no++ . '</td>
 
                     <td class="left strong">' . $val['product_name'] . '</td>
+                    <td class="left strong">' . $val['information'] . '</td>
 
                     <td class="center">' . $val['weight_return'] . ' Gram</td>
                     <td class="right">Rp. ' . number_format($val['price'], 0, ',', '.') . '</td>
@@ -570,6 +594,25 @@ class Order_retur extends CI_Controller
         $response['status'] = true;
         $response['message'] = 'Successfully canceled the return ' . $return_id . ' and, please confirm the refund!';
 
+        // INCREASE STOCK IN STOCK PRODUCT 
+        $dataPurchaseReturnDetail = $this->returOrder_m->getCustomerReturnProductByID($return_id);
+
+        if ($dataPurchaseReturnDetail != null) {
+          foreach ($dataPurchaseReturnDetail as $val) {
+            $getProductID = $val['id_product'];
+            $getQtyOrder = $val['qty_order'];
+            $getQtyProduct = $val['qty_product'];
+
+            $qty = (int) $getQtyProduct + (int) $getQtyOrder;
+
+            $update_product = array(
+              'qty' => $qty
+            );
+
+            $this->product_m->update($getProductID, $update_product);
+          }
+        }
+
         $this->_sendEmail('cancel', $info);
       } else {
         $response['status'] = false;
@@ -597,6 +640,213 @@ class Order_retur extends CI_Controller
     echo json_encode($response);
   }
   // FOR APPROVE RETURN MODAL
+
+  // FOR ADD ORDER RETUR
+  public function create_code()
+  {
+    date_default_timezone_set('Asia/Jakarta');
+    $generate = array();
+
+    $generate['order_return_id'] = 'R-' . date('His');
+    $generate['order_return_invoice'] = date("d") . date("m") . date('y') . '-OR-' . date('His');
+    $generate['order_return_datetime'] = date('Y-m-d H:i:s');
+
+    // return $generate;
+    echo json_encode($generate);
+  }
+
+  public function getCustomerPurchaseOrder()
+  {
+    $getInput = $this->input->post('searchTerm', true);
+
+    if (!isset($getInput)) {
+      $data = $this->returOrder_m->getCustomerPurchaseOrder($keyword = null, $limit = 10);
+    } else {
+      $data = $this->returOrder_m->getCustomerPurchaseOrder($keyword = $getInput, $limit = 10);
+    }
+
+    $row = array();
+    if ($data > 0) {
+      foreach ($data as $val) {
+        $row[] = array(
+          'id' => $val['id'],
+          'text' => $val['invoice_order']
+        );
+      }
+    }
+
+    echo json_encode($row);
+  }
+
+  public function getCustomerPurchaseOrderByID()
+  {
+    $order_id = $this->input->post('invoice_order');
+
+    $dataCustomerOrder = $this->returOrder_m->getCustomerPurchaseOrderByID($order_id);
+    echo json_encode($dataCustomerOrder);
+  }
+
+  public function getCustomerOrderProduct()
+  {
+    $order_id = $this->input->post('invoice_order');
+
+    $dataCustomerOrderProduct = $this->returOrder_m->getCustomerOrderProductByID($order_id);
+    echo json_encode($dataCustomerOrderProduct);
+  }
+
+  public function getProductDetailValueCustomerOrder()
+  {
+    $product_id = $this->input->post('product_id');
+
+    if ($product_id) {
+      $data = $this->returOrder_m->getProductDetailValueCustomerOrderByID($product_id);
+      echo json_encode($data);
+    }
+  }
+
+  public function getOrderValidityQty()
+  {
+    $response = array();
+    $order_id = $this->input->post('invoice_order');
+    $product_id = $this->input->post('product_id');
+    $qty_val = $this->input->post('qty');
+
+    $dataProducts = $this->returOrder_m->getCheckQtyProductOrderByID($order_id, $product_id);
+    $getQty = $dataProducts['qty'];
+
+    if ($qty_val <= $getQty) {
+      $response['status'] = "true";
+    } else {
+      $response['status'] = "false";
+      $response['message'] = "Sorry, you exceeded the quantity limit from product order!";
+    }
+
+    echo json_encode($response);
+  }
+
+  private function rajaOngkirCost($origin, $destination, $weight, $courier)
+  {
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => "https://api.rajaongkir.com/starter/cost",
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING => "",
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_TIMEOUT => 30,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => "POST",
+      CURLOPT_POSTFIELDS => "origin=" . $origin . "&destination=" . $destination . "&weight=" . $weight . "&courier=" . $courier,
+      CURLOPT_HTTPHEADER => array(
+        "content-type: application/x-www-form-urlencoded",
+        "key: " . $this->apiKey
+      ),
+    ));
+
+    $response = curl_exec($curl);
+
+    $return = ($response === FALSE) ? curl_error($curl) : $response;
+    curl_close($curl);
+    return $return;
+  }
+
+  public function getCostShippingRajaOngkir()
+  {
+    $getOrigin = $this->input->get('origin');
+    $getDestination = $this->input->get('destination');
+    $getWeight = $this->input->get('weight');
+    $getCourier = $this->input->get('courier');
+
+    $data = $this->rajaOngkirCost($getOrigin, $getDestination, $getWeight, $getCourier);
+    $getResult = json_decode($data)->rajaongkir->results;
+    // $getData = $getResult[0]->costs;
+
+    echo json_encode($getResult);
+  }
+
+  public function addRetur()
+  {
+    $info['title'] = "Add New Retur";
+    $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+
+    $this->form_validation->set_rules('invoice_order', 'invoice order', 'trim|required');
+    $this->form_validation->set_rules('date_return', 'return date', 'trim|required');
+    $this->form_validation->set_rules('qty[]', 'quantity', 'trim|required|numeric');
+    $this->form_validation->set_rules('courier', 'courier shipping', 'trim|required');
+    $this->form_validation->set_rules('service', 'service shipping', 'trim|required');
+    $this->form_validation->set_rules('shipping_cost', 'cost shipping', 'trim|required');
+    $this->form_validation->set_rules('product[]', 'product', 'trim|required');
+
+    if ($this->form_validation->run() == FALSE) {
+      renderBackTemplate('retur_orders/add-retur', $info);
+    } else {
+      $this->insertDataRetur();
+    }
+  }
+
+  public function insertDataRetur()
+  {
+    date_default_timezone_set('Asia/Jakarta');
+
+    $dataReturns = [
+      'id' => $this->input->post('id_return'),
+      'invoice_return' => $this->input->post('invoice_return'),
+      'purchase_order_id' => $this->input->post('invoice_order_val'),
+      'customer_email' => $this->input->post('c_email'),
+      'purchase_return_date' => $this->input->post('date_return', true),
+      'gross_amount' => $this->input->post('gross_amount_value', true),
+      'ship_amount' => $this->input->post('shipping_cost', true),
+      'net_amount' => $this->input->post('net_amount_value', true),
+      'status_order_id' => 5,
+      'reminder_pending' => 1,
+      'created_date' => date('Y-m-d H:i:s')
+    ];
+
+    $dataReturnShipps = [
+      'purchase_return_id' => $this->input->post('id_return'),
+      'courier' => $this->input->post('courier'),
+      'service' => $this->input->post('service_val'),
+      'etd' => $this->input->post('etd_val'),
+      'delivery_receipt_number' => null,
+    ];
+
+    $count_product = count($this->input->post('product'));
+
+    for ($j = 0; $j < $count_product; $j++) {
+      $getProduct = $this->returOrder_m->getCheckQtyProductOrderByID($this->input->post('invoice_order_val'), $this->input->post('product')[$j]);
+      $getProductDetail = $this->returOrder_m->getProductDetailValueCustomerOrderByID($this->input->post('product')[$j]);
+      $getProductInput = $this->input->post('product')[$j];
+      $qtyProduct = $this->input->post('qty')[$j];
+    }
+
+    if ($qtyProduct <= $getProduct['qty']) {
+      $this->returOrder_m->insertOrderRetur($dataReturns);
+
+      $this->returOrder_m->insertOrderReturShipps($dataReturnShipps);
+
+      // Store to sales_order_details
+      for ($i = 0; $i < $count_product; $i++) {
+        $dataReturnDetails = array(
+          'purchase_return_id' => $this->input->post('id_return'),
+          'product_id' => $this->input->post('product')[$i],
+          'weight' => $this->input->post('weight_val')[$i],
+          'qty' => $this->input->post('qty')[$i],
+          'unit_price' => $this->input->post('price_value')[$i],
+          'amount' => $this->input->post('amount_value')[$i],
+          'information' => $this->input->post('description')[$i],
+        );
+
+        $this->returOrder_m->insertOrderReturDetails($dataReturnDetails);
+      }
+
+      $this->session->set_flashdata('success', 'Your retur order has been set, now You can approve the retur order!');
+      redirect('order_retur', 'refresh');
+    } else {
+      $this->session->set_flashdata('error', 'Your quantity of ' . $getProductDetail['product_name'] . ' is limit from the previous order!');
+      redirect('order_retur/addretur', 'refresh');
+    }
+  }
+  // FOR ADD ORDER RETUR
 
   public function getCustomerOrder()
   {
@@ -628,133 +878,6 @@ class Order_retur extends CI_Controller
     if ($product_id) {
       $data = $this->returOrder_m->getProductDetailsQtyByID($product_id);
       echo json_encode($data);
-    }
-  }
-
-  public function getProductValueById()
-  {
-    $product_id = $this->input->post('product_id');
-    if ($product_id) {
-      $data = $this->returOrder_m->getProductDetailsByID($product_id);
-      echo json_encode($data);
-    }
-  }
-
-  public function create_code()
-  {
-    $this->db->select('RIGHT(id,4) as kode', FALSE);
-    $this->db->order_by('id', 'DESC');
-    $this->db->limit(1);
-
-    $query = $this->db->get('order_returns');      //cek dulu apakah ada sudah ada kode di tabel.    
-
-    if ($query->num_rows() <> 0) {
-      //jika kode ternyata sudah ada.      
-      $data = $query->row();
-      $kode = intval($data->kode) + 1;
-    } else {
-      //jika kode belum ada      
-      $kode = 1;
-    }
-    // https://stackoverflow.com/questions/35583733/right-substring-statement-sql
-    $max_code = str_pad($kode, 4, "0", STR_PAD_LEFT); // angka 4 menunjukkan jumlah digit angka 0
-    $generate = "RO" . date('d') . date("m") . date('y') . '-' . $max_code;
-
-    // return $generate;
-    echo json_encode($generate);
-  }
-
-  public function addRetur()
-  {
-    $info['title'] = "Add New Retur";
-
-    $this->form_validation->set_rules('retur_date', 'retur date', 'trim|required');
-    $this->form_validation->set_rules('order_id', 'order id', 'trim|required');
-
-    $this->form_validation->set_rules('product[]', 'product', 'trim|required');
-
-    $file = [
-      'id' => $this->input->post('id'),
-      'retur_date' => $this->input->post('retur_date', true),
-      'order_id' => $this->input->post('order_id', true),
-      'gross_amount' => $this->input->post('gross_amount_value', true),
-      'discount' => $this->input->post('discount', true),
-      'net_amount' => $this->input->post('net_amount_value', true),
-      'user_create' => $this->session->userdata('email')
-    ];
-
-    if ($this->form_validation->run() == FALSE) {
-      renderBackTemplate('retur_orders/add-retur', $info);
-    } else {
-      $count_product = count($this->input->post('product'));
-      for ($j = 0; $j < $count_product; $j++) {
-        $getProduct = $this->returOrder_m->getProductDetailsByID($this->input->post('product')[$j]);
-        $qtyProduct = $this->input->post('qty')[$j];
-      }
-
-      if ($qtyProduct <= $getProduct['order_qty']) {
-        $this->returOrder_m->insertOrderRetur($file);
-
-        // Store to sales_order_details
-        for ($i = 0; $i < $count_product; $i++) {
-          $products = array(
-            'retur_id' => $this->input->post('id'),
-            // 'order_id' => $this->input->post('order_id'),
-            'product_id' => $this->input->post('product')[$i],
-            'description' => $this->input->post('description')[$i],
-            'qty' => $this->input->post('qty')[$i],
-            'unit_price' => $this->input->post('price_value')[$i],
-            'amount' => $this->input->post('amount_value')[$i]
-          );
-
-          $this->returOrder_m->insertOrderReturDetails($products);
-
-          // Update qty product to increase stock after doing new retur 
-          $data_product = $this->product_m->getProductById($this->input->post('product')[$i]);
-          $qty_product = (int) $data_product['qty'] + (int) $this->input->post('qty')[$i];
-
-          $update_product = array(
-            'qty' => $qty_product
-          );
-
-          $this->product_m->update($this->input->post('product')[$i], $update_product);
-
-          // Update qty order details to decrease stock after doing new retur 
-          $data_order_detail = $this->returOrder_m->getOrdersById($this->input->post('product')[$i]);
-          $qty_order_detail = (int) $data_order_detail['qty'] - (int) $this->input->post('qty')[$i];
-
-          $update_order_detail = array(
-            'qty' => $qty_order_detail
-          );
-
-          $this->returOrder_m->updateOrderDetail($this->input->post('product')[$i], $update_order_detail);
-
-          // Update net amount order after doing new retur 
-          $amount_order = (int) $data_order_detail['amount'] - (int) $this->input->post('amount_value')[$i];
-
-          $update_amount_order = array(
-            'amount' => $amount_order
-          );
-
-          $this->returOrder_m->updateOrderDetail($this->input->post('product')[$i], $update_amount_order);
-        }
-
-        $data_order = $this->returOrder_m->getSimpleOrdersById($this->input->post('order_id'));
-
-        $net_amount_order = (int) $data_order['net_amount'] - (int) $this->input->post('net_amount_value');
-
-        $update_netamount_order = array(
-          'net_amount' => $net_amount_order
-        );
-
-        $this->returOrder_m->update($this->input->post('order_id'), $update_netamount_order);
-
-        $this->session->set_flashdata('success', 'Your retur order has been added !');
-        redirect('order_retur', 'refresh');
-      } else {
-        $this->session->set_flashdata('error', 'Your quantity of ' . $getProduct['product_name'] . ' is limit from the previous order !');
-        redirect('order_retur/addretur', 'refresh');
-      }
     }
   }
 

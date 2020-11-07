@@ -8,10 +8,6 @@
   </section>
 
   <section class="content-header">
-    <a href="<?php echo base_url(); ?>order_retur/addretur" class="btn btn-primary"><i class="fa fa-plus"></i> Retur</a>
-  </section>
-
-  <section class="content-header">
     <div class="row">
       <div class="col-lg-12">
         <?php if ($this->session->flashdata('success')) { ?>
@@ -41,6 +37,10 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <section class="content-header">
+    <a href="<?php echo base_url(); ?>order_retur/addretur" class="btn btn-primary"><i class="fa fa-plus"></i> Order Retur</a>
   </section>
 
   <!-- Main content -->

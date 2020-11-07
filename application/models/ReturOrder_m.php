@@ -165,6 +165,19 @@ class ReturOrder_m extends CI_Model
   // FOR APPROVE RETURN MODAL
 
   // APPROVER PURPOSE
+  public function getCustomerReturnProductByID($return_id)
+  {
+    $this->db->select('*, customer_purchase_return_details.id AS id_return_detail, customer_purchase_return_details.weight AS weight_order, customer_purchase_return_details.qty AS qty_order, products.id AS id_product, products.weight AS weight_product, products.qty AS qty_product');
+
+    $this->db->from('customer_purchase_return_details');
+    $this->db->join('products', 'products.id = customer_purchase_return_details.product_id', 'left');
+
+    $this->db->where('customer_purchase_return_details.purchase_return_id', $return_id);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
   public function insertPaymentApprove($data)
   {
     $this->db->insert('customer_purchase_return_approves', $data);
@@ -195,6 +208,89 @@ class ReturOrder_m extends CI_Model
     return $this->db->affected_rows();
   }
   // APPROVER PURPOSE
+
+  // ADD RETURN PURPOSES
+  public function getCustomerPurchaseOrder($keyword, $limit)
+  {
+    $this->db->select('*');
+    $this->db->from('customer_purchase_orders');
+
+    if ($keyword != null) {
+      $this->db->like('id', $keyword);
+      $this->db->or_like('invoice_order', $keyword);
+    }
+
+    $this->db->order_by('invoice_order', 'ASC');
+    $this->db->limit($limit);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getCustomerPurchaseOrderByID($order_id)
+  {
+    $this->db->select('*, customer_purchase_orders.id AS id_order, customer_address.id AS id_address');
+
+    $this->db->from('customer_purchase_orders');
+    $this->db->join('customers', 'customers.customer_email = customer_purchase_orders.customer_email', 'left');
+    $this->db->join('customer_address', 'customer_address.email = customer_purchase_orders.customer_email', 'left');
+
+    $this->db->where('customer_purchase_orders.id', $order_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function getCustomerOrderProductByID($order_id)
+  {
+    $this->db->select('*, customer_purchase_order_details.id AS id_order_detail, customer_purchase_order_details.weight AS weight_order, customer_purchase_order_details.qty AS qty_order, products.id AS id_product, products.weight AS weight_product, products.qty AS qty_product');
+
+    $this->db->from('customer_purchase_order_details');
+    $this->db->join('products', 'products.id = customer_purchase_order_details.product_id', 'left');
+
+    $this->db->where('customer_purchase_order_details.purchase_order_id', $order_id);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getProductDetailValueCustomerOrderByID($product_id)
+  {
+    $this->db->select('*, customer_purchase_order_details.id AS id_order_detail, customer_purchase_order_details.weight AS weight_order, customer_purchase_order_details.qty AS qty_order, products.id AS id_product, products.weight AS weight_product, products.qty AS qty_product');
+
+    $this->db->from('customer_purchase_order_details');
+    $this->db->join('products', 'products.id = customer_purchase_order_details.product_id', 'left');
+
+    $this->db->where('product_id', $product_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function getCheckQtyProductOrderByID($order_id, $product_id)
+  {
+    $this->db->where('purchase_order_id', $order_id);
+    $this->db->where('product_id', $product_id);
+
+    $query = $this->db->get('customer_purchase_order_details');
+    return $query->row_array();
+  }
+
+  public function insertOrderRetur($data)
+  {
+    $this->db->insert('customer_purchase_returns', $data);
+  }
+
+  public function insertOrderReturDetails($data)
+  {
+    $this->db->insert('customer_purchase_return_details', $data);
+  }
+
+  public function insertOrderReturShipps($data)
+  {
+    $this->db->insert('customer_purchase_return_shipping', $data);
+  }
+  // ADD RETURN PURPOSES
 
   public function getProductOrder($id)
   {
@@ -246,16 +342,6 @@ class ReturOrder_m extends CI_Model
 
     $query = $this->db->get('orders');
     return $query->result_array();
-  }
-
-  public function insertOrderRetur($data)
-  {
-    $this->db->insert('order_returns', $data);
-  }
-
-  public function insertOrderReturDetails($data)
-  {
-    $this->db->insert('order_return_details', $data);
   }
 
   public function getReturOrdersById($id)
