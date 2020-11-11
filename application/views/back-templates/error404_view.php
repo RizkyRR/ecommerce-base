@@ -43,7 +43,7 @@
 
           <p>
             We could not find the page you were looking for.
-            Meanwhile, you may <a href="<?php echo base_url(); ?>">return to right way</a> or try using the search form.
+            Meanwhile, you may <a href="javascript:window.history.go(-1);">return to right way</a> or try using the search form.
           </p>
         </div>
         <!-- /.error-content -->

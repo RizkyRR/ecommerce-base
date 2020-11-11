@@ -233,6 +233,35 @@ class Company_m extends CI_Model
 
     return $this->db->affected_rows();
   }
+
+  // SET ALERT 
+  public function getAlertValue($id)
+  {
+    $this->db->select('*, company_profile.id AS id_profile, company_profile_alerts.id AS id_profile_alert');
+
+    $this->db->from('company_profile_alerts');
+    $this->db->join('company_profile', 'company_profile.id = company_profile_alerts.company_profile_id', 'left');
+
+    $this->db->where('company_profile_alerts.company_profile_id', $id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function insertAlertValue($data)
+  {
+    $this->db->insert('company_profile_alerts', $data);
+
+    return $this->db->insert_id();
+  }
+
+  public function updateAlertValue($id, $data)
+  {
+    $this->db->where('company_profile_id', $id);
+    $this->db->update('company_profile_alerts', $data);
+
+    return $this->db->affected_rows();
+  }
 }
   
   /* End of file Company_m.php */

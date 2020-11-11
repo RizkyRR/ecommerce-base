@@ -27,10 +27,10 @@
 <script src="<?php echo base_url(); ?>back-assets/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
 
 <!-- chat notification -->
-<!-- <script src="<?php echo base_url(); ?>back-assets/plugins/custom-notification/messages-notif.js"></script> -->
+<script src="<?php echo base_url(); ?>back-assets/plugins/custom-notification/messages-notif.js"></script>
 
 <!-- stock notification -->
-<!-- <script src="<?php echo base_url(); ?>back-assets/plugins/custom-notification/stock-notif.js"></script> -->
+<script src="<?php echo base_url(); ?>back-assets/plugins/custom-notification/stock-notif.js"></script>
 
 <!-- payment auto -->
 <script src="<?php echo base_url(); ?>back-assets/plugins/custom-notification/payment-purchase-order.js"></script>

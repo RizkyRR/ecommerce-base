@@ -41,6 +41,9 @@
   <!-- datatables bootstrap3 -->
   <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'front-assets/plugins/datatables/datatables.min.css'; ?>">
 
+  <!-- ZOOM -->
+  <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'back-assets/plugins/zoom/css/zoom.css'; ?>">
+
 
   <!-- Js Plugins -->
   <script src="<?php echo base_url(); ?>front-assets/js/jquery-3.3.1.min.js"></script>
@@ -81,6 +84,9 @@
 
   <!-- datatables bootstrap3 -->
   <script type="text/javascript" src="<?php echo base_url() . 'front-assets/plugins/datatables/datatables.min.js'; ?>"></script>
+
+  <!-- ZOOM -->
+  <script src="<?php echo base_url(); ?>back-assets/plugins/zoom/js/zoom.js"></script>
 
 </head>
 

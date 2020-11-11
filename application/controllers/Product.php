@@ -154,7 +154,10 @@ class Product extends CI_Controller
 
   public function getProductLessStockCount()
   {
-    $data = $this->product_m->getLimitStockCount();
+    $getLimit = $this->company_m->getAlertValue(1);
+    $setLimit = $getLimit['minimum_stock_value'];
+
+    $data = $this->product_m->getLimitStockCount($setLimit);
 
     echo json_encode($data);
   }

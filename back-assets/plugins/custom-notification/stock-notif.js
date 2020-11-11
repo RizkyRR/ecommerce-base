@@ -19,7 +19,11 @@ function incomingStockLimitInfo() {
 			for (i = 0; i < data.length; i++) {
 				// TOLONG DICEK LAGI KARENA ADA MASALAH KETIKA DITAMBAHKAN DENGAN MODAL
 				html +=
-					'<a href="#" title="' +
+					'<a href="' +
+					url.pathname +
+					"product/editproduct/" +
+					data[i].id +
+					'" title="' +
 					data[i].id +
 					'">' +
 					'<i class="fa fa-exclamation-circle text-red"></i>' +
@@ -55,7 +59,7 @@ function incomingStockLimitCount() {
 			}
 
 			if (data > 5) {
-				html = '<a href="product">View all</a>';
+				html = '<a href="' + url.pathname + 'product">View all</a>';
 			}
 
 			$(".show-view-all-stock").html(html);

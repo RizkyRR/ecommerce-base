@@ -537,6 +537,44 @@ class Company extends CI_Controller
 
     echo json_encode($response);
   }
+
+  // SET ALERT VALUE 
+  public function getAlertValue()
+  {
+    $dataAlertValue = $this->company_m->getAlertValue(1);
+
+    if ($dataAlertValue != null) {
+      $data = $dataAlertValue;
+    } else {
+      $data = [];
+    }
+
+    echo json_encode($data);
+  }
+
+  public function actionAlertValue()
+  {
+    $response = array();
+    $dataAlertValue = $this->company_m->getAlertValue(1);
+
+    if ($dataAlertValue != null) {
+      // update
+      $update = $this->company_m->updateAlertValue(1, ['minimum_stock_value' => $this->input->post('min_stock_product_val')]);
+
+      if ($update > 0) {
+        $response['status'] = 'update';
+      }
+    } else {
+      // insert
+      $insert = $this->company_m->insertAlertValue(['company_profile_id' => 1, 'minimum_stock_value' => $this->input->post('min_stock_product_val')]);
+
+      if ($insert > 0) {
+        $response['status'] = 'insert';
+      }
+    }
+
+    echo json_encode($response);
+  }
 }
   
   /* End of file Company.php */

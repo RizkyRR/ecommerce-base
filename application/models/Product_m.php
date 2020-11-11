@@ -246,12 +246,18 @@ class Product_m extends CI_Model
     return $query->result_array();
   }
 
-  public function getLimitStockCount()
+  public function getLimitStockCount($limit)
   {
     // Untuk ambil jumlah
     $this->db->select('COUNT(*)');
     $this->db->from('products');
-    $this->db->where('qty <= 10');
+
+    if ($limit != null) {
+      $this->db->where('qty <=', $limit);
+    } else {
+      $this->db->where('qty <= 1');
+    }
+
     return $this->db->count_all_results();
   }
 

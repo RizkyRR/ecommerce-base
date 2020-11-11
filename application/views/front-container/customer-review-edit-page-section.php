@@ -96,7 +96,7 @@
 
                 <div class="form-group row">
                   <div class="col-sm-10">
-                    <a href="<?php echo base_url() ?>customer-review" class="btn btn-secondary btn-sm" id="btnCancel"><i class="fa fa-undo"></i> Cancel</a>
+                    <a href="<?php echo base_url() ?>customer-review" class="btn btn-secondary btn-sm" id="btnCancel"><i class="fa fa-undo"></i> Back</a>
                     <button type="submit" class="btn btn-success btn-sm" id="btnUpdate"><i class="fa fa-floppy-o"></i> Update</button>
                   </div>
                 </div>

@@ -104,6 +104,9 @@
   <!-- <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'back-assets/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css'; ?>"> -->
   <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'back-assets/plugins/datetimepicker_bs/css/bootstrap-datetimepicker.min.css'; ?>">
 
+  <!-- ZOOM -->
+  <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'back-assets/plugins/zoom/css/zoom.css'; ?>">
+
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -174,6 +177,9 @@
 
   <!-- AutoNumeric -->
   <script src="<?php echo base_url(); ?>back-assets/plugins/auto-numeric/autoNumeric.js"></script>
+
+  <!-- ZOOM -->
+  <script src="<?php echo base_url(); ?>back-assets/plugins/zoom/js/zoom.js"></script>
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">

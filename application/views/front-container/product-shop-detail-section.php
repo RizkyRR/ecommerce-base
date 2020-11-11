@@ -126,7 +126,7 @@
                 <a class="active" data-toggle="tab" href="#tab-1" role="tab">DESCRIPTION</a>
               </li>
               <li>
-                <a data-toggle="tab" href="#tab-2" role="tab">Customer Reviews <span id="count-info"></span></a>
+                <a data-toggle="tab" href="#tab-2" role="tab">Customer Review/s <span id="count-info"></span></a>
               </li>
             </ul>
           </div>
@@ -150,7 +150,7 @@
 
                   <!-- show count comment -->
                   <h4>
-                    <span id="count-comment"></span> Comment
+                    <span id="count-comment"></span> Review/s
                   </h4>
 
                   <div id="comment-review" style="display: none;" class="mb-3">
@@ -162,7 +162,7 @@
                     </div>
 
                     <div class="leave-comment">
-                      <h4>Leave A Comment</h4>
+                      <h4>Leave A Review</h4>
 
                       <form action="" method="POST" id="form-comment" enctype="multipart/form-data" class="comment-form">
                         <div class="row">
@@ -180,7 +180,7 @@
                               </div>
                             </div>
 
-                            <button type="submit" id="btnSend" class="site-btn">Send message</button>
+                            <button type="submit" id="btnSend" class="site-btn">Send review</button>
                           </div>
                         </div>
                       </form>
@@ -403,7 +403,7 @@
     },
     messages: {
       message: {
-        required: "Comment message is required!",
+        required: "Review message is required!",
         minlength: "Minimum of 20 characters"
       },
     },
@@ -600,14 +600,14 @@
             if (data.status == true) {
               Swal.fire({
                 icon: "success",
-                title: "Successfully deleted your comment!",
+                title: "Successfully deleted your review!",
                 showConfirmButton: false,
                 timer: 5000,
               });
             } else {
               Swal.fire({
                 icon: "error",
-                title: "Failed deleted your comment, please try again!",
+                title: "Failed deleted your review, please try again!",
                 showConfirmButton: false,
                 timer: 5000,
               });

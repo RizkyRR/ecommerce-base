@@ -332,7 +332,7 @@ class Product_shop extends CI_Controller
         if ($image_record != null) {
           foreach ($image_record as $record) {
             if ($record['comment_id'] == $val['id_comment']) {
-              $image .= '<img style="margin-right: 4px; margin-top: 3px; width: 223px; height: 264px;" src="' . base_url() . 'image/comment_review/' . $record['image'] . '" alt="" />';
+              $image .= '<img style="margin-right: 4px; margin-top: 3px; width: 223px; height: 264px;" data-action="zoom" src="' . base_url() . 'image/comment_review/' . $record['image'] . '" alt="" />';
             } else {
               $image .= '';
             }
@@ -349,6 +349,34 @@ class Product_shop extends CI_Controller
           $button = '';
         }
 
+        // check review reply 
+        $dataReviewReply = $this->customerProfile_m->getDataReviewReplyByID($val['id_comment']);
+
+        if ($dataReviewReply != null) {
+          $dataReviewReplyImage = $this->customerProfile_m->getDataReviewReplyImageByID($dataReviewReply['id_comment_reply']);
+
+          $image_reply = '';
+
+          if ($dataReviewReplyImage != null) {
+            foreach ($dataReviewReplyImage as $valImage) {
+              $image_reply .= '<img style="margin-right: 4px; margin-top: 3px; width: 223px; height: 264px;" data-action="zoom" src="' . base_url() . 'image/comment_review/' . $valImage['image'] . '" alt="" />';
+            }
+          } else {
+            $image_reply .= '';
+          }
+
+          $getReviewReply = '<div class="mb-3"></div>
+          <div class="avatar-text" style="margin-top: 3px;">
+          <h5>Admin <span>' . date('d M Y H:i:s', strtotime($dataReviewReply['reply_date'])) . '</span></h5>
+          <div class="at-reply">' . $dataReviewReply['message_reply'] . '</div>' .
+
+            $image_reply .
+
+            '</div>';
+        } else {
+          $getReviewReply = '';
+        }
+
         $html .= '<div class="co-item">
         <div class="avatar-pic">
           <img src="' . base_url() . 'image/customer_profile/' . $val['customer_image'] . '" alt="">
@@ -363,6 +391,10 @@ class Product_shop extends CI_Controller
               <h5>' . $val['customer_name'] . ' <span>' . date('d M Y H:i:s', strtotime($val['comment_date'])) . '</span></h5>
               <div class="at-reply">' . $val['message'] . '</div>
               ' . $image . '
+
+              <!-- START COMMENT REVIEW -->
+              ' . $getReviewReply . '
+              <!-- END COMMENT REVIEW -->
             </div>
           </div>
 
@@ -371,7 +403,7 @@ class Product_shop extends CI_Controller
       </div>';
       }
     } else {
-      $html .= '<span>Sorry, no comments yet!</span>';
+      $html .= '<span>Sorry, no review/s yet!</span>';
     }
 
     $data['html'] = $html;
@@ -513,16 +545,59 @@ class Product_shop extends CI_Controller
 
     $response = array();
 
-    $rows = $this->db->get_where('customer_comment_details', array('comment_id' => $id));
-    $result = $rows->result();
+    $getDataReviewReply = $this->review_m->getReviewReplyDataByID($id);
 
-    if ($result != null) {
-      foreach ($result as $row) {
-        @unlink('./image/comment_review/' . $row->image);
+    // comment review details
+    $dataImagesReview = $this->db->get_where('customer_comment_details', array('comment_id' => $id));
+    $imageReviewResult = $dataImagesReview->result();
+
+    // comment review reply details
+    $dataImagesReviewReply = $this->db->get_where('customer_comment_reply_details', array('comment_reply_id' => $getDataReviewReply['id_comment_reply']));
+    $imageReviewReplyResult = $dataImagesReviewReply->result();
+
+    // check apakah ada reply atau belum
+    $checkAvailableReply = $this->db->get_where('customer_comment_replies ', ['comment_id' => $id]);
+
+    if ($checkAvailableReply->num_rows() > 0) {
+      if ($imageReviewResult != null && $imageReviewReplyResult != null) {
+        // comment review details
+        foreach ($imageReviewResult as $row) {
+          @unlink('./image/comment_review/' . $row->image);
+        }
+
+        // comment review reply details
+        foreach ($imageReviewReplyResult as $row) {
+          @unlink('./image/comment_review/' . $row->image);
+        }
+
+        $delete = $this->review_m->deleteDataWithReviewDetailAndReplyDetail($id);
+      } else if ($imageReviewResult != null) {
+        // comment review details
+        foreach ($imageReviewResult as $row) {
+          @unlink('./image/comment_review/' . $row->image);
+        }
+
+        $delete = $this->review_m->deleteDataWithReviewDetail($id);
+      } else if ($imageReviewReplyResult != null) {
+        // comment review reply details
+        foreach ($imageReviewReplyResult as $row) {
+          @unlink('./image/comment_review/' . $row->image);
+        }
+
+        $delete = $this->review_m->deleteDataWithReplyDetail($id);
+      } else {
+        $delete = $this->review_m->deleteDataReview($id);
       }
-      $delete = $this->customerProfile_m->deleteCommentReviewDetail($id);
     } else {
-      $delete = $this->customerProfile_m->deleteCommentReview($id);
+      if ($imageReviewResult != null) {
+        foreach ($imageReviewResult as $row) {
+          @unlink('./image/comment_review/' . $row->image);
+        }
+
+        $delete = $this->review_m->deleteCommentReviewWithDetail($id);
+      } else {
+        $delete = $this->review_m->deleteCommentReview($id);
+      }
     }
 
     if ($delete > 0) {

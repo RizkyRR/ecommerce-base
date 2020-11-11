@@ -146,6 +146,7 @@ $autoload['model'] = array(
   'Product_m' => 'product_m',
   'Order_m' => 'order_m',
   'Piutang_m' => 'piutang_m',
+  'Review_m' => 'review_m',
   'ReturOrder_m' => 'returOrder_m',
   'Purchase_m' => 'purchase_m',
   'Hutang_m' => 'hutang_m',

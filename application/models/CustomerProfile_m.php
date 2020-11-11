@@ -196,6 +196,27 @@ class CustomerProfile_m extends CI_Model
     return $query->result_array();
   }
 
+  public function getDataReviewReplyByID($comment_id)
+  {
+    $this->db->select('*, customer_comments.id AS id_comment, customer_comments.message AS message_review, customer_comment_replies.id AS id_comment_reply, customer_comment_replies.message AS message_reply');
+
+    $this->db->from('customer_comment_replies');
+    $this->db->join('customer_comments', 'customer_comments.id = customer_comment_replies.comment_id', 'left');
+
+    $this->db->where('customer_comments.id', $comment_id);
+
+    $query = $this->db->get();
+    return $query->row_array();
+  }
+
+  public function getDataReviewReplyImageByID($id)
+  {
+    $this->db->where('comment_reply_id', $id);
+
+    $query = $this->db->get('customer_comment_reply_details');
+    return $query->result_array();
+  }
+
   public function getAverageCommentByProduct($id)
   {
     /* $this->db->select('AVG(customer_comments.rating) AS rating_comment, customer_comments.id AS id_comment, products.id AS id_product'); //*
