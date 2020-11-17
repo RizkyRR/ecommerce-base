@@ -57,7 +57,7 @@ class Order extends CI_Controller
       // CHECKING ORDER APPROVE
       $checkOrderPending = $this->order_m->getCheckPurchaseOrderPending($item->id_order);
 
-      if ($checkOrderPending == true) {
+      if ($checkOrderPending != null && ($checkOrderPending['status_order_id'] == 2 || $checkOrderPending['status_order_id'] == 11)) {
         $btnApprovePayment = '<a href="javascript:void(0)" class="btn btn-success btn-xs" onclick="payment_approve(' . $id . ')" id="btnApproveOrder_' . $item->id_order . '" title="approve payment"><i class="fa fa-check" aria-hidden="true"></i> Approve Payment</a> ';
       } else {
         $btnApprovePayment = '';
@@ -84,7 +84,7 @@ class Order extends CI_Controller
       // CONDITION FOR SHOW CANCEL BUTTON 
       $checkStatusCancelOrder = $this->order_m->getCheckPurchaseOrderCancel($item->id_order);
 
-      if ($checkStatusCancelOrder['status_order_id'] == 2 || $checkStatusCancelOrder['status_order_id'] == 3) {
+      if ($checkStatusCancelOrder['status_order_id'] == 2 || $checkStatusCancelOrder['status_order_id'] == 3 || $checkStatusCancelOrder['status_order_id'] == 11) {
         $btnOrderCancel = '<a href="javascript:void(0)" onclick="cancel_order(' . $id . ')" class="btn btn-danger btn-xs" id="btnCancelOrder_' . $item->id_order . '" title="cancel order"><i class="fa fa-trash-o"></i> Cancel Order</a> ';
       } else {
         $btnOrderCancel = '';

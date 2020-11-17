@@ -42,44 +42,9 @@
           <tbody id="show_data_user">
 
           </tbody>
-
-          <!-- <?php
-                if ($usercontrol) :
-                  foreach ($usercontrol as $uc) : ?>
-              <tr>
-                <td><?php echo ++$start; ?></td>
-                <td><?php echo $uc['name']; ?></td>
-                <td><?php echo $uc['email']; ?></td>
-                <td><?php echo $uc['role']; ?></td>
-                <td>
-                  <?php
-                    if ($uc['is_active'] == 1) {
-                      echo "<p class='label label-success'>Active</p>";
-                    } else {
-                      echo "<p class='label label-danger'>Inactive</p>";
-                    }
-                  ?>
-                </td>
-                <td><?php echo date('d F Y', $uc['created_at']); ?></td>
-                <td>
-                  <a href="<?php echo base_url() ?>usercontrol/deleteusercontrol/<?php echo $uc['user_id'] ?>" class="btn btn-sm btn-danger button-delete">Delete</a>
-                  <a href="<?php echo base_url() ?>usercontrol/editusercontrol/<?php echo $uc['user_id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          <?php else : ?>
-            <tr>
-              <td colspan="7" style="text-align: center">Data not found !</td>
-            </tr>
-          <?php endif; ?> -->
         </table>
       </div>
       <!-- /.box-body -->
-      <!-- <div class="box-footer clearfix">
-        <ul class="pagination pagination-sm no-margin pull-right">
-          <?php echo $pagination; ?>
-        </ul>
-      </div> -->
     </div>
     <!-- /.box -->
 

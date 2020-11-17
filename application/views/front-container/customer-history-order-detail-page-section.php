@@ -25,7 +25,7 @@
 
     <div class="row">
       <div class="container">
-        <?php if ($data_order['status_order_id'] == 1) : ?>
+        <?php if ($data_order['status_order_id'] == 1 || $data_order['status_order_id'] == 10) : ?>
           <div class="card text-white bg-danger mb-3 shadow">
             <div class="card-body">
               <h5 class="card-title"><i class="fa fa-info-circle" aria-hidden="true"></i> Attention</h5>
@@ -37,14 +37,16 @@
             <div class="card-body">
               <h5 class="card-title"><i class="fa fa-info-circle" aria-hidden="true"></i> Attention</h5>
               <p class="card-text">You can cancel your order while the order status is still pending. Apart from that you have to contact the Admin.</p>
-              <a href="<?php echo base_url(); ?>print-customer-purchase/<?php echo $data_order['id_order'] ?>" target="__blank" rel="noreferrer noopener" class="btn btn-sm btn-secondary"><i class="fa fa-print" aria-hidden="true"></i> Print order</a>
+              <a href="<?php echo base_url(); ?>print-customer-purchase/<?php echo $data_order['id_order'] ?>" target="__blank" rel="noreferrer noopener" class="btn btn-sm mt-1 mb-1 btn-secondary"><i class="fa fa-print" aria-hidden="true"></i> Print order</a>
 
               <?php if ($data_order['status_order_id'] == 2) : ?>
                 <input type="hidden" name="order_id" id="order_id" value="<?php echo $data_order['id_order'] ?>" readonly>
-                <a href="javascript:void(0)" class="btn btn-sm btn-danger" id="btnCancelPayment"><i class="fa fa-ban" aria-hidden="true"></i> Cancel</a>
+                <a href="javascript:void(0)" class="btn btn-sm mt-1 mb-1 btn-danger" id="btnCancelPayment"><i class="fa fa-ban" aria-hidden="true"></i> Cancel</a>
+
+                <a href="<?php echo base_url(); ?>customer-pay-report-page/<?php echo $data_order['id_order'] ?>" class="btn btn-sm mt-1 mb-1 btn-warning" id="btnPayReportMessage"><i class="fa fa-envelope" aria-hidden="true"></i> Report via Message</a>
               <?php endif; ?>
 
-              <a href="#" class="btn btn-sm btn-info"><i class="fa fa-phone" aria-hidden="true"></i> Contact admin</a>
+              <a href="#" class="btn btn-sm mt-1 mb-1 btn-info btnWhatsApp" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> Contact via Whatsapp</a>
             </div>
           </div>
         <?php endif; ?>
@@ -55,7 +57,7 @@
     <div class="row">
       <div class="container">
 
-        <?php if ($data_order['status_order_id'] == 1) : ?>
+        <?php if ($data_order['status_order_id'] == 1  || $data_order['status_order_id'] == 10) : ?>
           <div class="card text-white bg-danger mb-3 shadow">
           <?php else : ?>
             <div class="card mb-3 shadow">
@@ -243,6 +245,6 @@
           })
         }
       });
-    })
+    });
   })
 </script>

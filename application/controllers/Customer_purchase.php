@@ -96,6 +96,106 @@ class Customer_purchase extends CI_Controller
     }
   }
 
+  public function getDatetimePayReport()
+  {
+    date_default_timezone_set('Asia/Jakarta');
+
+    $getCurentDatetime = date('Y-m-d h:i:s', time());
+
+    echo json_encode($getCurentDatetime);
+  }
+
+  public function getCustomIdPayReport()
+  {
+    $id = "MSG" . "-";
+    $generate = date("m") . date('y') . '-' . $id . date('His');
+
+    // return $generate;
+    echo json_encode($generate);
+  }
+
+  public function getCompanyPhoneNumber()
+  {
+    $data = $this->company_m->getCompanyById(1);
+    echo json_encode($data);
+  }
+
+  public function customerPayReport($id)
+  {
+    $info['title'] = "Pay Report Customer Order Page";
+    $email = $this->session->userdata('customer_email');
+
+    $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($id, $email);
+
+    if ($dataOrder != null) {
+      $info['data_order'] = $dataOrder;
+
+      $info['company'] = $this->company_m->getCompanyById(1);
+      $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+      $info['detail_company'] = $this->company_m->getLinkCompany();
+      $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+      $info['count_wishlist'] = $this->product_m->getCountWishlist($email);
+
+      $this->load->view('front-templates/header', $info);
+      $this->load->view('front-container/side-menu-customer-section', $info);
+      $this->load->view('front-container/customer-history-order-pay-report', $info);
+      $this->load->view('front-templates/footer', $info);
+    } else {
+      redirect('error_404', 'refresh');
+    }
+  }
+
+  private function _uploadResizeImage()
+  {
+    $config['upload_path']    = './image/pay_report/';
+    $config['allowed_types']  = 'gif|jpg|png';
+    $config['max_size']       = '2048';
+    $config['maintain_ratio'] = TRUE;
+    $config['quality'] = '90%';
+    $config['encrypt_name'] = TRUE; // md5(uniqid(mt_rand())).$this->file_ext;
+
+    $this->load->library('upload', $config);
+
+    if ($this->upload->do_upload('image')) {
+      return $this->upload->data('file_name');
+    } else {
+      return $this->upload->display_errors();
+    }
+  }
+
+  public function setCustomerPayReport()
+  {
+    $response = array();
+    $order_id = $this->input->post('order_id');
+
+    $dataPayReport = [
+      'id' => $this->input->post('pay_report_id'),
+      'purchase_order_id' => $order_id,
+      'customer_email' => $this->session->userdata('customer_email'),
+      'image' => $this->_uploadResizeImage(),
+      'message' => $this->input->post('message_report'),
+      'message_datetime' => $this->input->post('pay_report_datetime')
+    ];
+
+    $dataStatusOrder = [
+      'status_order_id' => 11
+    ];
+
+    $insert = $this->customerPurchase_m->insertCustomerPayReport($dataPayReport);
+
+    if ($insert > 0) {
+      $response['status'] = TRUE;
+      $response['notif'] = 'Payment report has been sent!';
+
+      $update = $this->customerPurchase_m->updateDataPaymentUnpaidByID($order_id, $dataStatusOrder);
+    } else {
+      $response['status'] = FALSE;
+      $response['notif'] = 'There is something wrong, please send again or check your connection!';
+    }
+
+    echo json_encode($response);
+  }
+
   public function printPurchaseOrder($id)
   {
     $info['title'] = "Detail Customer Order Page";

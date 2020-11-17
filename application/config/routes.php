@@ -154,10 +154,15 @@ $route['get-api-cost-shipment'] = 'Check_out/getCost'; // get data ongkir from A
 $route['get-check-out-billing'] = 'Check_out/getCheckOutBilling';
 $route['get-check-out-order'] = 'Check_out/getCheckOutOrder';
 $route['get-company-charge-val'] = 'Check_out/getCheckCompanyChargeValue';
+$route['get-company-phone-number'] = 'Customer_purchase/getCompanyPhoneNumber';
 $route['insert-check-out'] = 'Check_out/insertCheckOut';
 
 
 $route['customer-history-purchase-order'] = 'Customer_purchase/index';
+$route['customer-pay-report-page/(:any)'] = 'Customer_purchase/customerPayReport/$1';
+$route['customer-pay-report-datetime'] = 'customer_purchase/getDatetimePayReport';
+$route['customer-pay-report-customid'] = 'customer_purchase/getCustomIdPayReport';
+$route['set-customer-pay-report'] = 'customer_purchase/setCustomerPayReport';
 $route['get-data-customer-purchase'] = 'Customer_purchase/showPurchaseOrder';
 $route['get-detail-customer-purchase/(:any)'] = 'Customer_purchase/detailPurchaseOrder/$1';
 $route['print-customer-purchase/(:any)'] = 'Customer_purchase/printPurchaseOrder/$1';

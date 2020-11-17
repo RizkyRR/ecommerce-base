@@ -73,15 +73,11 @@ class Order_m extends CI_Model
     $this->db->from('customer_purchase_orders');
 
     $this->db->where('id', $order_id);
-    $this->db->where('status_order_id', 2);
+    // $this->db->where('status_order_id', 2)->or_where('status_order_id', 11);
 
     $query = $this->db->get();
 
-    if ($query->num_rows() > 0) {
-      return true;
-    } else {
-      return false;
-    }
+    return $query->row_array();
   }
 
   public function getCheckPurchaseOrderApproved($order_id)

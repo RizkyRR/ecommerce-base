@@ -33,6 +33,18 @@
     </div>
   </section>
 
+  <section class="content-header">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="callout callout-info">
+          <h4><i class="fa fa-bullhorn"></i> Attention.</h4>
+
+          <p>Read a review by clicking the button <button class="btn btn-info btn-xs"><i class="fa fa-search" aria-hidden="true"></i> Detail</button> and <button class="btn btn-success btn-xs"><i class="fa fa-reply" aria-hidden="true"></i> Reply</button></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Main content -->
   <section class="content">
 
@@ -52,6 +64,7 @@
               <th>Customer Email</th>
               <th>Customer Rating</th>
               <th>Message</th>
+              <th>Status</th>
               <th>Comment Date</th>
               <th class="no-sort">Actions</th>
             </tr>
@@ -72,19 +85,25 @@
 <script>
   var table_review;
 
-  table_review = $("#table-data-review").DataTable({
-    processing: true,
-    serverSide: true,
-    bLengthChange: false,
-    ajax: {
-      url: "<?php echo base_url() ?>review/showAjaxReview",
-      type: "POST",
-    },
-    order: [],
-    columnDefs: [{
-      targets: "no-sort",
-      orderable: false,
-    }, ],
+  $(document).ready(function() {
+    table_review = $("#table-data-review").DataTable({
+      processing: true,
+      serverSide: true,
+      bLengthChange: false,
+      ajax: {
+        url: "<?php echo base_url() ?>review/showAjaxReview",
+        type: "POST",
+      },
+      order: [],
+      columnDefs: [{
+        targets: "no-sort",
+        orderable: false,
+      }, ],
+    });
+
+    $('.btnCloseDetailReview').click(function() {
+      table_review.ajax.reload(null, false);
+    })
   });
 
   function detail_review(id) {

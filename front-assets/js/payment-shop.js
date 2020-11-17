@@ -4,6 +4,8 @@ setInterval(function () {
 	getReminderPayment();
 }, 30000); //request every x seconds 5 minutes * 60 seconds * 1000 milliseconds = 300000ms
 
+getWhatsappContactCompany();
+
 var url = new URL("http://localhost/ecommerce-base/");
 
 table_history_payment = $("#table-data-purchase-order").DataTable({
@@ -59,6 +61,22 @@ function getReminderPayment() {
 		dataType: "JSON",
 		success: function () {
 			table_history_payment.ajax.reload(null, false);
+		},
+	});
+}
+
+function getWhatsappContactCompany() {
+	var url = new URL("http://localhost/ecommerce-base/");
+
+	$.ajax({
+		url: url.pathname + "get-company-phone-number",
+		type: "GET",
+		dataType: "JSON",
+		success: function (data) {
+			$(".btnWhatsApp").prop(
+				"href",
+				"https://api.whatsapp.com/send?phone=" + data.phone
+			);
 		},
 	});
 }

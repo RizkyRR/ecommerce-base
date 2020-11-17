@@ -5,8 +5,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Review_m extends CI_Model
 {
 
-  var $column_order = array(null, 'product_name', 'customer_name', 'email', 'rating', 'message', 'comment_date'); //set column field database for datatable orderable 
-  var $column_search = array('product_name', 'customer_name', 'email', 'rating', 'message', 'comment_date'); //set column field database for datatable searchable
+  var $column_order = array(null, 'product_name', 'customer_name', 'email', 'rating', 'message', 'read_status', 'comment_date'); //set column field database for datatable orderable 
+  var $column_search = array('product_name', 'customer_name', 'email', 'rating', 'message', 'read_status', 'comment_date'); //set column field database for datatable searchable
   var $order = array('customer_comments.comment_date' => 'desc');  // default order
 
   private function _getReviewDatatablesQuery()
@@ -149,6 +149,14 @@ class Review_m extends CI_Model
   {
     $this->db->where('comment_id', $id);
     $this->db->update('customer_comment_replies', $data);
+
+    return $this->db->affected_rows();
+  }
+
+  public function updateStatusReadReview($id, $data)
+  {
+    $this->db->where('id', $id);
+    $this->db->update('customer_comments', $data);
 
     return $this->db->affected_rows();
   }

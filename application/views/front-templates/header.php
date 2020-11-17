@@ -43,6 +43,7 @@
 
   <!-- ZOOM -->
   <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'back-assets/plugins/zoom/css/zoom.css'; ?>">
+  <!-- <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'back-assets/plugins/zoom-zoomove/dist/zoomove.min.css'; ?>"> -->
 
 
   <!-- Js Plugins -->
@@ -87,6 +88,9 @@
 
   <!-- ZOOM -->
   <script src="<?php echo base_url(); ?>back-assets/plugins/zoom/js/zoom.js"></script>
+  <!-- https://www.jqueryscript.net/blog/Best-Image-Zoom-jQuery-Plugins.html -->
+  <!-- <script src="<?php echo base_url(); ?>back-assets/plugins/zoom-master/jquery.zoom.js"></script> -->
+  <!-- <script src="<?php echo base_url(); ?>back-assets/plugins/zoom-zoomove/dist/zoomove.min.js"></script> -->
 
 </head>
 

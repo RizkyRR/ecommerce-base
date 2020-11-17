@@ -31,7 +31,7 @@
     <div class="row">
       <div class="col-lg-12">
         <div class="callout callout-warning">
-          <h4><i class="fa fa-bullhorn"></i> Attention.</h4>
+          <h4><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Warning.</h4>
 
           <p>Once you do a retur order, you cannot edit and delete it. Please be careful when entering into input fields. !</p>
         </div>
@@ -127,10 +127,12 @@
       $(this).parent().parent().removeClass('has-error');
       $(this).next().empty();
     });
+
     $("textarea").change(function() {
       $(this).parent().parent().removeClass('has-error');
       $(this).next().empty();
     });
+
     $("select").change(function() {
       $(this).parent().parent().removeClass('has-error');
       $(this).next().empty();

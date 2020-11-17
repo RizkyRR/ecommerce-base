@@ -27,8 +27,9 @@
       <div class="card-body mb-3">
         <h5 class="card-title"><i class="fa fa-info-circle" aria-hidden="true"></i> Attention</h5>
         <p class="card-text">1. Please complete your payment before it's due or less than one day.</p>
-        <p class="card-text">2. After you complete the payment, please include proof of transfer via your email by clicking the "contact admin" button or via our WhatsApp.</p>
-        <a href="#" class="btn btn-sm btn-info"><i class="fa fa-phone" aria-hidden="true"></i> Contact admin</a>
+        <p class="card-text">2. After you complete the payment, please include proof of transfer via your email by clicking the button via our WhatsApp.</p>
+        <p class="card-text">2. <strong>Or you can confirm your payment report by clicking the info button and selecting "Report via Message"</strong>.</p>
+        <a href="#" class="btn btn-sm mt-1 mb-1 btn-info btnWhatsApp" target="_blank"><i class="fa fa-whatsapp" aria-hidden="true"></i> Contact via Whatsapp</a>
       </div>
     </div>
 

@@ -314,6 +314,14 @@ class CustomerPurchase_m extends CI_Model
 
     return $this->db->affected_rows();
   }
+
+  // PAY REPORT
+  public function insertCustomerPayReport($data)
+  {
+    $this->db->insert('customer_messages', $data);
+    return $this->db->affected_rows();
+  }
+  // PAY REPORT
 }
   
   /* End of file CustomerPurchase_m.php */

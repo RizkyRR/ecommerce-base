@@ -49,12 +49,12 @@ function incomingStockLimitCount() {
 			if (data > 0) {
 				$("#show-count-stock-limit-label").html(data);
 				$("#show-count-stock-limit-header").html(
-					"Anda memiliki " + data + " pemberitahuan"
+					"You have " + data + " notification!"
 				);
 			} else {
 				$("#show-count-stock-limit-label").html(0);
 				$("#show-count-stock-limit-header").html(
-					"Anda tidak memiliki pemberitahuan apapun"
+					"You don't have any notification!"
 				);
 			}
 

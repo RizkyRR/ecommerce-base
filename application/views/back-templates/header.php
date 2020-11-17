@@ -135,7 +135,7 @@
   <!-- ZoomImage -->
   <!--  https://www.npmjs.com/package/js-image-zoom -->
   <!-- <script src="https://unpkg.com/js-image-zoom@0.4.1/js-image-zoom.js" type="application/javascript"></script> -->
-  <script src="<?php echo base_url(); ?>back-assets/plugins/zoom-master/jquery.zoom.js"></script>
+  <script src="<?php echo base_url(); ?>back-assets/plugins/zoom-master/jquery.zoom.js"></script> <!-- https://www.jqueryscript.net/blog/Best-Image-Zoom-jQuery-Plugins.html -->
 
   <!-- Sweet Alert Js -->
   <!-- <script src="<?php echo base_url(); ?>back-assets/plugins/sweet_alert/dist/sweetalert2.min.js"></script> -->

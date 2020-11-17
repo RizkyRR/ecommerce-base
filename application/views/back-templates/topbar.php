@@ -24,10 +24,9 @@
 
             <!-- span ini dikondisikan di .js kalo ada pesan merah kalo semua 0 hilangkan label -->
             <span class="label label-danger show-count-incoming-label"></span>
-
           </a>
-          <ul class="dropdown-menu">
 
+          <ul class="dropdown-menu">
             <!-- class count-all-messages dikondisikan di .js -->
             <!-- <li class="header">You have 0 message</li> -->
             <li class="header">
@@ -35,20 +34,15 @@
             </li>
 
             <li>
-
               <!-- inner menu: contains the actual data -->
-              <ul class="menu">
-                <li id="show-count-chat">
+              <ul class="menu" id="show-messages-notif">
+                <li id="show-review-notif">
                 </li>
-                <li>
-                  <a href="#">
-                    <i class="fa fa-comment text-aqua"></i> {2} Comment
-                  </a>
+
+                <li id="show-message-notif">
                 </li>
               </ul>
-
             </li>
-            <li class="footer"><a href="#">View all</a></li>
           </ul>
         </li>
 
@@ -63,8 +57,8 @@
             </span>
 
           </a>
-          <ul class="dropdown-menu">
 
+          <ul class="dropdown-menu">
             <!-- header set on js -->
             <li class="header">
               <div id="show-count-stock-limit-header"></div>
@@ -73,13 +67,9 @@
             <li>
               <!-- inner menu: contains the actual data -->
               <ul class="menu">
-                <li id="show-count-stock-limit">
-                </li>
-                <!-- <li>
-                  <a href="#">
-                    <i class="fa fa-users text-aqua"></i> 5 new members joined today
-                  </a>
-                </li> -->
+
+                <li id="show-count-stock-limit"></li>
+
               </ul>
             </li>
 

@@ -67,6 +67,14 @@ class Review extends CI_Controller
       }
 
       $row[] = $message;
+
+      if ($item->read_status == "READ") {
+        $read_status = '<span class="label label-success">' . $item->read_status . '</span>';
+      } else {
+        $read_status = '<span class="label label-danger">' . $item->read_status . '</span>';
+      }
+
+      $row[] = $read_status;
       $row[] = $item->comment_date;
 
       // get data reply_id
@@ -78,7 +86,7 @@ class Review extends CI_Controller
       if ($query->num_rows() > 0) {
         $reply_status = '<a href="' . base_url() . 'review/editReplyReview/' . $item->id_comment . '" class="btn btn-warning btn-xs" title="update review reply"><i class="fa fa-pencil" aria-hidden="true"></i> Update</a> ';
 
-        $delete_reply = '<a href="javascript:void(0)" class="btn btn-danger btn-xs" onclick="delete_reply(' . $id_reply . ')" title="delete review reply"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete Reply</a>';
+        $delete_reply = '<a href="javascript:void(0)" class="btn btn-danger btn-xs" onclick="delete_reply(' . $id_reply . ')" title="delete review reply"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete Reply</a> ';
       } else {
         $reply_status = '<a href="' . base_url() . 'review/replyReview/' . $item->id_comment . '" class="btn btn-success btn-xs" title="reply review"><i class="fa fa-reply" aria-hidden="true"></i> Reply</a> ';
 
@@ -86,9 +94,9 @@ class Review extends CI_Controller
       }
 
       // add html for action
-      $row[] = '<a href="javascript:void(0)" onclick="delete_review(' . $id . ')" class="btn btn-danger btn-xs" title="delete review"><i class="fa fa-trash-o"></i> Delete Review</a>
+      $row[] = '<a href="javascript:void(0)" onclick="detail_review(' . $id . ')" class="btn btn-info btn-xs" title="detail review"><i class="fa fa-search"></i> Detail</a>
       
-      <a href="javascript:void(0)" onclick="detail_review(' . $id . ')" class="btn btn-info btn-xs" title="detail review"><i class="fa fa-search"></i> Detail</a>
+      <a href="javascript:void(0)" onclick="delete_review(' . $id . ')" class="btn btn-danger btn-xs" title="delete review"><i class="fa fa-trash-o"></i> Delete Review</a>
       ' . $reply_status . $delete_reply;
 
       $data[] = $row;
@@ -256,6 +264,13 @@ class Review extends CI_Controller
 
     $getDataReview = $this->review_m->getReviewDataByID($id);
 
+    // update read status to read 
+    $data = [
+      'read_status' => 'READ'
+    ];
+
+    $this->review_m->updateStatusReadReview($id, $data);
+
     if ($getDataReview != null) {
       $info['review_data'] = $getDataReview;
 
@@ -359,6 +374,13 @@ class Review extends CI_Controller
     $dataReviewCustomer = $this->review_m->getReviewWithProductDataByID($comment_id);
     $dataReviewImageCustomer = $this->review_m->getReviewDetailsDataByID($comment_id);
     $dataReviewReply = $this->review_m->getReviewReplyByID($comment_id);
+
+    // update read status to read 
+    $data = [
+      'read_status' => 'READ'
+    ];
+
+    $this->review_m->updateStatusReadReview($comment_id, $data);
 
     if ($dataReviewCustomer != null) {
       $dataReviewImage = '';

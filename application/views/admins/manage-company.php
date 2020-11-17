@@ -35,7 +35,7 @@
               </div>
 
               <div class="form-group">
-                <label for="phone">Company phone</label>
+                <label for="phone">Company phone (it must be available for WhatsApp)</label>
                 <input type="text" class="form-control" name="phone" id="phone" placeholder="Enter company phone">
                 <span class="help-block"></span>
               </div>
