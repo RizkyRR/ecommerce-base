@@ -20,48 +20,65 @@ class Report_order extends CI_Controller
     renderBackTemplate('reports/report-order', $info);
   }
 
-  public function getDataOrder()
+  public function showAjaxReportOrder()
   {
-    $startdate = $this->input->post('startDate');
-    $enddate = $this->input->post('endDate');
+    $start_date = $this->input->post('start_date');
+    $end_date = $this->input->post('end_date');
 
-    $list = $this->report_m->dateRangeFilterOrder($startdate, $enddate);
-    $no = 1;
+    $start_date = $start_date . ' 00:00:00';
+    $end_date = $end_date . ' 23:59:59';
 
-    if (empty($list)) {
-      $data = '
-          <tr>
-          <td colspan="7" style="text-align: center">Data not found !</td>
-          </tr>
-        ';
+    $list = $this->report_m->get_datatables_order($start_date, $end_date);
 
-      $output = array(
-        "data" => $data
-      );
-    } else {
-      foreach ($list as $item) {
-        $data[] = '
-          <tr>
-            <td>' . $no++ . '.' . '</td>
-            <td>' . $item['id'] . '</td>
-            <td>' . $item['customer_name'] . '</td>
-            <td>' . date('d M Y', strtotime($item['order_date'])) . '</td>
-            <td>' . $item['jumlah'] . '</td>
-            <td>' . "Rp. " . number_format($item['net_amount'], 0, ',', '.') . '</td>
-            <td>' . $item['paid_status'] . '</td>
-          </tr>
-        ';
-      }
+    $data = array();
+    $no = @$_POST['start'];
 
-      $cetak = 'report_order/print_order?startdate=' . $startdate . '&enddate=' . $enddate . '';
+    foreach ($list as $item) {
+      $no++;
+      $row = array();
+      $row[] = $no . ".";
+      $row[] = $item->invoice_order;
+      $row[] = $item->customer_email;
+      $row[] = $item->customer_name;
+      $row[] = date('d M Y H:i:s', strtotime($item->created_date));
+      $row[] = $item->total_product;
+      $row[] = "Rp " . number_format($item->net_amount, 0, ',', '.');
+      $row[] = '<span class="label label-' . $item->status_color . '">' . $item->status_name . '</span>';
 
-      $output = array(
-        "cetak" => $cetak,
-        "data" => $data
-      );
+      $data[] = $row;
     }
 
+    $output = array(
+      "draw" => @$_POST['draw'],
+      "recordsTotal" => $this->report_m->count_all_order($start_date, $end_date),
+      "recordsFiltered" => $this->report_m->count_filtered_order($start_date, $end_date),
+      "data" => $data,
+    );
+
+    // OUTPUT TO JSON FORMAT
     echo json_encode($output);
+  }
+
+  public function getOrderDatePrint()
+  {
+    $start_date = $this->input->post('startDate');
+    $end_date = $this->input->post('endDate');
+    $search = $this->input->post('search');
+
+    $start_date = $start_date . ' 00:00:00';
+    $end_date = $end_date . ' 23:59:59';
+
+    $response = array();
+
+    $data = $this->report_m->dateRangeFilterOrder($start_date, $end_date, $search);
+
+    if ($data != null) {
+      $response['url'] = base_url() . 'report_order/print_order?startdate=' . $start_date . '&enddate=' . $end_date . '&search=' . $search;
+    } else {
+      $response['url'] = '';
+    }
+
+    echo json_encode($response);
   }
 
   public function print_order()
@@ -69,11 +86,13 @@ class Report_order extends CI_Controller
     $info['title'] = 'Print Report Order';
     $info['user'] = $this->auth_m->getUserSession();
     $info['company'] = $this->company_m->getCompanyById(1);
+    $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
 
     $info['startdate'] = $this->input->get('startdate');
     $info['enddate'] = $this->input->get('enddate');
+    $info['search'] = $this->input->get('search');
 
-    $info['data'] = $this->report_m->dateRangeFilterOrder($info['startdate'], $info['enddate']);
+    $info['data'] = $this->report_m->dateRangeFilterOrder($info['startdate'], $info['enddate'], $info['search']);
 
     $this->load->view('reports/print-report-order', $info);
   }

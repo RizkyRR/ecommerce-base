@@ -31,7 +31,7 @@
     <tr>
       <td align="center">
         <span style="line-height: 1.6;">
-          <?php echo $company['address'] ?>
+          <?php echo $company_address['street_name'] ?>, <?php echo $company_address['city_name'] ?>, <?php echo $company_address['province'] ?>
         </span><br>
         <span style="line-height: 1.6;">
           <?php echo $company['business_email'] ?>
@@ -42,10 +42,10 @@
   <hr class="line-title">
 
   <p align="center">
-    LAPORAN DATA RETUR ORDER
+    LAPORAN DATA ORDER RETURN
   </p>
   <p align="center">
-    <?php echo date('d F Y', strtotime($startdate)); ?> sampai dengan <?php echo date('d F Y', strtotime($enddate)); ?>
+    <?php echo date('d F Y 00:00:00', strtotime($startdate)); ?> sampai dengan <?php echo date('d F Y 23:59:59', strtotime($enddate)); ?>
   </p>
 
   <div class="table-responsive">
@@ -53,11 +53,13 @@
       <thead>
         <tr>
           <th>No</th>
-          <th>Retur ID</th>
-          <th>Retur Date</th>
-          <th>Order ID</th>
+          <th>Invoice Return</th>
+          <th>Invoice Order</th>
+          <th>Customer Email</th>
           <th>Customer Name</th>
-          <th>Total Products</th>
+          <th>Return Date</th>
+          <th>Total Return</th>
+          <th>Status Return</th>
           <th>Total Amount</th>
         </tr>
       </thead>
@@ -67,19 +69,21 @@
         $total_sum = 0;
         foreach ($data as $val) :
           $total_sum += $val['net_amount'];
-          ?>
+        ?>
           <tr>
             <td><?php echo $no++; ?></td>
-            <td><?php echo $val['retur_id']; ?></td>
-            <td><?php echo date('d M Y', strtotime($val['retur_date'])); ?></td>
-            <td><?php echo $val['order_id']; ?></td>
+            <td><?php echo $val['invoice_return']; ?></td>
+            <td><?php echo $val['invoice_order']; ?></td>
+            <td><?php echo $val['customer_email'] ?></td>
             <td><?php echo $val['customer_name'] ?></td>
-            <td><?php echo $val['jumlah']; ?></td>
+            <td><?php echo date('d M Y h:i:s', strtotime($val['purchase_return_date'])); ?></td>
+            <td><?php echo $val['total_product']; ?></td>
+            <td><?php echo $val['status_name']; ?></td>
             <td><?php echo "Rp. " . number_format($val['net_amount'], 0, ',', '.'); ?></td>
           </tr>
         <?php endforeach; ?>
         <tr>
-          <td colspan="6" align="center"><strong>TOTAL</strong></td>
+          <td colspan="8" align="center"><strong>TOTAL</strong></td>
           <td><strong><?php echo "Rp. " . number_format($total_sum, 0, ',', '.'); ?></strong></td>
         </tr>
       </tbody>
