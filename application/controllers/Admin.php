@@ -19,15 +19,56 @@ class Admin extends CI_Controller
         $info['title']  = "Dashboard";
 
         // GET EARNINGS MONTHLY https://stackoverflow.com/questions/16717274/calculate-monthly-totals-using-php
+        // All about customer
+        $info['totalCustomer'] = $this->admin_m->getTotalCustomer();
+
+        // All about product 
+        $getLimit = $this->company_m->getAlertValue(1);
+        $setLimit = $getLimit['minimum_stock_value'];
+        $info['totalProductCountInStock'] = $this->admin_m->getProductCountInStock($setLimit);
+
+        $theNumberOfItemSold = $this->admin_m->getProductCountSold();
+        $info['theNumberOfItemSold'] = $theNumberOfItemSold['qty_sold'];
+
+        $theNumberOfItemReturn = $this->admin_m->getProductCountReturn();
+        $info['theNumberOfItemReturn'] = $theNumberOfItemReturn['qty_return'];
+
+        $info['newOrderIn'] = $this->admin_m->getNewOrderIn();
+
+        // By Monthly
+        $netSalesMonthly = $this->admin_m->getNetSalesMonthly();
+        $netReturnMonthly = $this->admin_m->getNetReturnMonthly();
+        $getGrossSalesMonthly = $netSalesMonthly['net_amount_sum_order'];
+        $getDiscountSalesMonthly = $netSalesMonthly['coupon_charge_sum_order'];
+        $info['netSalesMonthly'] = $getGrossSalesMonthly - $getDiscountSalesMonthly - $netReturnMonthly['net_amount_sum_return'];
+
+        // By Annual
+        $netSalesAnnual = $this->admin_m->getNetSalesAnnual();
+        $netReturnAnnual = $this->admin_m->getNetReturnAnnual();
+        $getGrossSalesAnnual = $netSalesAnnual['net_amount_sum_order'];
+        $getDiscountSalesAnnual = $netSalesAnnual['coupon_charge_sum_order'];
+        $info['netSalesAnnual'] = $getGrossSalesAnnual - $getDiscountSalesAnnual - $netReturnAnnual['net_amount_sum_return'];
+
+        // Hasil penjualan perbulan
+        $info['resultSalesMonthly'] = $netSalesMonthly['net_amount_sum_order'];
+
+        // Hasil penjualan pertahun
+        $info['resultSalesAnnual'] = $netSalesAnnual['net_amount_sum_order'];
+
+        // Count transaction monthly
+        $info['countTransactionMonthly'] = $this->admin_m->getCountTransactionMonthly();
+
+        // Count transaction annual
+        $info['countTransactionAnnual'] = $this->admin_m->getCountTransactionAnnual();
+
+        // Count return monthly
+        $info['countReturnMonthly'] = $this->admin_m->getCountReturnMonthly();
+
+        // Count return annual
+        $info['countReturnAnnual'] = $this->admin_m->getCountReturnAnnual();
 
         renderBackTemplate('admins/index', $info);
         $this->load->view('modals/modal-event');
-    }
-
-    public function getAllDashDetail()
-    {
-        $data = $this->company_m->getAllDashDetail();
-        echo json_encode($data);
     }
 
     // Menghitung Penjualan Bersih

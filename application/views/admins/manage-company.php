@@ -293,25 +293,6 @@
         </div>
         <!-- /.box -->
 
-        <!-- SET DASHBOARDS -->
-        <div class="box box-info">
-          <div class="box-header with-border">
-            <h3 class="box-title">Set Dashboard</h3>
-          </div>
-          <!-- /.box-header -->
-
-          <section class="content-header">
-            <button onclick="add_dashboard()" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Dashboard</button>
-          </section>
-
-          <section class="content">
-            <div class="row">
-              <div id="box-dashboard"></div>
-            </div>
-          </section>
-        </div>
-        <!-- /.box -->
-
         <!-- SET ALERT -->
         <div class="box box-success">
           <div class="box-header with-border">

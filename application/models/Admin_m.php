@@ -82,6 +82,14 @@ class Admin_m extends CI_Model
         return $query->row_array();
     }
 
+    // for customers
+    public function getTotalCustomer()
+    {
+        $this->db->select('COUNT(*)');
+        $this->db->from('customers');
+        return $this->db->count_all_results();
+    }
+
     public function getUserCount()
     {
         $this->db->select('COUNT(*)');
@@ -104,22 +112,127 @@ class Admin_m extends CI_Model
         return $this->db->count_all_results();
     }
 
-    public function getProductSold()
+    public function getProductCountInStock($setLimit)
     {
-        $this->db->select('COUNT(product_id)');
-        $this->db->group_by('product_id');
+        $this->db->select('COUNT(*)');
+        $this->db->from('products');
 
-        $this->db->from('order_details');
+        if ($setLimit != null) {
+            $this->db->where('qty >=', $setLimit);
+        } else {
+            $this->db->where('qty >= 1');
+        }
+
         return $this->db->count_all_results();
     }
 
-    public function getProductReturn()
+    public function getProductCountSold()
     {
-        $this->db->select('COUNT(product_id)');
-        $this->db->group_by('product_id');
+        $this->db->select('SUM(qty) AS qty_sold');
 
-        $this->db->from('order_return_details');
-        return $this->db->count_all_results();
+        $query = $this->db->get('customer_purchase_order_details');
+        return $query->row_array();
+    }
+
+    public function getProductCountReturn()
+    {
+        $this->db->select('SUM(qty) AS qty_return');
+
+        $query = $this->db->get('customer_purchase_return_details');
+        return $query->row_array();
+    }
+
+    public function getNewOrderIn()
+    {
+        return $this->db
+            ->where('status_order_id', 2)
+            ->count_all_results('customer_purchase_orders');
+    }
+
+    public function getNetSalesMonthly()
+    {
+        $this->db->select("SUM(customer_purchase_orders.net_amount) AS net_amount_sum_order, SUM(customer_purchase_orders.coupon_charge) AS coupon_charge_sum_order");
+
+        $this->db->from('customer_purchase_orders');
+
+        $this->db->where('customer_purchase_orders.status_order_id = 4');
+        $this->db->where('MONTH(customer_purchase_orders.created_date) = MONTH(CURRENT_DATE()) AND YEAR(customer_purchase_orders.created_date) = YEAR(CURRENT_DATE())');
+
+
+        $query = $this->db->get();
+        return $query->row_array();
+    }
+
+    public function getNetSalesAnnual()
+    {
+        $this->db->select("SUM(customer_purchase_orders.net_amount) AS net_amount_sum_order, SUM(customer_purchase_orders.coupon_charge) AS coupon_charge_sum_order");
+
+        $this->db->from('customer_purchase_orders');
+
+        $this->db->where('customer_purchase_orders.status_order_id = 4');
+        $this->db->where('YEAR(customer_purchase_orders.created_date) = YEAR(CURRENT_DATE())');
+
+
+        $query = $this->db->get();
+        return $query->row_array();
+    }
+
+    public function getNetReturnMonthly()
+    {
+        $this->db->select("SUM(customer_purchase_returns.net_amount) AS net_amount_sum_return");
+
+        $this->db->from('customer_purchase_returns');
+
+        $this->db->where('customer_purchase_returns.status_order_id = 7');
+        $this->db->where('MONTH(customer_purchase_returns.created_date) = MONTH(CURRENT_DATE()) AND YEAR(customer_purchase_returns.created_date) = YEAR(CURRENT_DATE())');
+
+        $query = $this->db->get();
+        return $query->row_array();
+    }
+
+    public function getNetReturnAnnual()
+    {
+        $this->db->select("SUM(customer_purchase_returns.net_amount) AS net_amount_sum_return");
+
+        $this->db->from('customer_purchase_returns');
+
+        $this->db->where('customer_purchase_returns.status_order_id = 7');
+        $this->db->where('YEAR(customer_purchase_returns.created_date) = YEAR(CURRENT_DATE())');
+
+        $query = $this->db->get();
+        return $query->row_array();
+    }
+
+    public function getCountTransactionMonthly()
+    {
+        return $this->db
+            ->where_not_in('status_order_id', 1)
+            ->where('MONTH(customer_purchase_orders.created_date) = MONTH(CURRENT_DATE()) AND YEAR(customer_purchase_orders.created_date) = YEAR(CURRENT_DATE())')
+            ->count_all_results('customer_purchase_orders');
+    }
+
+    public function getCountTransactionAnnual()
+    {
+        return $this->db
+            ->where_not_in('status_order_id', 1)
+            ->where('YEAR(customer_purchase_orders.created_date) = YEAR(CURRENT_DATE())')
+            ->count_all_results('customer_purchase_orders');
+    }
+
+    public function getCountReturnMonthly()
+    {
+        return $this->db
+            ->where_not_in('status_order_id', 1)
+            ->where('MONTH(customer_purchase_returns.created_date) = MONTH(CURRENT_DATE()) AND YEAR(customer_purchase_returns.created_date) = YEAR(CURRENT_DATE())')
+            ->count_all_results('customer_purchase_returns');
+    }
+
+    public function getCountReturnAnnual()
+    {
+        return $this->db
+            ->where_not_in('status_order_id', 1)
+            ->where('YEAR(customer_purchase_returns.created_date) = YEAR(CURRENT_DATE())')
+            ->count_all_results('customer_purchase_returns');
     }
     // END OF DASHBOARDS
 

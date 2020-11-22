@@ -12,7 +12,216 @@
   <section class="content">
     <!-- Info boxes -->
     <div class="row">
-      <div id="show-info-dashboard"></div>
+      <!-- All about products -->
+      <!-- get products count -->
+      <?php if ($totalProductCountInStock != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="total product in stock">
+            <span class="info-box-icon bg-teal"><i class="fa fa-cubes" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Total Product in Stock</span>
+              <span class="info-box-number">
+                <?php echo $totalProductCountInStock ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- the number of items sold -->
+      <?php if ($theNumberOfItemSold != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="the number of items sold">
+            <span class="info-box-icon bg-olive"><i class="fa fa-cubes" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">The Number of Item Sold</span>
+              <span class="info-box-number">
+                <?php echo $theNumberOfItemSold ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- the number of items return -->
+      <?php if ($theNumberOfItemReturn != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="the number of items return">
+            <span class="info-box-icon bg-purple"><i class="fa fa-cubes" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">The Number of Item Return</span>
+              <span class="info-box-number">
+                <?php echo $theNumberOfItemReturn ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- All about customer -->
+      <!-- get customer data -->
+      <?php if ($totalCustomer != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="total customer">
+            <span class="info-box-icon bg-aqua"><i class="fa fa-users" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Total Customer</span>
+              <span class="info-box-number">
+                <?php echo $totalCustomer ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- All about new order in -->
+      <!-- get new order data -->
+      <?php if ($newOrderIn != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="new orders">
+            <span class="info-box-icon bg-orange"><i class="fa fa-cart-arrow-down" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">New Order</span>
+              <span class="info-box-number">
+                <?php echo $newOrderIn ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- get net sales monthly data -->
+      <?php if ($netSalesMonthly != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="net sales data monthly">
+            <span class="info-box-icon bg-olive"><i class="fa fa-dollar" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Net Sales Data Monthly (net amount order - discount - net amount return)</span>
+              <span class="info-box-number">
+                Rp. <?php echo number_format($netSalesMonthly, 0, ',', '.') ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- get net sales annual data -->
+      <?php if ($netSalesAnnual != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="net sales data annual">
+            <span class="info-box-icon bg-light-blue"><i class="fa fa-dollar" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Net Sales Data Annual (net amount order - discount - net amount return)</span>
+              <span class="info-box-number">
+                Rp. <?php echo number_format($netSalesAnnual, 0, ',', '.') ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- get sales monthly data -->
+      <?php if ($resultSalesMonthly != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="result sales data monthly">
+            <span class="info-box-icon bg-olive"><i class="fa fa-handshake-o" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Result Sales Data Monthly</span>
+              <span class="info-box-number">
+                Rp. <?php echo number_format($resultSalesMonthly, 0, ',', '.') ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- get sales annual data -->
+      <?php if ($resultSalesAnnual != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="result sales data annual">
+            <span class="info-box-icon bg-light-blue"><i class="fa fa-handshake-o" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Result Sales Data Annual</span>
+              <span class="info-box-number">
+                Rp. <?php echo number_format($resultSalesAnnual, 0, ',', '.') ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- get cont transaction monthly -->
+      <?php if ($countTransactionMonthly != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="count transaction monthly">
+            <span class="info-box-icon bg-yellow"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Count Transaction Monthly</span>
+              <span class="info-box-number">
+                <?php echo $countTransactionMonthly ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- get cont transaction annual -->
+      <?php if ($countTransactionAnnual != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="count transaction annual">
+            <span class="info-box-icon bg-red"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Count Transaction Annual</span>
+              <span class="info-box-number">
+                <?php echo $countTransactionAnnual ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- get cont rerturn monthly -->
+      <?php if ($countReturnMonthly != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="count rerturn monthly">
+            <span class="info-box-icon bg-yellow"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Count Return Monthly</span>
+              <span class="info-box-number">
+                <?php echo $countReturnMonthly ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- get cont rerturn annual -->
+      <?php if ($countReturnAnnual != null) : ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="info-box" title="count rerturn annual">
+            <span class="info-box-icon bg-red"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Count Return Annual</span>
+              <span class="info-box-number">
+                <?php echo $countReturnAnnual ?>
+              </span>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
       <!-- fix for small devices only -->
       <div class="clearfix visible-sm-block"></div>
     </div>
@@ -45,165 +254,6 @@
 
 <script>
   $(document).ready(function() {
-    getAllInfoDashboard();
-    getNetSalesData();
-    getNetPurchaseData();
-    getGoodsAvailableForSale();
-    getCostOfGoodsSold();
-    getUserCount();
-    getUserOnline();
-    getProductCount();
-    getProductSold();
-    getProductReturn();
-
-    function getAllInfoDashboard() {
-      var html = '';
-      var i;
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getAllDashDetail',
-        dataType: 'JSON',
-        async: true,
-        success: function(data) {
-          for (i = 0; i < data.length; i++) {
-            html += '<div class="col-md-4 col-sm-6 col-xs-12">' +
-              '<div class="info-box" title="' + data[i].title + '">' +
-              '<span class="info-box-icon ' + data[i].name + '"><i class="' + data[i].value + '" aria-hidden="true"></i></span>' +
-
-              '<div class="info-box-content">' +
-              '<span class="info-box-text">' + data[i].title + '</span>' +
-              '<span class="info-box-number"><p class="' + data[i].class_id_number + '"></p></span>' +
-              '</div>' +
-              '</div>' +
-              '</div>';
-          }
-
-          $('#show-info-dashboard').html(html);
-        }
-      });
-    }
-
-    function getNetSalesData() {
-      // https://www.dumetschool.com/blog/cara-membuat-format-uang-rupiah-dengan-jquery
-
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getNetSalesData',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.net-sales').attr("data-a-sign", "Rp. ");
-          $('.net-sales').attr("data-a-dec", ",");
-          $('.net-sales').attr("data-a-sep", ".");
-          $('.net-sales').html(data).autoNumeric();
-        }
-      })
-    }
-
-    function getNetPurchaseData() {
-      // https://www.dumetschool.com/blog/cara-membuat-format-uang-rupiah-dengan-jquery
-
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getNetPurchaseData',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.net-purchase').attr("data-a-sign", "Rp. ");
-          $('.net-purchase').attr("data-a-dec", ",");
-          $('.net-purchase').attr("data-a-sep", ".");
-          $('.net-purchase').html(data).autoNumeric();
-        }
-      })
-    }
-
-    function getGoodsAvailableForSale() {
-      // https://www.dumetschool.com/blog/cara-membuat-format-uang-rupiah-dengan-jquery
-
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getGoodsAvailableForSale',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.goods-available-for-sale').attr("data-a-sign", "Rp. ");
-          $('.goods-available-for-sale').attr("data-a-dec", ",");
-          $('.goods-available-for-sale').attr("data-a-sep", ".");
-          $('.goods-available-for-sale').html(data).autoNumeric();
-        }
-      })
-    }
-
-    function getCostOfGoodsSold() {
-      // https://www.dumetschool.com/blog/cara-membuat-format-uang-rupiah-dengan-jquery
-
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getCostOfGoodsSold',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.cost-of-goods-sold').attr("data-a-sign", "Rp. ");
-          $('.cost-of-goods-sold').attr("data-a-dec", ",");
-          $('.cost-of-goods-sold').attr("data-a-sep", ".");
-          $('.cost-of-goods-sold').html(data).autoNumeric();
-        }
-      })
-    }
-
-    function getUserCount() {
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getUserCount',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.user-count').html(data);
-        }
-      })
-    }
-
-    function getUserOnline() {
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getUserOnline',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.user-online').html(data);
-        }
-      })
-    }
-
-    function getProductCount() {
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getProductCount',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.total-product').html(data);
-        }
-      })
-    }
-
-    function getProductSold() {
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getProductSold',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.total-product-sold').html(data);
-        }
-      })
-    }
-
-    function getProductReturn() {
-      $.ajax({
-        type: 'GET',
-        url: '<?php echo base_url(); ?>admin/getProductReturn',
-        dataType: 'JSON',
-        success: function(data) {
-          $('.total-product-return').html(data);
-        }
-      })
-    }
-
-    // CALENDAR SETUP //
-
     $.validator.setDefaults({
       highlight: function(element) {
         $(element).closest(".form-group").addClass("has-error");

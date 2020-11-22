@@ -185,55 +185,6 @@ class Company_m extends CI_Model
     return $this->db->affected_rows();
   }
 
-  // DASHBOARD
-  public function getAllDash()
-  {
-    $query = $this->db->get('dashboards');
-    return $query->result_array();
-  }
-
-  public function getFontawesome()
-  {
-    $query = $this->db->get('fontawesomes');
-    return $query->result_array();
-  }
-
-  public function getColor()
-  {
-    $query = $this->db->get('colors');
-    return $query->result_array();
-  }
-
-  public function getAllDashDetail()
-  {
-    $this->db->select('*, dashboard_details.id AS dashboard_detail_id');
-    $this->db->from('dashboard_details');
-    $this->db->join('dashboards', 'dashboards.id = dashboard_details.detail_dash_id');
-    $this->db->join('fontawesomes', 'fontawesomes.id = dashboard_details.icon_id');
-    $this->db->join('colors', 'colors.id = dashboard_details.color_id');
-
-    $this->db->group_by('dashboard_details.id');
-
-    $this->db->order_by('dashboard_details.id', 'ASC');
-
-    $query = $this->db->get();
-    return $query->result_array();
-  }
-
-  public function insertDashboard($data)
-  {
-    $this->db->insert('dashboard_details', $data);
-    return $this->db->insert_id();
-  }
-
-  public function deleteDashboard($id)
-  {
-    $this->db->where('id', $id);
-    $this->db->delete('dashboard_details');
-
-    return $this->db->affected_rows();
-  }
-
   // SET ALERT 
   public function getAlertValue($id)
   {
