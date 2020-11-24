@@ -37,7 +37,14 @@ class Supplier extends CI_Controller
       $row[] = $no . ".";
       $row[] = $item->supplier_name;
       $row[] = $item->supplier_phone;
-      $row[] = $item->supplier_address;
+
+      if (strlen($item->supplier_address) >= 50) {
+        $address = substr($item->supplier_address, 0, 50) . '...';
+      } else {
+        $address = $item->supplier_address;
+      }
+
+      $row[] = $address;
       $row[] = $item->credit_card_type;
       $row[] = $item->credit_card_number;
       // add html for action

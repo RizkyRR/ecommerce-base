@@ -107,6 +107,7 @@
   <!-- ZOOM -->
   <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'back-assets/plugins/zoom/css/zoom.css'; ?>">
 
+
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -180,6 +181,9 @@
 
   <!-- ZOOM -->
   <script src="<?php echo base_url(); ?>back-assets/plugins/zoom/js/zoom.js"></script>
+
+  <!-- ChartJS -->
+  <script src="<?php echo base_url(); ?>back-assets/bower_components/chart.js/Chart.js"></script>
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">

@@ -71,118 +71,66 @@ class Admin extends CI_Controller
         $this->load->view('modals/modal-event');
     }
 
-    // Menghitung Penjualan Bersih
-    public function getNetSalesData()
+    public function getNetSalesCharts()
     {
-        $dataOrder = $this->admin_m->getOrdersData();
-        $dataOrderReturns = $this->admin_m->getOrderReturnsData();
+        $list = array();
+        $dataSales = $this->admin_m->getNetSalesMonthlyCharts();
 
-        // gross amount + service charge + vat charge from data Orders
-        $sumDataOrderSell = $dataOrder['order_gross_amount'] + $dataOrder['order_service_charge'] + $dataOrder['order_vat_charge'];
+        $month = '';
+        $getNetSales = 0;
 
-        // Discount
-        $sumDataOrderDiscount = $dataOrder['order_after_discount'];
+        foreach ($dataSales as $val_s) {
+            $data = array();
+            $getSales = $val_s['net_amount_sum_order'];
+            $getDiscount = $val_s['coupon_charge_sum_order'];
 
-        // Shipping
-        $sumDataOrderShipping = $dataOrder['order_ship_amount'];
+            $getSalesCount = $getSales - $getDiscount;
+            $month = date('Y-m', strtotime($val_s['order_date']));
 
-        // net amount from Order Returns
-        $sumDataOrderReturns = $dataOrderReturns['order_return_net_amount'];
+            $dataReturn = $this->admin_m->getNetReturnMonthlyCharts($month);
 
-        // Penjualan Bersih = Penjualan - Biaya Angkut - Retur Penjualan - Potongan Penjualan
-        $netSales = $sumDataOrderSell - $sumDataOrderShipping - $sumDataOrderReturns - $sumDataOrderDiscount;
+            $getReturn = $dataReturn['net_amount_sum_return'];
+            $getNetSales = $getSalesCount - $getReturn;
 
-        echo json_encode($netSales);
+            $data['getNetSales'] = $getNetSales;
+            $data['month'] = $month;
+
+            $list[] = $data;
+        }
+
+        echo json_encode($list);
     }
 
-    // Menghitung Pembelian Bersih
-    public function getNetPurchaseData()
+    public function getTransactionSuccessCharts()
     {
-        $dataPurchase = $this->admin_m->getPurchasesData();
-        $dataPurchaseReturns = $this->admin_m->getPurchaseReturnsData();
+        $list = array();
+        $dataTransaction = $this->admin_m->getCountTransactionSuccessMonthlyCharts();
 
-        // Pembelian bersih = (Pembelian + Ongkos Angkut Pembelian) – (Retur Pembelian + Potongan Pembelian)
-        $netPurchase = ($dataPurchase['purchase_gross_amount'] + $dataPurchase['purchase_ship_amount']) - ($dataPurchaseReturns['purchase_return_net_amount'] + $dataPurchase['purchase_ship_amount']);
+        $month = '';
+        $getCountTransaction = 0;
 
-        echo json_encode($netPurchase);
+        foreach ($dataTransaction as $val) {
+            $data = array();
+            $getCountTransaction = $val['count_transaction'];
+
+            $month = date('Y-m', strtotime($val['created_date']));
+
+            $data['getCountTransaction'] = $getCountTransaction;
+            $data['month'] = $month;
+
+            $list[] = $data;
+        }
+
+        echo json_encode($list);
     }
 
-    // Menghitung Persediaan Barang
-    public function getGoodsAvailableForSale()
+    /* public function getNetSalesCharts()
     {
-        $dataPurchase = $this->admin_m->getPurchasesData();
-        $dataPurchaseReturns = $this->admin_m->getPurchaseReturnsData();
+        $list = array();
+        $dataSales = $this->admin_m->_getNetSalesMonthlyCharts();
 
-        // Pembelian bersih = (Pembelian + Ongkos Angkut Pembelian) – (Retur Pembelian + Potongan Pembelian)
-        $netPurchase = ($dataPurchase['purchase_gross_amount'] + $dataPurchase['purchase_ship_amount']) - ($dataPurchaseReturns['purchase_return_net_amount'] + $dataPurchase['purchase_ship_amount']);
-
-        // Persediaan awal product price * qty
-        $dataInitialInventory = $this->admin_m->getSumProductsPriceCurrentYear();
-
-        // Persediaan Barang = Persediaan Awal + Pembelian Bersih
-        $data = $dataInitialInventory['product_subtot'] + $netPurchase;
-
-        echo json_encode($data);
-    }
-
-    public function getCostOfGoodsSold()
-    {
-        $dataPurchase = $this->admin_m->getPurchasesData();
-        $dataPurchaseReturns = $this->admin_m->getPurchaseReturnsData();
-
-        // Pembelian bersih = (Pembelian + Ongkos Angkut Pembelian) – (Retur Pembelian + Potongan Pembelian)
-        $netPurchase = ($dataPurchase['purchase_gross_amount'] + $dataPurchase['purchase_ship_amount']) - ($dataPurchaseReturns['purchase_return_net_amount'] + $dataPurchase['purchase_ship_amount']);
-
-        // Persediaan awal
-        $dataInitialInventory = $this->admin_m->getSumProductsPriceCurrentYear();
-
-        // Persediaan Barang = Persediaan Awal + Pembelian Bersih
-        $dataGoodsAvailableForSale = $dataInitialInventory['product_subtot'] + $netPurchase;
-
-        // Harga Pokok Penjualan = Persediaan Barang – Persediaan Akhir
-        // Persediaan Akhir
-        $dataEndingInventory = $this->admin_m->getSumProductsOrderCurrentYear();
-
-        $data = $dataGoodsAvailableForSale - $dataEndingInventory['order_gross_amount'];
-
-        echo json_encode($data);
-    }
-
-    public function getUserCount()
-    {
-        $data = $this->admin_m->getUserCount();
-
-        echo json_encode($data);
-    }
-
-    public function getUserOnline()
-    {
-        $data = $this->admin_m->getUserOnline();
-        // $getData = $data['isonline'];
-
-        echo json_encode($data);
-    }
-
-    public function getProductCount()
-    {
-        $data = $this->admin_m->getProductCount();
-
-        echo json_encode($data);
-    }
-
-    public function getProductSold()
-    {
-        $data = $this->admin_m->getProductSold();
-
-        echo json_encode($data);
-    }
-
-    public function getProductReturn()
-    {
-        $data = $this->admin_m->getProductReturn();
-
-        echo json_encode($data);
-    }
+        echo json_encode($dataSales);
+    } */
 
     public function getEvents()
     {

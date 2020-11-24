@@ -162,11 +162,11 @@
       <!-- get cont transaction monthly -->
       <?php if ($countTransactionMonthly != null) : ?>
         <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="info-box" title="count transaction monthly">
+          <div class="info-box" title="count transaction success monthly">
             <span class="info-box-icon bg-yellow"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></span>
 
             <div class="info-box-content">
-              <span class="info-box-text">Count Transaction Monthly</span>
+              <span class="info-box-text">Count Transaction Success Monthly</span>
               <span class="info-box-number">
                 <?php echo $countTransactionMonthly ?>
               </span>
@@ -178,11 +178,11 @@
       <!-- get cont transaction annual -->
       <?php if ($countTransactionAnnual != null) : ?>
         <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="info-box" title="count transaction annual">
+          <div class="info-box" title="count transaction success annual">
             <span class="info-box-icon bg-red"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></span>
 
             <div class="info-box-content">
-              <span class="info-box-text">Count Transaction Annual</span>
+              <span class="info-box-text">Count Transaction Success Annual</span>
               <span class="info-box-number">
                 <?php echo $countTransactionAnnual ?>
               </span>
@@ -194,11 +194,11 @@
       <!-- get cont rerturn monthly -->
       <?php if ($countReturnMonthly != null) : ?>
         <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="info-box" title="count rerturn monthly">
+          <div class="info-box" title="count rerturn success monthly">
             <span class="info-box-icon bg-yellow"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i></span>
 
             <div class="info-box-content">
-              <span class="info-box-text">Count Return Monthly</span>
+              <span class="info-box-text">Count Return Success Monthly</span>
               <span class="info-box-number">
                 <?php echo $countReturnMonthly ?>
               </span>
@@ -210,11 +210,11 @@
       <!-- get cont rerturn annual -->
       <?php if ($countReturnAnnual != null) : ?>
         <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="info-box" title="count rerturn annual">
+          <div class="info-box" title="count rerturn success annual">
             <span class="info-box-icon bg-red"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i></span>
 
             <div class="info-box-content">
-              <span class="info-box-text">Count Return Annual</span>
+              <span class="info-box-text">Count Return Success Annual</span>
               <span class="info-box-number">
                 <?php echo $countReturnAnnual ?>
               </span>
@@ -228,6 +228,38 @@
     <!-- /.row -->
   </section>
   <!-- /.content -->
+
+  <section class="content">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="box box-primary">
+          <div class="box-header with-border">
+            <h3 class="box-title">Information Net Sales Data Chart</h3>
+          </div>
+
+          <div class="box-body">
+            <div id="mycanvas-netsales">
+              <canvas id="show-charts" style="height: 250px; width: 787px;" height="250" width="787"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="box box-success">
+          <div class="box-header with-border">
+            <h3 class="box-title">Information Transaction Success Chart</h3>
+          </div>
+
+          <div class="box-body">
+            <div id="mycanvas-transaction">
+              <canvas id="show-transaction-charts" style="height: 250px; width: 787px;" height="250" width="787"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Calendar Main Content -->
   <section class="content">
@@ -253,6 +285,107 @@
 <!-- /.content-wrapper -->
 
 <script>
+  getShowNetSalesChart();
+  getShowTransactionSuccessChart();
+
+  function getShowNetSalesChart() {
+    $.ajax({
+      url: '<?php echo base_url(); ?>admin/getNetSalesCharts',
+      type: 'GET',
+      dataType: 'JSON',
+      success: function(data) {
+        // codeigniter and charts js
+        // https://jaranguda.com/membuat-diagram-dengan-chartjs-di-codeigniter-3/
+
+        var label = [];
+        var value = [];
+        var i;
+
+        /* for (i = 0; i < data.length; i++) {
+          // if (data[i].order_status == 4 && data[i].return_status == 7) {
+          //   label.push(moment(data[i].order_date).format('YYYY-MM'));
+          //   value.push(data[i].net_amount_sum_order - data[i].coupon_charge_sum_order - data[i].net_amount_sum_return);
+          // }
+
+          label.push(moment(data[i].order_date).format('YYYY-MM'));
+          value.push(data[i].net_amount_sum_order - data[i].coupon_charge_sum_order - data[i].net_amount_sum_return);
+        } */
+
+        for (i = 0; i < data.length; i++) {
+          label.push(moment(data[i].month).format('MMMM YYYY'));
+          value.push(data[i].getNetSales);
+        }
+
+        var lineChartData = {
+          labels: label,
+          datasets: [{
+            fillColor: "rgba(60,141,188,0.9)",
+            strokeColor: "rgba(60,141,188,0.8)",
+            pointColor: "#3b8bba",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(152,235,239,1)",
+            data: value
+          }]
+        }
+
+        var myLine = new Chart(document.getElementById("show-charts").getContext("2d")).Line(lineChartData);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        Swal.fire({
+          icon: "error",
+          title: 'Sorry the chart of net sales data cannot show up.',
+          showConfirmButton: false,
+          timer: 5000,
+        });
+      }
+    })
+  }
+
+  function getShowTransactionSuccessChart() {
+    $.ajax({
+      url: '<?php echo base_url(); ?>admin/getTransactionSuccessCharts',
+      type: 'GET',
+      dataType: 'JSON',
+      success: function(data) {
+        // codeigniter and charts js
+        // https://jaranguda.com/membuat-diagram-dengan-chartjs-di-codeigniter-3/
+
+        var label = [];
+        var value = [];
+        var i;
+
+        for (i = 0; i < data.length; i++) {
+          label.push(moment(data[i].month).format('MMMM YYYY'));
+          value.push(data[i].getCountTransaction);
+        }
+
+        var lineChartData = {
+          labels: label,
+          datasets: [{
+            fillColor: "rgba(60,141,188,0.9)",
+            strokeColor: "rgba(60,141,188,0.8)",
+            pointColor: "#3b8bba",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(152,235,239,1)",
+            data: value
+          }]
+        }
+
+        var myLine = new Chart(document.getElementById("show-transaction-charts").getContext("2d")).Line(lineChartData);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        Swal.fire({
+          icon: "error",
+          title: 'Sorry the chart of transaction data cannot show up.',
+          showConfirmButton: false,
+          timer: 5000,
+        });
+      }
+    })
+  }
+
   $(document).ready(function() {
     $.validator.setDefaults({
       highlight: function(element) {

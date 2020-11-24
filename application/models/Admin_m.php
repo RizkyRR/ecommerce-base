@@ -234,6 +234,46 @@ class Admin_m extends CI_Model
             ->where('YEAR(customer_purchase_returns.created_date) = YEAR(CURRENT_DATE())')
             ->count_all_results('customer_purchase_returns');
     }
+
+    public function getCountTransactionSuccessMonthlyCharts()
+    {
+        $this->db->select('COUNT(*) AS count_transaction, created_date');
+        $this->db->from('customer_purchase_orders');
+
+        $this->db->where_not_in('status_order_id', 1);
+
+        $this->db->group_by('YEAR(customer_purchase_orders.created_date), MONTH(customer_purchase_orders.created_date)');
+
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    public function getNetSalesMonthlyCharts()
+    {
+        $this->db->select("customer_purchase_orders.net_amount AS net_amount_sum_order, customer_purchase_orders.coupon_charge AS coupon_charge_sum_order, customer_purchase_orders.created_date AS order_date, customer_purchase_orders.status_order_id AS order_status");
+
+        $this->db->from('customer_purchase_orders');
+
+        $this->db->group_by('YEAR(customer_purchase_orders.created_date), MONTH(customer_purchase_orders.created_date)');
+        $this->db->where('customer_purchase_orders.status_order_id = 4');
+
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    public function getNetReturnMonthlyCharts($month)
+    {
+        $this->db->select("SUM(customer_purchase_returns.net_amount) AS net_amount_sum_return, customer_purchase_returns.created_date AS return_date, customer_purchase_returns.status_order_id AS return_status");
+
+        $this->db->from('customer_purchase_returns');
+
+        $this->db->where('customer_purchase_returns.status_order_id = 7');
+
+        $this->db->like('customer_purchase_returns.created_date', $month);
+
+        $query = $this->db->get();
+        return $query->row_array();
+    }
     // END OF DASHBOARDS
 
     // FOR CALENDAR EVENTS

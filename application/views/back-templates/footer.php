@@ -18,8 +18,6 @@
 <script src="<?php echo base_url(); ?>back-assets/plugins/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 <!-- SlimScroll -->
 <script src="<?php echo base_url(); ?>back-assets/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
-<!-- ChartJS -->
-<script src="<?php echo base_url(); ?>back-assets/bower_components/chart.js/Chart.js"></script>
 
 <!-- CK Editor -->
 <script src="<?php echo base_url(); ?>back-assets/bower_components/ckeditor/ckeditor.js"></script>
