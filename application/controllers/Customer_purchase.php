@@ -287,11 +287,16 @@ class Customer_purchase extends CI_Controller
     $info['company'] = $dataCompany;
     $info['company_name'] = $dataCompany['company_name'];
     $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
-    $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+    $info['company_bank'] = '';
 
     $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
     $info['data_order'] = $dataOrder;
     $info['invoice_order'] = $dataOrder['invoice_order'];
+    $info['purchase_due'] = date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+    $info['purchase_date'] = date('d M Y H:i:s', strtotime($dataOrder['created_date']));
+
+    $info['message'] = 'Your payment has been canceled. Please do not pay for this order!';
+
     $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
     $info['customer_email'] = $dataCustomer['email'];
     $info['customer'] = $dataCustomer;
@@ -328,48 +333,6 @@ class Customer_purchase extends CI_Controller
     echo json_encode($response);
   }
 
-  public function getReminderCancelFromPaymentDue()
-  {
-    $response = array();
-    $email = $this->session->userdata('customer_email');
-
-    $dataPayment = $this->customerPurchase_m->getDataPaymentCancelByEmail($email);
-
-    if ($email) {
-      if ($dataPayment != null) {
-        foreach ($dataPayment as $val) {
-          $getOrderID = $val['id'];
-
-          $data = [
-            'reminder_cancel' => 1
-          ];
-
-          $updatePaymentEmailSend = $this->customerPurchase_m->updateDataPaymentCancelByID($getOrderID, $data);
-
-          // email purposes
-          $dataCompany = $this->company_m->getCompanyById(1);
-          $info['company'] = $dataCompany;
-          $info['company_name'] = $dataCompany['company_name'];
-          $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
-          $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
-
-          $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($getOrderID, $email);
-          $info['data_order'] = $dataOrder;
-          $info['invoice_order'] = $dataOrder['invoice_order'];
-          $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
-          $info['customer_email'] = $dataCustomer['email'];
-          $info['customer'] = $dataCustomer;
-          $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($getOrderID);
-
-          $this->_sendEmail('cancel', $info);
-          // email purposes
-        }
-      }
-    }
-
-    echo json_encode($response);
-  }
-
   public function getReminderPayment()
   {
     $response = array();
@@ -398,12 +361,64 @@ class Customer_purchase extends CI_Controller
           $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($getOrderID, $email);
           $info['data_order'] = $dataOrder;
           $info['invoice_order'] = $dataOrder['invoice_order'];
+          $info['purchase_due'] = date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+          $info['purchase_date'] = date('d M Y H:i:s', strtotime($dataOrder['created_date']));
+
+          $info['message'] = 'Waiting for payment before ' . date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+
           $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
           $info['customer_email'] = $dataCustomer['email'];
           $info['customer'] = $dataCustomer;
           $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($getOrderID);
 
           $this->_sendEmail('payment', $info);
+          // email purposes
+        }
+      }
+    }
+
+    echo json_encode($response);
+  }
+
+  public function getReminderCancelFromPaymentDue()
+  {
+    $response = array();
+    $email = $this->session->userdata('customer_email');
+
+    $dataPayment = $this->customerPurchase_m->getDataPaymentCancelByEmail($email);
+
+    if ($email) {
+      if ($dataPayment != null) {
+        foreach ($dataPayment as $val) {
+          $getOrderID = $val['id'];
+
+          $data = [
+            'reminder_cancel' => 1
+          ];
+
+          $updatePaymentEmailSend = $this->customerPurchase_m->updateDataPaymentCancelByID($getOrderID, $data);
+
+          // email purposes
+          $dataCompany = $this->company_m->getCompanyById(1);
+          $info['company'] = $dataCompany;
+          $info['company_name'] = $dataCompany['company_name'];
+          $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
+          $info['company_bank'] = '';
+
+          $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($getOrderID, $email);
+          $info['data_order'] = $dataOrder;
+          $info['invoice_order'] = $dataOrder['invoice_order'];
+          $info['purchase_due'] = date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+          $info['purchase_date'] = date('d M Y H:i:s', strtotime($dataOrder['created_date']));
+
+          $info['message'] = 'Your payment has been canceled. Please do not pay for this order!';
+
+          $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
+          $info['customer_email'] = $dataCustomer['email'];
+          $info['customer'] = $dataCustomer;
+          $info['detail_order'] = $this->customerPurchase_m->getDetailPurchaseOrderByID($getOrderID);
+
+          $this->_sendEmail('cancel', $info);
           // email purposes
         }
       }

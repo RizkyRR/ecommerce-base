@@ -54,7 +54,7 @@
 
             <div class="box-body">
               <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                   <div class="form-group">
                     <label for="category">Product category*</label>
                     <select class="form-control select-category" style="width: 100%;" name="category" id="category">
@@ -63,7 +63,16 @@
                   </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="brand">Product brand*</label>
+                    <select class="form-control select-brand" style="width: 100%;" name="brand" id="brand">
+                    </select>
+                    <span class="help-block"><?php echo form_error('brand') ?></span>
+                  </div>
+                </div>
+
+                <div class="col-lg-4">
                   <div class="form-group">
                     <label for="supplier">Product supplier*</label>
                     <select class="form-control select-supplier" style="width: 100%;" name="supplier" id="supplier">
@@ -202,6 +211,32 @@
       $(this).valid();
     });
 
+    $(".select-brand").select2({
+      ajax: {
+        url: "<?php echo base_url(); ?>product/getBrand",
+        type: "POST",
+        dataType: 'JSON',
+        delay: 250,
+        data: function(params) {
+          return {
+            searchTerm: params.term // search term
+          };
+        },
+        processResults: function(response) {
+          return {
+            results: response
+          };
+        },
+        cache: true
+      },
+      placeholder: 'Select for a brand',
+    });
+
+    // Untuk menghilangkan pesan validasi jika sudah terisi
+    $('.select-brand').on('change', function() {
+      $(this).valid();
+    });
+
     $(".select-supplier").select2({
       ajax: {
         url: "<?php echo base_url(); ?>product/getSupplier",
@@ -260,6 +295,9 @@
         minlength: 10
       },
       category: {
+        required: true
+      },
+      brand: {
         required: true
       },
       supplier: {

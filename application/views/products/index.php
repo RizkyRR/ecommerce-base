@@ -49,6 +49,7 @@
               <th>No</th>
               <th>Name</th>
               <th>Category</th>
+              <th>Brand</th>
               <th>Supplier</th>
               <th>Weight</th>
               <th>Unit Price</th>
@@ -90,7 +91,7 @@
         title: 'Data Product',
         download: 'open',
         exportOptions: {
-          columns: [0, 1, 2, 3, 4, 5]
+          columns: [0, 1, 2, 3, 4, 5, 6]
         }
       }, {
         extend: 'print',
@@ -99,11 +100,11 @@
         title: 'Data Product',
         download: 'open',
         exportOptions: {
-          columns: [0, 1, 2, 3, 4, 5]
+          columns: [0, 1, 2, 3, 4, 5, 6]
         }
       }],
       "columnDefs": [{
-        "targets": [0, 6],
+        "targets": [0, 7],
         "orderable": false,
         "searchable": false
       }],

@@ -491,9 +491,9 @@ $("#place-order").on("click", function (e) {
 						title: data.message,
 						showConfirmButton: false,
 						timer: 5000,
+					}).then(function () {
+						window.location.href = url + "customer-history-purchase-order";
 					});
-
-					window.location.href = url + "customer-history-purchase-order";
 				} else {
 					Swal.fire({
 						icon: "error",

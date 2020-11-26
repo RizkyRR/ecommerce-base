@@ -265,10 +265,16 @@ class Role extends CI_Controller
   public function accessRole($id)
   {
     $info['title'] = 'Access Role';
-    $info['role'] = $this->role_m->getAccessById($id);
-    $info['menu'] = $this->role_m->getAllMenu();
+    $dataRole = $this->role_m->getAccessById($id);
 
-    renderBackTemplate('roles/access-role', $info);
+    if ($dataRole != null) {
+      $info['role'] = $dataRole;
+      $info['menu'] = $this->role_m->getAllMenu();
+
+      renderBackTemplate('roles/access-role', $info);
+    } else {
+      redirect('error_404', 'refresh');
+    }
   }
 
   public function accessUpdate()

@@ -39,6 +39,7 @@ class Product extends CI_Controller
       $row[] = $no . ".";
       $row[] = $item->product_name;
       $row[] = $item->category_name;
+      $row[] = $item->brand_name;
       $row[] = $item->supplier_name;
       $row[] = $item->weight . ' Gram';
       $row[] = "Rp " . number_format($item->price, 0, ',', '.');
@@ -99,6 +100,29 @@ class Product extends CI_Controller
         $row[] = array(
           'id' => $val['id'],
           'text' => $val['category_name']
+        );
+      }
+    }
+
+    echo json_encode($row);
+  }
+
+  public function getBrand()
+  {
+    $getInput = $this->input->post('searchTerm', true);
+
+    if (!isset($getInput)) {
+      $data = $this->brand_m->getAllBrandBySelect($keyword = null, $limit = 10);
+    } else {
+      $data = $this->brand_m->getAllBrandBySelect($keyword = $getInput, $limit = 10);
+    }
+
+    $row = array();
+    if ($data > 0) {
+      foreach ($data as $val) {
+        $row[] = array(
+          'id' => $val['id'],
+          'text' => $val['brand_name']
         );
       }
     }
@@ -290,6 +314,7 @@ class Product extends CI_Controller
 
     $this->form_validation->set_rules('name', 'product name', 'trim|required|min_length[10]');
     $this->form_validation->set_rules('category', 'category', 'trim|required');
+    $this->form_validation->set_rules('brand', 'brand', 'trim|required');
     $this->form_validation->set_rules('supplier', 'supplier', 'trim|required');
     $this->form_validation->set_rules('description', 'description product', 'trim|required|min_length[20]');
     $this->form_validation->set_rules('stock', 'product stock', 'trim|required|numeric');
@@ -316,6 +341,7 @@ class Product extends CI_Controller
       'product_name' => $this->input->post('name', true),
       'slug' => $slug,
       'category_id' => $this->input->post('category', true),
+      'brand_id' => $this->input->post('brand', true),
       'supplier_id' => $this->input->post('supplier', true),
       'description' => $this->input->post('description', true),
       'price' => $convertCurrency,
@@ -377,7 +403,29 @@ class Product extends CI_Controller
     $product_id = $this->input->post('product_id');
 
     $data = $this->product_m->getProductById($product_id);
-    echo json_encode($data);
+
+    if ($data != null) {
+      $dataCategory = $data;
+    } else {
+      $dataCategory = $this->category_m->getAllCategory($keyword = null, $limit = 10);;
+    }
+
+    echo json_encode($dataCategory);
+  }
+
+  public function getSelectedOptionBrand()
+  {
+    $product_id = $this->input->post('product_id');
+
+    $data = $this->product_m->getProductById($product_id);
+
+    if ($data != null) {
+      $dataBrand = $data;
+    } else {
+      $dataBrand = $this->brand_m->getAllBrandBySelect($keyword = null, $limit = 10);;
+    }
+
+    echo json_encode($dataBrand);
   }
 
   public function getSelectedOptionSupplier()
@@ -385,7 +433,14 @@ class Product extends CI_Controller
     $product_id = $this->input->post('product_id');
 
     $data = $this->product_m->getProductById($product_id);
-    echo json_encode($data);
+
+    if ($data != null) {
+      $dataSupplier = $data;
+    } else {
+      $dataSupplier = $this->supplier_m->getSupplier($keyword = null, $limit = 10);
+    }
+
+    echo json_encode($dataSupplier);
   }
 
   public function editProduct($id)
@@ -393,30 +448,36 @@ class Product extends CI_Controller
     $info['title'] = 'Edit Product';
 
     $data_product = $this->product_m->getProductById($id);
-    $info['data'] = $data_product;
 
-    date_default_timezone_set('Asia/Jakarta');
+    if ($data_product != null) {
+      $info['data'] = $data_product;
 
-    $info['user'] = $this->auth_m->getUserSession();
-    $info['company'] = $this->company_m->getCompanyById(1);
+      date_default_timezone_set('Asia/Jakarta');
 
-    $this->form_validation->set_rules('name', 'product name', 'trim|required|min_length[10]');
-    $this->form_validation->set_rules('category', 'category', 'trim|required');
-    $this->form_validation->set_rules('supplier', 'supplier', 'trim|required');
-    $this->form_validation->set_rules('description', 'description product', 'trim|required|min_length[20]');
-    $this->form_validation->set_rules('stock', 'product stock', 'trim|required|numeric');
-    $this->form_validation->set_rules('weight', 'product weight', 'trim|required|numeric');
-    $this->form_validation->set_rules('price', 'product price', 'trim|required');
+      $info['user'] = $this->auth_m->getUserSession();
+      $info['company'] = $this->company_m->getCompanyById(1);
 
-    if ($this->form_validation->run() == false) {
-      $this->load->view('back-templates/header', $info);
-      $this->load->view('back-templates/topbar', $info);
-      $this->load->view('back-templates/navbar', $info);
-      $this->load->view('products/edit-product', $info);
-      $this->load->view('modals/modal-delete');
-      $this->load->view('back-templates/footer', $info);
+      $this->form_validation->set_rules('name', 'product name', 'trim|required|min_length[10]');
+      $this->form_validation->set_rules('category', 'category', 'trim|required');
+      $this->form_validation->set_rules('brand', 'brand', 'trim|required');
+      $this->form_validation->set_rules('supplier', 'supplier', 'trim|required');
+      $this->form_validation->set_rules('description', 'description product', 'trim|required|min_length[20]');
+      $this->form_validation->set_rules('stock', 'product stock', 'trim|required|numeric');
+      $this->form_validation->set_rules('weight', 'product weight', 'trim|required|numeric');
+      $this->form_validation->set_rules('price', 'product price', 'trim|required');
+
+      if ($this->form_validation->run() == false) {
+        $this->load->view('back-templates/header', $info);
+        $this->load->view('back-templates/topbar', $info);
+        $this->load->view('back-templates/navbar', $info);
+        $this->load->view('products/edit-product', $info);
+        $this->load->view('modals/modal-delete');
+        $this->load->view('back-templates/footer', $info);
+      } else {
+        $this->updateProduct();
+      }
     } else {
-      $this->updateProduct();
+      redirect('error_404', 'refresh');
     }
   }
 
@@ -433,6 +494,7 @@ class Product extends CI_Controller
       'product_name' => $this->input->post('name', true),
       'slug' => $slug,
       'category_id' => $this->input->post('category', true),
+      'brand_id' => $this->input->post('brand', true),
       'supplier_id' => $this->input->post('supplier', true),
       'description' => $this->input->post('description', true),
       'price' => $convertCurrency,
@@ -479,14 +541,21 @@ class Product extends CI_Controller
     </div>
 
     <div class="row">
-      <div class="col-lg-6">
+      <div class="col-lg-4">
         <div class="form-group">
           <label for="detail_category">Product category</label>
           <input type="text" class="form-control" name="detail_category" value="' . $dataProduct['category_name'] . '" readonly>
         </div>
       </div>
 
-      <div class="col-lg-6">
+      <div class="col-lg-4">
+        <div class="form-group">
+          <label for="detail_brand">Product brand</label>
+          <input type="text" class="form-control" name="detail_brand" value="' . $dataProduct['brand_name'] . '" readonly>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
         <div class="form-group">
           <label for="detail_supplier">Product supplier</label>
           <input type="text" class="form-control" name="detail_supplier" value="' . $dataProduct['supplier_name'] . '" readonly>

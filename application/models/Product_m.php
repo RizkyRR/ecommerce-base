@@ -6,18 +6,19 @@ class Product_m extends CI_Model
 {
   // DataTables Model Setup
 
-  var $column_order = array(null, 'product_name', 'category_name', 'supplier_name', 'weight', 'qty', 'price'); //set column field database for datatable orderable 
+  var $column_order = array(null, 'product_name', 'category_name', 'brand_name', 'supplier_name', 'weight', 'qty', 'price'); //set column field database for datatable orderable 
 
-  var $column_search = array('products.id', 'product_name', 'category_name', 'supplier_name', 'weight', 'qty', 'price'); //set column field database for datatable searchable
+  var $column_search = array('products.id', 'product_name', 'category_name', 'brand_name', 'supplier_name', 'weight', 'qty', 'price'); //set column field database for datatable searchable
 
   var $order = array('products.created_at' => 'desc');  // default order
 
   private function _get_datatables_query()
   {
-    $this->db->select('*, products.id AS product_id');
+    $this->db->select('*, products.id AS product_id, product_categories.id AS id_category, product_brands.id AS id_brand, suppliers.id AS id_supplier');
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
-    $this->db->join('suppliers', 'suppliers.id = products.supplier_id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
+    $this->db->join('suppliers', 'suppliers.id = products.supplier_id', 'left');
 
     $i = 0;
     foreach ($this->column_search as $product) { // loop column
@@ -69,9 +70,11 @@ class Product_m extends CI_Model
   public function getProductCountPage()
   {
     $this->db->select('*');
+
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
-    $this->db->join('suppliers', 'suppliers.id = products.supplier_id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
+    $this->db->join('suppliers', 'suppliers.id = products.supplier_id', 'left');
 
     $query = $this->db->get();
     return $query->num_rows();
@@ -79,11 +82,12 @@ class Product_m extends CI_Model
 
   public function getAllProduct()
   {
-    $this->db->select('*, products.id AS product_id, product_details.image AS product_image');
+    $this->db->select('*, products.id AS product_id, product_categories.id AS id_category, product_brands.id AS id_brand, product_details.image AS product_image');
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
-    $this->db->join('suppliers', 'suppliers.id = products.supplier_id');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
+    $this->db->join('suppliers', 'suppliers.id = products.supplier_id', 'left');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
 
     $this->db->order_by('product_name', 'ASC');
 
@@ -93,11 +97,12 @@ class Product_m extends CI_Model
 
   public function getAllProductByID($id)
   {
-    $this->db->select('*, products.id AS id_product, product_categories.id AS id_category, suppliers.id AS id_supplier, product_details.id AS id_detail, product_details.image AS product_image');
+    $this->db->select('*, products.id AS id_product, product_categories.id AS id_category, product_brands.id AS id_brand, suppliers.id AS id_supplier, product_details.id AS id_detail, product_details.image AS product_image');
 
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
-    $this->db->join('suppliers', 'suppliers.id = products.supplier_id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
+    $this->db->join('suppliers', 'suppliers.id = products.supplier_id', 'left');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
 
     $this->db->where('products.id', $id);
@@ -182,11 +187,12 @@ class Product_m extends CI_Model
   public function getProductById($id)
   {
     // $this->db->select('*, products.id AS product_id, gallery.image AS product_image');
-    $this->db->select('*, products.id AS id_product, product_categories.id AS id_category, product_details.image AS product_image');
+    $this->db->select('*, products.id AS id_product, product_categories.id AS id_category, product_brands.id AS id_brand, suppliers.id AS id_supplier, product_details.image AS product_image');
 
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
-    $this->db->join('suppliers', 'suppliers.id = products.supplier_id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
+    $this->db->join('suppliers', 'suppliers.id = products.supplier_id', 'left');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
 
     // $this->db->group_by('products.id');
@@ -265,7 +271,7 @@ class Product_m extends CI_Model
   {
     $this->db->select('product_images.image AS image_product');
     $this->db->from('products');
-    $this->db->join('product_images', 'product_images.product_id = products.id');
+    $this->db->join('product_images', 'product_images.product_id = products.id', 'left');
 
     $this->db->where('product_images.product_id', $id);
 
@@ -396,7 +402,7 @@ class Product_m extends CI_Model
   {
     $this->db->select('*, product_discounts.id AS discount_id');
     $this->db->from('products');
-    $this->db->join('product_discounts', 'product_discounts.product_id = products.id');
+    $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left');
 
     $this->db->where('product_discounts.product_id', $id);
 
@@ -408,7 +414,7 @@ class Product_m extends CI_Model
   {
     $this->db->select('*');
     $this->db->from('products');
-    $this->db->join('product_discounts', 'product_discounts.product_id = products.id');
+    $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left');
 
     $this->db->where('products.id', $id);
 
@@ -423,11 +429,12 @@ class Product_m extends CI_Model
 
   public function getShowDiscountProducts()
   {
-    $this->db->select('*, products.id AS id_product, product_categories.id AS id_category, product_details.id AS id_detail, product_discounts.id AS id_discount');
+    $this->db->select('*, products.id AS id_product, product_categories.id AS id_category, product_brands.id AS id_brand, product_details.id AS id_detail, product_discounts.id AS id_discount');
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
-    $this->db->join('product_discounts', 'product_discounts.product_id = products.id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
+    $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left');
 
     $this->db->group_by('product_details.product_id');
 
@@ -454,7 +461,7 @@ class Product_m extends CI_Model
   {
     $this->db->select('*');
     $this->db->from('products');
-    $this->db->join('product_discounts', 'product_discounts.product_id = products.id');
+    $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left');
 
     $this->db->where('products.id', $id);
 
@@ -466,7 +473,7 @@ class Product_m extends CI_Model
   {
     $this->db->select('*, products.id AS id_product, product_discounts.id AS id_discount');
     $this->db->from('products');
-    $this->db->join('product_discounts', 'product_discounts.product_id = products.id');
+    $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left');
 
     $this->db->where('products.id', $id);
 
@@ -492,8 +499,8 @@ class Product_m extends CI_Model
 
     // $this->db->select('*, products.id AS id_product, product_details.id AS id_detail'); 
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
     $this->db->join('order_details', 'order_details.product_id = products.id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
@@ -516,8 +523,8 @@ class Product_m extends CI_Model
 
     // $this->db->select('*, products.id AS id_product, product_details.id AS id_detail'); 
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
     $this->db->join('order_details', 'order_details.product_id = products.id');
 
@@ -575,7 +582,7 @@ class Product_m extends CI_Model
     $this->db->select('count(*) as allcount');
 
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
 
     $this->db->where('products.qty > 0');
 
@@ -600,7 +607,7 @@ class Product_m extends CI_Model
     $this->db->select('count(*) as allcount');
 
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
 
     $this->db->where('product_categories.category_name', $category);
     $this->db->where('products.qty > 0');
@@ -646,8 +653,8 @@ class Product_m extends CI_Model
     $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -673,8 +680,8 @@ class Product_m extends CI_Model
     $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -691,8 +698,8 @@ class Product_m extends CI_Model
     $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -712,9 +719,9 @@ class Product_m extends CI_Model
     $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_discounts.id AS id_discount, product_details.id AS id_detail'); //*
 
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
-    $this->db->join('product_details', 'product_details.product_id = products.id');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
 
     $this->db->group_by('product_details.product_id');
     $this->db->where('products.id', $id);
@@ -728,7 +735,7 @@ class Product_m extends CI_Model
     $this->db->select('product_details.image AS product_image, products.id AS id_product, product_details.id AS id_detail'); //*
 
     $this->db->from('products');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
 
     // $this->db->group_by('product_details.product_id');
     $this->db->where('product_details.product_id', $id);
@@ -745,8 +752,8 @@ class Product_m extends CI_Model
 
     // $this->db->select('*, products.id AS id_product, product_details.id AS id_detail'); 
     $this->db->from('products');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -772,8 +779,8 @@ class Product_m extends CI_Model
     $this->db->select('*, COUNT(products.id) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -789,7 +796,7 @@ class Product_m extends CI_Model
   {
     $this->db->select('count(*) as allcount');
     $this->db->from('products');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
 
     $query = $this->db->get();
     $result = $query->result_array();
@@ -854,9 +861,9 @@ class Product_m extends CI_Model
     $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, customer_wishlists.id AS id_wishlist, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
-    $this->db->join('product_details', 'product_details.product_id = products.id');
-    $this->db->join('customer_wishlists', 'customer_wishlists.product_id = products.id');
-    $this->db->join('product_categories', 'product_categories.id = products.category_id');
+    $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
+    $this->db->join('customer_wishlists', 'customer_wishlists.product_id = products.id', 'left');
+    $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -896,8 +903,8 @@ class Product_m extends CI_Model
     $this->db->select('*, SUM(quantity) as total_qty, products.id AS id_product, product_details.id AS id_detail, customer_carts.id AS id_cart, products.qty AS product_qty, customer_carts.quantity AS cart_qty'); //*
 
     $this->db->from('customer_carts');
-    $this->db->join('product_details', 'product_details.product_id = customer_carts.product_id');
-    $this->db->join('products', 'customer_carts.product_id = products.id');
+    $this->db->join('product_details', 'product_details.product_id = customer_carts.product_id', 'left');
+    $this->db->join('products', 'customer_carts.product_id = products.id', 'left');
 
     $this->db->group_by('product_details.product_id');
 

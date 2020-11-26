@@ -215,6 +215,11 @@ class ReturOrder_m extends CI_Model
     $this->db->select('*');
     $this->db->from('customer_purchase_orders');
 
+    $this->db->where_not_in('status_order_id', 1);
+    $this->db->where_not_in('status_order_id', 2);
+    $this->db->where_not_in('status_order_id', 10);
+    $this->db->where_not_in('status_order_id', 11);
+
     if ($keyword != null) {
       $this->db->like('id', $keyword);
       $this->db->or_like('invoice_order', $keyword);

@@ -297,6 +297,11 @@ class Order extends CI_Controller
         $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
         $info['data_order'] = $dataOrder;
         $info['invoice_order'] = $dataOrder['invoice_order'];
+        $info['purchase_due'] = date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+        $info['purchase_date'] = date('d M Y H:i:s', strtotime($dataOrder['created_date']));
+
+        $info['message'] = 'The payment is verified and the order has been forwarded to the seller';
+
         $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
         $info['customer_email'] = $dataCustomer['email'];
         $info['customer'] = $dataCustomer;
@@ -381,6 +386,11 @@ class Order extends CI_Controller
     $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
     $info['data_order'] = $dataOrder;
     $info['invoice_order'] = $dataOrder['invoice_order'];
+    $info['purchase_due'] = date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+    $info['purchase_date'] = date('d M Y H:i:s', strtotime($dataOrder['created_date']));
+
+    $info['message'] = 'Your payment has been canceled by Admin!';
+
     $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
     $info['customer_email'] = $dataCustomer['email'];
     $info['customer'] = $dataCustomer;
@@ -475,6 +485,11 @@ class Order extends CI_Controller
       $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($order_id, $email);
       $info['data_order'] = $dataOrder;
       $info['invoice_order'] = $dataOrder['invoice_order'];
+      $info['purchase_due'] = date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+      $info['purchase_date'] = date('d M Y H:i:s', strtotime($dataOrder['created_date']));
+
+      $info['message'] = 'Your order has been completed.';
+
       $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
       $info['customer_email'] = $dataCustomer['email'];
       $info['customer'] = $dataCustomer;

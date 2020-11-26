@@ -68,8 +68,11 @@ $route['translate_uri_dashes'] = false;
 // Front's Page Route
 $route['sign-in'] = 'Auth_shop';
 $route['sign-in'] = 'Auth_shop/index';
+$route['set-sign-in'] = 'Auth_shop/signin'; // Ajax
 $route['sign-up'] = 'Auth_shop/signup';
+$route['set-register'] = 'Auth_shop/setRegister'; // Ajax
 $route['forgot-password'] = 'Auth_shop/forgotPassword';
+$route['set-forgot-password'] = 'Auth_shop/setForgotPassword'; // Ajax
 $route['sign-out'] = 'Auth_shop/logout';
 $route['activate-account'] = 'Auth_shop/activate';
 $route['reset-password'] = 'Auth_shop/resetPassword';

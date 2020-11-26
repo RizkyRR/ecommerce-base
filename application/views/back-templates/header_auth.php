@@ -25,6 +25,41 @@
 
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+  <!-- JavaScript -->
+  <!-- jQuery 3 -->
+  <script src="<?php echo base_url(); ?>back-assets/bower_components/jquery/dist/jquery.min.js"></script>
+
+  <!-- Bootstrap 3.3.7 -->
+  <script src="<?php echo base_url(); ?>back-assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <!-- iCheck -->
+  <script src="<?php echo base_url(); ?>back-assets/plugins/iCheck/icheck.min.js"></script>
+
+  <script>
+    $(function() {
+      $('input').iCheck({
+        checkboxClass: 'icheckbox_square-blue',
+        radioClass: 'iradio_square-blue',
+        increaseArea: '20%' /* optional */
+      });
+    });
+  </script>
+
+  <script>
+    window.setTimeout(function() {
+      $(".alert").fadeTo(3000, 500).slideUp(500, function() {
+        $(this).remove();
+      });
+    })
+  </script>
+
+  <!-- Validator -->
+  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/dist/additional-methods.min.js"></script>
+
+  <!-- Sweet Alert Js -->
+  <script src="<?php echo base_url(); ?>front-assets/js/sweetalert2.all.min.js"></script>
 </head>
 
 <body class="hold-transition register-page">

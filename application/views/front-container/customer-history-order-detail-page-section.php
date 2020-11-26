@@ -226,10 +226,10 @@
                   title: response.message,
                   showConfirmButton: false,
                   timer: 5000,
+                }).then(function() {
+                  window.location.reload(false);
+                  // window.location.href = "<?php echo base_url() ?>customer-history-purchase-order";
                 });
-
-                window.location.reload(false);
-                // window.location.href = "<?php echo base_url() ?>customer-history-purchase-order";
               } else {
                 Swal.fire({
                   icon: "error",

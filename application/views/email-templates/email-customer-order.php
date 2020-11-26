@@ -1,157 +1,690 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="description" content="Fashi Template">
-  <meta name="keywords" content="Fashi, unica, creative, html">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="supported-color-schemes" content="light dark" />
+  <title></title>
+  <style type="text/css" rel="stylesheet" media="all">
+    /* Base ------------------------------ */
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css?family=Muli:300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    @import url("https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap");
 
-  <!-- Css Styles -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    body {
+      width: 100% !important;
+      height: 100%;
+      margin: 0;
+      -webkit-text-size-adjust: none;
+    }
+
+    a {
+      color: #3869d4;
+    }
+
+    a img {
+      border: none;
+    }
+
+    td {
+      word-break: break-word;
+    }
+
+    .preheader {
+      display: none !important;
+      visibility: hidden;
+      mso-hide: all;
+      font-size: 1px;
+      line-height: 1px;
+      max-height: 0;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+
+    /* Type ------------------------------ */
+
+    body,
+    td,
+    th {
+      font-family: "Nunito Sans", Helvetica, Arial, sans-serif;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #333333;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #333333;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    h3 {
+      margin-top: 0;
+      color: #333333;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    td,
+    th {
+      font-size: 16px;
+    }
+
+    p,
+    ul,
+    ol,
+    blockquote {
+      margin: 0.4em 0 1.1875em;
+      font-size: 16px;
+      line-height: 1.625;
+    }
+
+    p.sub {
+      font-size: 13px;
+    }
+
+    /* Utilities ------------------------------ */
+
+    .align-right {
+      text-align: right;
+    }
+
+    .align-left {
+      text-align: left;
+    }
+
+    .align-center {
+      text-align: center;
+    }
+
+    /* Buttons ------------------------------ */
+
+    .button {
+      background-color: #3869d4;
+      border-top: 10px solid #3869d4;
+      border-right: 18px solid #3869d4;
+      border-bottom: 10px solid #3869d4;
+      border-left: 18px solid #3869d4;
+      display: inline-block;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 3px;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
+      -webkit-text-size-adjust: none;
+      box-sizing: border-box;
+    }
+
+    .button--green {
+      background-color: #22bc66;
+      border-top: 10px solid #22bc66;
+      border-right: 18px solid #22bc66;
+      border-bottom: 10px solid #22bc66;
+      border-left: 18px solid #22bc66;
+    }
+
+    .button--red {
+      background-color: #ff6136;
+      border-top: 10px solid #ff6136;
+      border-right: 18px solid #ff6136;
+      border-bottom: 10px solid #ff6136;
+      border-left: 18px solid #ff6136;
+    }
+
+    @media only screen and (max-width: 500px) {
+      .button {
+        width: 100% !important;
+        text-align: center !important;
+      }
+    }
+
+    /* Attribute list ------------------------------ */
+
+    .attributes {
+      margin: 0 0 21px;
+    }
+
+    .attributes_content {
+      background-color: #f4f4f7;
+      padding: 16px;
+    }
+
+    .attributes_item {
+      padding: 0;
+    }
+
+    /* Related Items ------------------------------ */
+
+    .related {
+      width: 100%;
+      margin: 0;
+      padding: 25px 0 0 0;
+      -premailer-width: 100%;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+    }
+
+    .related_item {
+      padding: 10px 0;
+      color: #cbcccf;
+      font-size: 15px;
+      line-height: 18px;
+    }
+
+    .related_item-title {
+      display: block;
+      margin: 0.5em 0 0;
+    }
+
+    .related_item-thumb {
+      display: block;
+      padding-bottom: 10px;
+    }
+
+    .related_heading {
+      border-top: 1px solid #cbcccf;
+      text-align: center;
+      padding: 25px 0 10px;
+    }
+
+    /* Discount Code ------------------------------ */
+
+    .discount {
+      width: 100%;
+      margin: 0;
+      padding: 24px;
+      -premailer-width: 100%;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+      background-color: #f4f4f7;
+      border: 2px dashed #cbcccf;
+    }
+
+    .discount_heading {
+      text-align: center;
+    }
+
+    .discount_body {
+      text-align: center;
+      font-size: 15px;
+    }
+
+    /* Social Icons ------------------------------ */
+
+    .social {
+      width: auto;
+    }
+
+    .social td {
+      padding: 0;
+      width: auto;
+    }
+
+    .social_icon {
+      height: 20px;
+      margin: 0 8px 10px 8px;
+      padding: 0;
+    }
+
+    /* Data table ------------------------------ */
+
+    .purchase {
+      width: 100%;
+      margin: 0;
+      padding: 35px 0;
+      -premailer-width: 100%;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+    }
+
+    .purchase_content {
+      width: 100%;
+      margin: 0;
+      padding: 25px 0 0 0;
+      -premailer-width: 100%;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+    }
+
+    .purchase_item {
+      padding: 10px 0;
+      color: #51545e;
+      font-size: 15px;
+      line-height: 18px;
+    }
+
+    .purchase_heading {
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eaeaec;
+    }
+
+    .purchase_heading p {
+      margin: 0;
+      color: #85878e;
+      font-size: 12px;
+    }
+
+    .purchase_footer {
+      padding-top: 15px;
+      border-top: 1px solid #eaeaec;
+    }
+
+    .purchase_total {
+      margin: 0;
+      text-align: right;
+      font-weight: bold;
+      color: #333333;
+    }
+
+    .purchase_total--label {
+      padding: 0 15px 0 0;
+    }
+
+    body {
+      background-color: #f4f4f7;
+      color: #51545e;
+    }
+
+    p {
+      color: #51545e;
+    }
+
+    p.sub {
+      color: #6b6e76;
+    }
+
+    .email-wrapper {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      -premailer-width: 100%;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+      background-color: #f4f4f7;
+    }
+
+    .email-content {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      -premailer-width: 100%;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+    }
+
+    /* Masthead ----------------------- */
+
+    .email-masthead {
+      padding: 25px 0;
+      text-align: center;
+    }
+
+    .email-masthead_logo {
+      width: 94px;
+    }
+
+    .email-masthead_name {
+      font-size: 16px;
+      font-weight: bold;
+      color: #a8aaaf;
+      text-decoration: none;
+      text-shadow: 0 1px 0 white;
+    }
+
+    /* Body ------------------------------ */
+
+    .email-body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      -premailer-width: 100%;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+      background-color: #ffffff;
+    }
+
+    .email-body_inner {
+      width: 570px;
+      margin: 0 auto;
+      padding: 0;
+      -premailer-width: 570px;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+      background-color: #ffffff;
+    }
+
+    .email-footer {
+      width: 570px;
+      margin: 0 auto;
+      padding: 0;
+      -premailer-width: 570px;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+      text-align: center;
+    }
+
+    .email-footer p {
+      color: #6b6e76;
+    }
+
+    .body-action {
+      width: 100%;
+      margin: 30px auto;
+      padding: 0;
+      -premailer-width: 100%;
+      -premailer-cellpadding: 0;
+      -premailer-cellspacing: 0;
+      text-align: center;
+    }
+
+    .body-sub {
+      margin-top: 25px;
+      padding-top: 25px;
+      border-top: 1px solid #eaeaec;
+    }
+
+    .content-cell {
+      padding: 35px;
+    }
+
+    /*Media Queries ------------------------------ */
+
+    @media only screen and (max-width: 600px) {
+
+      .email-body_inner,
+      .email-footer {
+        width: 100% !important;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+
+      body,
+      .email-body,
+      .email-body_inner,
+      .email-content,
+      .email-wrapper,
+      .email-masthead,
+      .email-footer {
+        background-color: #333333 !important;
+        color: #fff !important;
+      }
+
+      p,
+      ul,
+      ol,
+      blockquote,
+      h1,
+      h2,
+      h3,
+      span,
+      .purchase_item {
+        color: #fff !important;
+      }
+
+      .attributes_content,
+      .discount {
+        background-color: #222 !important;
+      }
+
+      .email-masthead_name {
+        text-shadow: none !important;
+      }
+    }
+
+    :root {
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
+    }
+  </style>
+  <!--[if mso]>
+      <style type="text/css">
+        .f-fallback {
+          font-family: Arial, sans-serif;
+        }
+      </style>
+    <![endif]-->
 </head>
 
 <body>
-
-  <div class="row">
-    <div class="container">
-      <div class="card mb-3 shadow">
-        <div class="card-header">
-          Invoice
-          <strong><?php echo $data_order['invoice_order'] ?></strong>
-          <span class="float-right"> <strong>Status:</strong> <?php echo $data_order['status_name'] ?></span>
-
-        </div>
-        <div class="card-body">
-          <div class="row mb-4">
-            <div class="col-sm-6">
-              <h6 class="mb-3">From:</h6>
-              <div>
-                <strong><?php echo $company['company_name'] ?></strong>
-              </div>
-              <div><?php echo $company_address['street_name'] ?>, <?php echo $company_address['city_name'] ?>, <?php echo $company_address['province'] ?></div>
-              <div>Email: <?php echo $company['business_email'] ?></div>
-              <div>Phone: <?php echo $company['phone'] ?></div>
-
-              <?php if ($company_bank != null) : ?>
-                <?php foreach ($company_bank as $val) : ?>
-                  <div><strong><?php echo $val['bank_name'] ?>: <?php echo $val['account'] ?> (<?php echo $val['account_holder_name'] ?>)</strong></div>
-                <?php endforeach; ?>
-              <?php endif; ?>
-            </div>
-
-            <div class="col-sm-6">
-              <h6 class="mb-3">To:</h6>
-              <div>
-                <strong><?php echo $customer['customer_name'] ?></strong>
-              </div>
-              <div><?php echo $customer['street_name'] ?>, <?php echo $customer['city_name'] ?>, <?php echo $customer['province'] ?></div>
-              <div>Email: <?php echo $customer['email'] ?></div>
-              <div>Phone: <?php echo $customer['customer_phone'] ?></div>
-            </div>
-          </div>
-
-          <div class="table-responsive-sm">
-            <table class="table table-striped">
-              <thead>
+  <span class="preheader">This is an invoice for your purchase on <?php echo date('d M Y H:i:s', strtotime($data_order['created_date'])); ?>. Please
+    submit payment by <?php echo date('d M Y H:i:s', strtotime($data_order['created_date'] . ' +1 day')); ?></span>
+  <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center">
+        <table class="email-content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          <tr>
+            <td class="email-masthead">
+              <a href="<?php echo base_url(); ?>profile" class="f-fallback email-masthead_name">
+                <?php echo $company['company_name'] ?>
+              </a>
+            </td>
+          </tr>
+          <!-- Email Body -->
+          <tr>
+            <td class="email-body" width="100%" cellpadding="0" cellspacing="0">
+              <table class="email-body_inner" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
+                <!-- Body content -->
                 <tr>
-                  <th class="center">#</th>
-                  <th>Item Name</th>
-                  <th>Weight</th>
-                  <th class="right">Price</th>
-                  <th class="center">Qty</th>
-                  <th class="right">Total</th>
+                  <td class="content-cell">
+                    <div class="f-fallback">
+                      <h1>Hi <?php echo $customer['customer_name'] ?>,</h1>
+                      <p>
+                        <?php echo $message; ?>
+                      </p>
+                      <table class="attributes" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                        <tr>
+                          <td class="attributes_content">
+                            <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                              <tr>
+                                <td class="attributes_item">
+                                  <span class="f-fallback">
+                                    <strong>Amount Due:</strong> Rp. <?php echo number_format($data_order['net_amount'], 0, ',', '.') ?>
+                                  </span>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <td class="attributes_item">
+                                  <span class="f-fallback">
+                                    <strong>Due By:</strong> <?php echo date('d M Y H:i:s', strtotime($data_order['created_date'] . ' +1 day')); ?>
+                                  </span>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <td class="attributes_item">
+                                  <span class="f-fallback">
+
+                                    <?php if ($company_bank != null) : ?>
+                                      <strong>Bank Transfer:</strong>
+
+                                      <?php foreach ($company_bank as $val) : ?>
+                                        <strong><?php echo $val['bank_name'] ?>: <?php echo $val['account'] ?> (<?php echo $val['account_holder_name'] ?>)</strong>
+                                      <?php endforeach; ?>
+                                    <?php endif; ?>
+
+                                  </span>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                      <table class="purchase" width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td>
+                            <h3><?php echo $data_order['invoice_order'] ?></h3>
+                          </td>
+                          <td>
+                            <h3><?php echo $data_order['status_name'] ?></h3>
+                          </td>
+                          <td>
+                            <h3 class="align-right"><?php echo date('d M Y H:i:s', strtotime($data_order['created_date'])); ?></h3>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td colspan="3">
+                            <table class="purchase_content" width="100%" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <th class="purchase_heading" align="left">
+                                  <p class="f-fallback">Product</p>
+                                </th>
+
+                                <th class="purchase_heading" align="right">
+                                  <p class="f-fallback">Amount</p>
+                                </th>
+                              </tr>
+
+                              <?php if ($detail_order != null && $detail_order != 0) : ?>
+                                <?php $no = 1; ?>
+                                <?php foreach ($detail_order as $val) : ?>
+                                  <tr>
+                                    <td width="80%" class="purchase_item">
+                                      <span class="f-fallback"><?php echo $val['product_name'] ?> (<?php echo $val['qty_order'] ?> x Rp. <?php echo number_format($val['price'], 0, ',', '.') ?>)</span>
+                                    </td>
+
+                                    <td class="align-right" width="20%" class="purchase_item">
+                                      <span class="f-fallback">Rp. <?php echo number_format($val['amount'], 0, ',', '.') ?></span>
+                                    </td>
+                                  </tr>
+                                <?php endforeach; ?>
+                              <?php endif; ?>
+
+                              <tr>
+                                <td width="40%" class="purchase_footer" valign="middle">
+                                  <p class="f-fallback purchase_total purchase_total--label">
+                                    Sub-total
+                                  </p>
+                                </td>
+                                <td width="60%" class="purchase_footer" valign="middle">
+                                  <p class="f-fallback purchase_total">
+                                    Rp. <?php echo number_format($data_order['gross_amount'], 0, ',', '.') ?>
+                                  </p>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <?php if ($data_order['ship_amount'] != null && $data_order['ship_amount'] != 0) : ?>
+                                  <td width="40%" valign="middle">
+                                    <p class="f-fallback purchase_total purchase_total--label">
+                                      Shipping cost
+                                    </p>
+                                  </td>
+
+                                  <td width="60%" valign="middle">
+                                    <p class="f-fallback purchase_total">
+                                      Rp. <?php echo number_format($data_order['ship_amount'], 0, ',', '.') ?> (<?php echo $data_order['courier'] ?> - <?php echo $data_order['service'] ?>)
+                                    </p>
+                                  </td>
+                                <?php endif; ?>
+                              </tr>
+
+                              <tr>
+                                <td width="40%" valign="middle">
+                                  <p class="f-fallback purchase_total purchase_total--label">
+                                    VAT (<?php echo $data_order['vat_charge_rate'] ?>%)
+                                  </p>
+                                </td>
+
+                                <td width="60%" valign="middle">
+                                  <p class="f-fallback purchase_total">
+                                    Rp. <?php echo number_format($data_order['vat_charge_val'], 0, ',', '.') ?>
+                                  </p>
+                                </td>
+                              </tr>
+
+
+                              <tr>
+                                <?php if ($data_order['coupon_charge_rate'] != null && $data_order['coupon_charge_rate'] != 0) : ?>
+                                  <td width="40%" valign="middle">
+                                    <p class="f-fallback purchase_total purchase_total--label">
+                                      Coupon (<?php echo $data_order['coupon_charge_rate'] ?>%)
+                                    </p>
+                                  </td>
+
+                                  <td width="60%" valign="middle">
+                                    <p class="f-fallback purchase_total">
+                                      Rp. <?php echo number_format($data_order['coupon_charge'], 0, ',', '.') ?>
+                                    </p>
+                                  </td>
+                                <?php endif; ?>
+                              </tr>
+
+                              <tr>
+                                <td width="40%" valign="middle">
+                                  <p class="f-fallback purchase_total purchase_total--label">
+                                    Total
+                                  </p>
+                                </td>
+
+                                <td width="60%" valign="middle">
+                                  <p class="f-fallback purchase_total">
+                                    Rp. <?php echo number_format($data_order['net_amount'], 0, ',', '.') ?>
+                                  </p>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                      <p>
+                        If you have any questions about this invoice, simply
+                        reply to this email or reach out to our
+                        <a href="#">support team</a> for help.
+                      </p>
+                      <p>Cheers, <br />The <?php echo $company['company_name'] ?> Team</p>
+                      <!-- Sub copy -->
+                      <table class="body-sub" role="presentation">
+                        <tr>
+                          <td>
+                            <p class="f-fallback sub">
+                              If you’re having trouble with the button above,
+                              copy and paste the URL below into your web
+                              browser.
+                            </p>
+                            <p class="f-fallback sub">#</p>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-
-                <?php if ($detail_order != null && $detail_order != 0) : ?>
-                  <?php $no = 1; ?>
-                  <?php foreach ($detail_order as $val) : ?>
-                    <tr>
-                      <td class="center"><?php echo $no++; ?></td>
-
-                      <td class="left strong"><?php echo $val['product_name'] ?></td>
-
-                      <td class="center"><?php echo $val['weight_order'] ?> Gram</td>
-                      <td class="right">Rp. <?php echo number_format($val['price'], 0, ',', '.') ?></td>
-                      <td class="center"><?php echo $val['qty_order'] ?></td>
-                      <td class="right">Rp. <?php echo number_format($val['amount'], 0, ',', '.') ?></td>
-                    </tr>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-
-              </tbody>
-            </table>
-          </div>
-          <div class="row">
-
-            <div class="col-lg-6 col-sm-5 ml-auto">
-              <table class="table table-clear">
-                <tbody>
-                  <tr>
-                    <td class="left">
-                      <strong>Sub-total</strong>
-                    </td>
-                    <td class="right">Rp. <?php echo number_format($data_order['gross_amount'], 0, ',', '.') ?></td>
-                  </tr>
-
-                  <?php if ($data_order['ship_amount'] != null && $data_order['ship_amount'] != 0) : ?>
-                    <tr>
-                      <td class="left">
-                        <strong>Shipping cost</strong>
-                      </td>
-                      <td class="right">Rp. <?php echo number_format($data_order['ship_amount'], 0, ',', '.') ?> (<?php echo $data_order['courier'] ?> - <?php echo $data_order['service'] ?>)</td>
-                    </tr>
-                  <?php endif; ?>
-
-                  <tr>
-                    <td class="left">
-                      <strong>VAT (<?php echo $data_order['vat_charge_rate'] ?>%)</strong>
-                    </td>
-                    <td class="right">Rp. <?php echo number_format($data_order['vat_charge_val'], 0, ',', '.') ?></td>
-                  </tr>
-
-                  <?php if ($data_order['coupon_charge_rate'] != null && $data_order['coupon_charge_rate'] != 0) : ?>
-                    <tr>
-                      <td class="left">
-                        <strong>Coupon (<?php echo $data_order['coupon_charge_rate'] ?>%)</strong>
-                      </td>
-                      <td class="right">Rp. <?php echo number_format($data_order['coupon_charge'], 0, ',', '.') ?></td>
-                    </tr>
-                  <?php endif; ?>
-
-                  <tr>
-                    <td class="left">
-                      <strong>Total</strong>
-                    </td>
-                    <td class="right">
-                      <strong>Rp. <?php echo number_format($data_order['net_amount'], 0, ',', '.') ?></strong>
-                    </td>
-                  </tr>
-                </tbody>
               </table>
-
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Main content from side menu customer section end -->
-
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td class="content-cell" align="center">
+                    <p class="f-fallback sub align-center">
+                      &copy; <?php echo date("Y") ?> <?php echo $company['company_name'] ?>. All rights reserved.
+                    </p>
+                    <p class="f-fallback sub align-center">
+                      <?php echo $company['company_name'] ?>
+                      <br /><?php echo $company_address['street_name'] ?>, <?php echo $company_address['city_name'] ?>, <?php echo $company_address['province'] ?><br /><?php echo $company['phone'] ?>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 
 </html>

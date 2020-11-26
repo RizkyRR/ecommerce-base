@@ -279,6 +279,10 @@ class Order_retur extends CI_Controller
         $dataReturn = $this->customerPurchase_m->getDataPurchaseReturnByID($return_id, $email);
         $info['data_return'] = $dataReturn;
         $info['invoice_return'] = $dataReturn['invoice_return'];
+        $info['return_date'] = date('d M Y H:i:s', strtotime($dataReturn['created_date']));
+
+        $info['message'] = 'The order return has been approved by seller.';
+
         $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
         $info['customer_email'] = $dataCustomer['email'];
         $info['customer'] = $dataCustomer;
@@ -377,6 +381,10 @@ class Order_retur extends CI_Controller
       $dataReturn = $this->customerPurchase_m->getDataPurchaseReturnByID($return_id, $email);
       $info['data_return'] = $dataReturn;
       $info['invoice_return'] = $dataReturn['invoice_return'];
+      $info['return_date'] = date('d M Y H:i:s', strtotime($dataReturn['created_date']));
+
+      $info['message'] = 'The order return has been completed.';
+
       $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
       $info['customer_email'] = $dataCustomer['email'];
       $info['customer'] = $dataCustomer;
@@ -575,6 +583,10 @@ class Order_retur extends CI_Controller
     $dataReturn = $this->customerPurchase_m->getDataPurchaseReturnByID($return_id, $email);
     $info['data_return'] = $dataReturn;
     $info['invoice_return'] = $dataReturn['invoice_return'];
+    $info['return_date'] = date('d M Y H:i:s', strtotime($dataReturn['created_date']));
+
+    $info['message'] = 'Your order return has been canceled by Admin!';
+
     $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
     $info['customer_email'] = $dataCustomer['email'];
     $info['customer'] = $dataCustomer;

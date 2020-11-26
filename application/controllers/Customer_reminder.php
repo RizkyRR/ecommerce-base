@@ -122,11 +122,16 @@ class Customer_reminder extends CI_Controller
         $info['company'] = $dataCompany;
         $info['company_name'] = $dataCompany['company_name'];
         $info['company_address'] = $this->company_m->getFullAdressCustomer(1);
-        $info['company_bank'] = $this->company_m->getCompanyBankAccount(1);
+        $info['company_bank'] = '';
 
         $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($getOrderID, $email);
         $info['data_order'] = $dataOrder;
         $info['invoice_order'] = $dataOrder['invoice_order'];
+        $info['purchase_due'] = date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+        $info['purchase_date'] = date('d M Y H:i:s', strtotime($dataOrder['created_date']));
+
+        $info['message'] = 'Your payment has been canceled. Please do not pay for this order!';
+
         $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
         $info['customer_email'] = $dataCustomer['email'];
         $info['customer'] = $dataCustomer;
@@ -168,6 +173,11 @@ class Customer_reminder extends CI_Controller
         $dataOrder = $this->customerPurchase_m->getDataPurchaseOrderByID($getOrderID, $email);
         $info['data_order'] = $dataOrder;
         $info['invoice_order'] = $dataOrder['invoice_order'];
+        $info['purchase_due'] = date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+        $info['purchase_date'] = date('d M Y H:i:s', strtotime($dataOrder['created_date']));
+
+        $info['message'] = 'Waiting for payment before ' . date('d M Y H:i:s', strtotime($dataOrder['created_date'] . ' +1 day'));
+
         $dataCustomer = $this->customerPurchase_m->getDataCustomerPurchaseByID($email);
         $info['customer_email'] = $dataCustomer['email'];
         $info['customer'] = $dataCustomer;

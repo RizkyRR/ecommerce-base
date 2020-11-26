@@ -26,7 +26,7 @@
             </div>
           <?php endif; ?>
 
-          <form action="<?php echo base_url(); ?>sign-in" method="POST" enctype="multipart/form-data">
+          <form id="form-signin-store" action="" method="POST" enctype="multipart/form-data">
             <div class="group-input">
               <label for="username">Email address *</label>
               <input type="text" id="email" name="email" value="<?php echo set_value('email') ?>">
@@ -35,8 +35,8 @@
 
             <div class="group-input">
               <label for="pass">Password *</label>
-              <input type="password" id="pass" name="pass">
-              <span class="help-block"><?php echo form_error('pass') ?></span>
+              <input type="password" id="password" name="password">
+              <span class="help-block"><?php echo form_error('password') ?></span>
             </div>
 
             <div class="group-input gi-check">
@@ -45,7 +45,8 @@
               </div>
             </div>
 
-            <button type="submit" class="site-btn login-btn">Sign In</button>
+            <button type="button" class="site-btn login-btn" id="btnSignIn">Sign In</button>
+
           </form>
           <div class="switch-login">
             <a href="<?php echo base_url(); ?>sign-up" class="or-login">Or Create An Account</a>
@@ -56,3 +57,132 @@
   </div>
 </div>
 <!-- Register Form Section End -->
+
+<script>
+  $(document).ready(function() {
+    $.validator.setDefaults({
+      highlight: function(element) {
+        $(element).closest(".form-group").addClass("has-error");
+      },
+      unhighlight: function(element) {
+        $(element).closest(".form-group").removeClass("has-error");
+      },
+      errorElement: "span",
+      errorClass: "error-message",
+      errorPlacement: function(error, element) {
+        if (element.parent(".input-group").length) {
+          error.insertAfter(element.parent()); // radio/checkbox?
+        } else if (element.hasClass("select2-hidden-accessible")) {
+          /* else if (element.hasClass('select2')) {
+             error.insertAfter(element.next('span')); // select2
+           } */
+          error.insertAfter(element.next("span.select2")); // select2 new ver
+        } else {
+          error.insertAfter(element); // default
+        }
+      },
+    });
+
+    // https://stackoverflow.com/questions/37606285/how-to-validate-email-using-jquery-validate/37606312
+    $.validator.addMethod(
+      /* The value you can use inside the email object in the validator. */
+      "regex",
+
+      /* The function that tests a given string against a given regEx. */
+      function(value, element, regexp) {
+        /* Check if the value is truthy (avoid null.constructor) & if it's not a RegEx. (Edited: regex --> regexp)*/
+
+        if (regexp && regexp.constructor != RegExp) {
+          /* Create a new regular expression using the regex argument. */
+          regexp = new RegExp(regexp);
+        } else if (regexp.global) regexp.lastIndex = 0;
+
+        /* Check whether the argument is global and, if so set its last index to 0. */
+
+        /* Return whether the element is optional or the result of the validation. */
+        return this.optional(element) || regexp.test(value);
+      }
+    );
+
+    var $validator = $("#form-signin-store").validate({
+      focusInvalid: false,
+      rules: {
+        email: {
+          required: true,
+          email: true,
+          regex: /^\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i,
+        },
+        password: {
+          required: true,
+        }
+      },
+      messages: {
+        email: {
+          required: 'Email can not be empty!',
+        },
+        password: {
+          required: 'Password can not be empty!',
+        }
+      }
+    });
+
+    $('#btnSignIn').click(function() {
+      $('#btnSignIn').text('Signing...'); //change button text
+      $('#btnSignIn').attr('disabled', true); //set button disable 
+
+      var $valid = $("#form-signin-store").valid();
+
+      if (!$valid) {
+        $("#btnSignIn").text("Sign In"); //change button text
+        $("#btnSignIn").attr("disabled", false); //set button enable
+        return false;
+      } else {
+        // ajax adding data to database
+        $.ajax({
+          url: '<?php echo base_url(); ?>set-sign-in',
+          type: "POST",
+          data: $('#form-signin-store').serialize(),
+          dataType: "JSON",
+          success: function(data) {
+            if (data.status == true) //if success close modal and reload ajax table
+            {
+              Swal.fire({
+                  icon: 'success',
+                  title: 'Sign in success!',
+                  text: 'You will be directed in 3 seconds',
+                  timer: 3000,
+                  showCancelButton: false,
+                  showConfirmButton: false
+                })
+                .then(function() {
+                  window.location.href = "<?php echo base_url() ?>profile";
+                });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: data.message,
+                showConfirmButton: false,
+                timer: 3000,
+              });
+            }
+
+            $('#btnSignIn').text('Sign In'); //change button text
+            $('#btnSignIn').attr('disabled', false); //set button enable 
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            Swal.fire({
+              icon: "error",
+              title: 'Error Sign In, please try again!',
+              showConfirmButton: false,
+              timer: 3000,
+            });
+
+            $('#btnSignIn').text('Sign In'); //change button text
+            $('#btnSignIn').attr('disabled', false); //set button enable 
+
+          }
+        });
+      }
+    })
+  })
+</script>

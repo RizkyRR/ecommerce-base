@@ -34,11 +34,13 @@ class AuthShop_m extends CI_Model
   public function insertRegister($data)
   {
     $this->db->insert('customers', $data);
+    return $this->db->affected_rows();
   }
 
   public function insertToken($data)
   {
     $this->db->insert('customer_token', $data);
+    return $this->db->affected_rows();
   }
 
   public function updateCustomer($data)
@@ -68,6 +70,8 @@ class AuthShop_m extends CI_Model
   public function insertChangePass($data)
   {
     $this->db->insert('customer_token', $data);
+
+    return $this->db->affected_rows();
   }
 
   public function updateCustomerPass($data, $value)
