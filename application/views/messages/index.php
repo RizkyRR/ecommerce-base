@@ -127,6 +127,8 @@
 
         $('[name="message"]').val(data.message).attr('readonly', true); // tambahan
 
+        table_message.ajax.reload(null, false);
+
         $('#modal-detail-message').modal('show'); // show bootstrap modal when complete loaded
         $('.modal-title').text('Pay Report Detail Message'); // Set title to Bootstrap modal title
 

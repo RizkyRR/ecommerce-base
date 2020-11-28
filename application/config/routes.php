@@ -84,6 +84,9 @@ $route['get-check-hot-products'] = 'Home_shop/getCheckHotProduct';
 $route['set-hot-products'] = 'Home_shop/setHotProducts';
 $route['get-hot-product-price'] = 'Home_shop/getHotProductPrice';
 $route['get-hot-product-sale'] = 'Home_shop/getHotProductSale';
+$route['company-about'] = 'Home_shop/aboutCompany';
+$route['company-contact'] = 'Home_shop/contactCompany';
+$route['send-message'] = 'home_shop/sendMessage';
 
 $route['product-section'] = 'Product_shop';
 $route['product-section/(:any)'] = 'Product_shop/index';

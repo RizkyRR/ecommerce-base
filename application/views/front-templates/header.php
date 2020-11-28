@@ -137,7 +137,7 @@
         <div class="row">
           <div class="col-lg-2 col-md-2">
             <div class="logo">
-              <a href="<?php echo base_url(); ?>">
+              <a href="<?php echo base_url(); ?>home">
                 <img src="<?php echo base_url(); ?>image/logo/<?php echo $company['image'] ?>" alt="">
               </a>
             </div>
@@ -218,10 +218,10 @@
         </div>
         <nav class="nav-menu mobile-menu">
           <ul>
-            <li><a href="<?php echo base_url(); ?>">Home</a></li>
+            <li><a href="<?php echo base_url(); ?>home">Home</a></li>
             <li><a href="<?php echo base_url(); ?>product-section">Shop</a></li>
-            <li><a href="<?php echo base_url(); ?>">Store</a></li>
-            <li><a href="<?php echo base_url(); ?>">FAQ</a></li>
+            <li><a href="<?php echo base_url(); ?>company-about">About Us</a></li>
+            <li><a href="<?php echo base_url(); ?>company-contact">Contact Us</a></li>
           </ul>
         </nav>
         <div id="mobile-menu-wrap"></div>

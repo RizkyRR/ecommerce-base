@@ -173,6 +173,14 @@ class Product_m extends CI_Model
     $this->db->delete('product_slugs');
   }
 
+  public function getSlugToProductID($slug)
+  {
+    $this->db->where('slug', $slug);
+    $query = $this->db->get('products');
+
+    return $query->row_array();
+  }
+
   public function insert($data)
   {
     $this->db->insert('products', $data);
@@ -650,11 +658,12 @@ class Product_m extends CI_Model
 
   public function getAllProductShop($limit, $offset, $keyword, $sort, $type_sort)
   {
-    $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
+    $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_brands.id AS id_brand, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
     $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -663,6 +672,7 @@ class Product_m extends CI_Model
       $this->db->like('products.id', $keyword);
       $this->db->or_like('category_name', $keyword);
       $this->db->or_like('product_name', $keyword);
+      $this->db->or_like('brand_name', $keyword);
     }
 
     $this->db->order_by('products.' . $sort, $type_sort);
@@ -677,11 +687,12 @@ class Product_m extends CI_Model
 
   public function getProductShopByID($id)
   {
-    $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
+    $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_brands.id AS id_brand, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
     $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -695,11 +706,12 @@ class Product_m extends CI_Model
 
   public function getAllProductCategoryShop($limit, $offset, $category, $sorting)
   {
-    $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
+    $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_brands.id AS id_brand, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
     $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -716,10 +728,11 @@ class Product_m extends CI_Model
 
   public function getDetailProductShop($id)
   {
-    $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_discounts.id AS id_discount, product_details.id AS id_detail'); //*
+    $this->db->select('*, products.id AS id_product, product_categories.id As id_category, product_brands.id AS id_brand, product_discounts.id AS id_discount, product_details.id AS id_detail'); //*
 
     $this->db->from('products');
     $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
 
@@ -748,12 +761,13 @@ class Product_m extends CI_Model
   // ONLY AJAX PURPOSES
   public function getScrollDataProductShop($limit, $start)
   {
-    $this->db->select('*, COUNT(products.id) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
+    $this->db->select('*, COUNT(products.id) as total, products.id AS id_product, product_categories.id As id_category, product_brands.id AS id_brand, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     // $this->db->select('*, products.id AS id_product, product_details.id AS id_detail'); 
     $this->db->from('products');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
     $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -776,11 +790,12 @@ class Product_m extends CI_Model
 
   public function getButtonDataProductShop($offset, $limit)
   {
-    $this->db->select('*, COUNT(products.id) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
+    $this->db->select('*, COUNT(products.id) as total, products.id AS id_product, product_categories.id As id_category, product_brands.id AS id_brand, product_details.id AS id_detail, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
     $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');
@@ -858,12 +873,13 @@ class Product_m extends CI_Model
 
   public function getAllWishlistProductShop($limit, $offset, $email)
   {
-    $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_details.id AS id_detail, customer_wishlists.id AS id_wishlist, product_discounts.id AS id_discount'); //*
+    $this->db->select('*, COUNT(*) as total, products.id AS id_product, product_categories.id As id_category, product_brands.id AS id_brand, product_details.id AS id_detail, customer_wishlists.id AS id_wishlist, product_discounts.id AS id_discount'); //*
 
     $this->db->from('products');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
     $this->db->join('customer_wishlists', 'customer_wishlists.product_id = products.id', 'left');
     $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
+    $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
     $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left'); //*
 
     $this->db->group_by('product_details.product_id');

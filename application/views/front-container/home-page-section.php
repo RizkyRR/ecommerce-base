@@ -109,12 +109,12 @@
                       </a>
                     </li> -->
 
-                    <li class="quick-view"><a href="<?php echo base_url(); ?>product-detail/<?php echo $val['id_product'] ?>">+ See Details</a></li>
+                    <li class="quick-view"><a href="<?php echo base_url(); ?>product-detail/<?php echo $val['slug'] ?>">+ See Details</a></li>
                   </ul>
                 </div>
                 <div class="pi-text">
                   <div class="catagory-name"><?php echo $val['category_name'] ?></div>
-                  <a href="<?php echo base_url(); ?>product-detail/<?php echo $val['id_product'] ?>">
+                  <a href="<?php echo base_url(); ?>product-detail/<?php echo $val['slug'] ?>">
                     <h5><?php echo $val['product_name'] ?></h5>
                   </a>
                   <div class="product-price">
@@ -191,12 +191,12 @@
                       </a>
                     </li> -->
 
-                    <li class="quick-view"><a href="<?php echo base_url(); ?>product-detail/<?php echo $val['id_product'] ?>">+ See Details</a></li>
+                    <li class="quick-view"><a href="<?php echo base_url(); ?>product-detail/<?php echo $val['slug'] ?>">+ See Details</a></li>
                   </ul>
                 </div>
                 <div class="pi-text">
                   <div class="catagory-name"><?php echo $val['category_name'] ?></div>
-                  <a href="<?php echo base_url(); ?>product-detail/<?php echo $val['id_product'] ?>">
+                  <a href="<?php echo base_url(); ?>product-detail/<?php echo $val['slug'] ?>">
                     <h5><?php echo $val['product_name'] ?></h5>
                   </a>
                   <div class="product-price">

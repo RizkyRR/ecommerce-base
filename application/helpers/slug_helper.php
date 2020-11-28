@@ -2,6 +2,8 @@
 
 function set_slug($text)
 {
+  $ci = &get_instance();
+
   // ganti bukan huruf atau angka dengan -
   $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
 
@@ -20,6 +22,10 @@ function set_slug($text)
   if (empty($text)) {
     return 'n-a';
   }
+
+  $query = $ci->db->where('slug', $text)->get('products');
+  if ($query->num_rows() > 0)
+    $text = $text . '-' . $query->num_rows();
 
   return $text;
 }

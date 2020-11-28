@@ -46,12 +46,12 @@ class Customer_cart extends CI_Controller
 
         $html .= '<tr id="row_' . $i . '">' .
           '<td class="cart-pic">
-              <a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><img style="width: 170px; height: 170px" src="' . base_url() . 'image/product/' . $val['image'] . '" alt=""></a>' .
+              <a href="' . base_url() . 'product-detail/' . $val['slug'] . '"><img style="width: 170px; height: 170px" src="' . base_url() . 'image/product/' . $val['image'] . '" alt=""></a>' .
           '<input type="hidden" name="id_product[]" id="id_product_' . $i . '" value="' . $val['id_product'] . '" readonly>' .
           '</td>' .
 
           '<td class="cart-title">' .
-          '<a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><h5>' . $val['product_name'] . '</h5></a>' .
+          '<a href="' . base_url() . 'product-detail/' . $val['slug'] . '"><h5>' . $val['product_name'] . '</h5></a>' .
           '</td>' .
 
           '<td class="p-price">' . $val['price'] .

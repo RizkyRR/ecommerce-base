@@ -43,11 +43,6 @@
         </table>
       </div>
       <!-- /.box-body -->
-      <!-- <div class="box-footer clearfix">
-        <ul class="pagination pagination-sm no-margin pull-right">
-          <?php echo $pagination; ?>
-        </ul>
-      </div> -->
     </div>
     <!-- /.box -->
 

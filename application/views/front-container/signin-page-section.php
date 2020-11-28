@@ -149,10 +149,26 @@
               Swal.fire({
                   icon: 'success',
                   title: 'Sign in success!',
-                  text: 'You will be directed in 3 seconds',
+                  html: 'You will be directed in <b>3</b> seconds',
                   timer: 3000,
                   showCancelButton: false,
-                  showConfirmButton: false
+                  showConfirmButton: false,
+                  timerProgressBar: true,
+                  willOpen: () => {
+                    Swal.showLoading()
+                    timerInterval = setInterval(() => {
+                      const content = Swal.getContent()
+                      if (content) {
+                        const b = content.querySelector('b')
+                        if (b) {
+                          b.textContent = Swal.getTimerLeft()
+                        }
+                      }
+                    }, 100)
+                  },
+                  willClose: () => {
+                    clearInterval(timerInterval)
+                  }
                 })
                 .then(function() {
                   window.location.href = "<?php echo base_url() ?>profile";

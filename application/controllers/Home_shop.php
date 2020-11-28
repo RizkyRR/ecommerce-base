@@ -131,6 +131,81 @@ class Home_shop extends CI_Controller
       }
     }
   }
+
+  public function aboutCompany()
+  {
+    $info['title'] = "About Us Page";
+    renderFrontTemplate('front-container/about-page-section', $info);
+  }
+
+  public function contactCompany()
+  {
+    $info['title'] = "Contact Us Page";
+    renderFrontTemplate('front-container/contact-page-section', $info);
+  }
+
+  private function _sendEmail($data)
+  {
+    $dataEmail = $this->company_m->getEmail(1);
+    $dataCompany = $this->company_m->getCompanyById(1);
+
+    $config = [
+      'protocol'   => 'smtp',
+      'smtp_host'  => 'ssl://smtp.googlemail.com',
+      'smtp_user'  => $dataEmail['email'],
+      'smtp_pass'  => $dataEmail['password'],
+      'smtp_port'  => 465,
+      'mailtype'  => 'html',
+      'charset'  => 'utf-8',
+      'newline'  => "\r\n"
+    ];
+
+    $this->load->library('email', $config);
+    $this->email->initialize($config);
+
+    $this->email->from($data['email'], 'Customer ' . $dataCompany['company_name'] . ' ' .  $data['name']);
+    $this->email->to($dataEmail['email']);
+    /*$this->email->cc('another@example.com');
+      $this->email->bcc('and@another.com');*/
+
+    $this->email->subject('Message from ' . $data['name'] . ' customer ' . $dataCompany['company_name']);
+
+    $this->email->message($data['message']);
+    $this->email->set_mailtype("html");
+
+    if ($this->email->send()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  public function sendMessage()
+  {
+    $response = array();
+
+    $this->form_validation->set_rules('g_name', 'Your name', 'trim|required');
+    $this->form_validation->set_rules('g_email', 'Your email', 'trim|required|valid_email');
+    $this->form_validation->set_rules('g_message', 'Your message', 'trim|required');
+
+    if ($this->form_validation->run() == TRUE) {
+      $data = array();
+
+      $data['name'] = $this->input->post('g_name');
+      $data['email'] = $this->input->post('g_email');
+      $data['message'] = $this->input->post('g_message');
+
+      $this->_sendEmail($data);
+
+      $response['status'] = TRUE;
+      $response['message'] = 'Your message has been successfully sent. Please be patient waiting for our answer. Thank you!';
+    } else {
+      $response['status'] = FALSE;
+      $response['message'] = validation_errors();
+    }
+
+    echo json_encode($response);
+  }
 }
   
   /* End of file Home_shop.php */

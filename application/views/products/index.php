@@ -164,6 +164,10 @@
         $('#modal-detail-product').modal('show'); // show bootstrap modal when complete loaded
         $('.modal-title').text('Detail Product'); // Set title to Bootstrap modal title
 
+        $('#image-detail').zoom({
+          on: 'mouseover'
+        });
+
         $('#show-data-detail-product').html(data.detail);
       }
     })

@@ -165,68 +165,77 @@ class Product_shop extends CI_Controller
   }
 
   // ALL DETAIL PRODUCTS
-  public function detailPageProduct($id)
+  public function detailPageProduct($slug)
   {
     $info['title'] = 'detail product shop';
 
     // get session
     $email = $this->session->userdata('customer_email');
 
-    // COUNT ROWS COMMENT and COMMENTS
-    $info['get_count'] = $this->customerProfile_m->getCountRowsComment($id);
+    // filter slug to id product 
+    $getProductId = $this->product_m->getSlugToProductID($slug);
 
-    $getCommentRating = $this->customerProfile_m->getAverageCommentByProduct($id);
+    if ($getProductId != null) {
+      $getProductId = $getProductId['id'];
 
-    /* $getSumRating = 0;
-    
-    foreach ($getCommentRating as $val) {
-      $getSumRating = $val['rating_comment'];
-      // $getSumRating += $val['rating'];
-    } */
+      // COUNT ROWS COMMENT and COMMENTS
+      $info['get_count'] = $this->customerProfile_m->getCountRowsComment($getProductId);
 
-    $getSumRatingx = $getCommentRating->rating_comment;
+      $getCommentRating = $this->customerProfile_m->getAverageCommentByProduct($getProductId);
 
-    $count = 0;
-    // $countRating = round($getSumRatingx / 5, 0, PHP_ROUND_HALF_UP);
-    // $countRating = 30 / 5;
-    $rating = '';
+      /* $getSumRating = 0;
+      
+      foreach ($getCommentRating as $val) {
+        $getSumRating = $val['rating_comment'];
+        // $getSumRating += $val['rating'];
+      } */
 
-    /* for ($i = 0; $i < 5; $i++) {
-      if ($getSumRatingx > $count) {
+      $getSumRatingx = $getCommentRating->rating_comment;
+
+      $count = 0;
+      // $countRating = round($getSumRatingx / 5, 0, PHP_ROUND_HALF_UP);
+      // $countRating = 30 / 5;
+      $rating = '';
+
+      /* for ($i = 0; $i < 5; $i++) {
+        if ($getSumRatingx > $count) {
+          $rating .= '<i class="fa fa-star"></i>';
+        } else {
+          $rating .= '<i class="fa fa-star-o"></i>';
+        }
+        $count++;
+      } */
+
+      for ($x = 1; $x <= round($getSumRatingx, 0, PHP_ROUND_HALF_DOWN); $x++) {
         $rating .= '<i class="fa fa-star"></i>';
-      } else {
-        $rating .= '<i class="fa fa-star-o"></i>';
       }
-      $count++;
-    } */
+      if (strpos(round($getSumRatingx, 0, PHP_ROUND_HALF_DOWN), '.')) {
+        $rating .= '<i class="fa fa-star-half-o"></i>';
+        $x++;
+      }
+      while ($x <= 5) {
+        $rating .= '<i class="fa fa-star-o"></i>';
+        $x++;
+      }
 
-    for ($x = 1; $x <= round($getSumRatingx, 0, PHP_ROUND_HALF_DOWN); $x++) {
-      $rating .= '<i class="fa fa-star"></i>';
+      $info['avg_rating'] = number_format($getSumRatingx, 1);
+      $info['rating_comment'] = $rating;
+
+      $info['detail'] = $this->product_m->getDetailProductShop($getProductId);
+      $info['images'] = $this->product_m->getImageProductShop($getProductId);
+
+      $info['wishlist'] = $this->product_m->getWishlistSet($email, $getProductId);
+
+      $getDetail = $this->product_m->getProductById($getProductId);
+      $getCategory = $getDetail['id_category'];
+
+      $info['relatedWishlist'] = $this->product_m->getWishlistSet($email, $getProductId);
+      $info['relatedProducts'] = $this->product_m->getRelatedProduct($getCategory);
+
+      renderFrontTemplate('front-container/product-shop-detail-section', $info);
+    } else {
+      redirect('error_404', 'refresh');
     }
-    if (strpos(round($getSumRatingx, 0, PHP_ROUND_HALF_DOWN), '.')) {
-      $rating .= '<i class="fa fa-star-half-o"></i>';
-      $x++;
-    }
-    while ($x <= 5) {
-      $rating .= '<i class="fa fa-star-o"></i>';
-      $x++;
-    }
-
-    $info['avg_rating'] = number_format($getSumRatingx, 1);
-    $info['rating_comment'] = $rating;
-
-    $info['detail'] = $this->product_m->getDetailProductShop($id);
-    $info['images'] = $this->product_m->getImageProductShop($id);
-
-    $info['wishlist'] = $this->product_m->getWishlistSet($email, $id);
-
-    $getDetail = $this->product_m->getProductById($id);
-    $getCategory = $getDetail['id_category'];
-
-    $info['relatedWishlist'] = $this->product_m->getWishlistSet($email, $id);
-    $info['relatedProducts'] = $this->product_m->getRelatedProduct($getCategory);
-
-    renderFrontTemplate('front-container/product-shop-detail-section', $info);
   }
 
   public function getLoadAllComment($rowno = 0)
@@ -719,14 +728,14 @@ class Product_shop extends CI_Controller
                 </a>
               </li> -->
 
-              <li class="quick-view"><a href="' . base_url() . 'product-detail/' . $val['id_product'] . '">+ See Details</a></li>
+              <li class="quick-view"><a href="' . base_url() . 'product-detail/' . $val['slug'] . '">+ See Details</a></li>
             </ul>
           </div>
 
           <div class="pi-text">
             <div class="catagory-name">' . $val['category_name'] . '</div>
 
-            <a href="' . base_url() . 'product-detail/' . $val['id_product'] . '">
+            <a href="' . base_url() . 'product-detail/' . $val['slug'] . '">
               <h5>' . $val['product_name'] . '</h5>
             </a>
 
@@ -1008,11 +1017,11 @@ class Product_shop extends CI_Controller
       $id = htmlspecialchars(json_encode($val['id_cart']));
 
       $html .= '<tr>' .
-        '<td class="si-pic"><a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><img style="height: 100px; width: 100px" src="' . base_url() . 'image/product/' . $val['image'] . '"></a></td>' .
+        '<td class="si-pic"><a href="' . base_url() . 'product-detail/' . $val['slug'] . '"><img style="height: 100px; width: 100px" src="' . base_url() . 'image/product/' . $val['image'] . '"></a></td>' .
         '<td class="si-text">' .
         '<div class="product-selected">' .
         '<p>Rp. ' . number_format($val['price'], 0, ',', '.') . ' x ' . $val['cart_qty'] . '</p>' .
-        '<a href="' . base_url() . 'product-detail/' . $val['id_product'] . '"><h6>' . $val['product_name'] . '</h6></a>' .
+        '<a href="' . base_url() . 'product-detail/' . $val['slug'] . '"><h6>' . $val['product_name'] . '</h6></a>' .
         '</div>' .
         '</td>' .
         '<td class="si-close">' .

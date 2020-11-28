@@ -170,6 +170,7 @@
 <script>
   $(document).ready(function() {
     getSelectedOptionCategory();
+    getSelectedOptionBrand();
     getSelectedOptionSupplier();
 
     /* $('.select-category').select2();

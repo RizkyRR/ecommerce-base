@@ -307,6 +307,15 @@ class Product extends CI_Controller
     echo "{}";
   }
 
+  private function _regenerateProductName($text)
+  {
+    $query = $this->db->where('product_name', $text)->get('products');
+    if ($query->num_rows() > 0)
+      $text = $text . ' ' . $query->num_rows();
+
+    return $text;
+  }
+
   public function addProduct()
   {
     $info['title'] = "Add New Product";
@@ -333,12 +342,13 @@ class Product extends CI_Controller
     date_default_timezone_set('Asia/Jakarta');
 
     $slug = set_slug($this->input->post('name', true));
+    $product_name = $this->_regenerateProductName($this->input->post('name', true));
 
     $convertCurrency = preg_replace('/\D/', '', $this->input->post('price', true));
 
     $data = [
       'id' => $this->input->post('id'),
-      'product_name' => $this->input->post('name', true),
+      'product_name' => $product_name,
       'slug' => $slug,
       'category_id' => $this->input->post('category', true),
       'brand_id' => $this->input->post('brand', true),
@@ -486,12 +496,14 @@ class Product extends CI_Controller
     $id = $this->input->post('id');
     $slug = set_slug($this->input->post('name', true));
 
+    $product_name = $this->_regenerateProductName($this->input->post('name', true));
+
     date_default_timezone_set('Asia/Jakarta');
 
     $convertCurrency = preg_replace('/\D/', '', $this->input->post('price', true));
 
     $data = [
-      'product_name' => $this->input->post('name', true),
+      'product_name' => $product_name,
       'slug' => $slug,
       'category_id' => $this->input->post('category', true),
       'brand_id' => $this->input->post('brand', true),
@@ -520,7 +532,7 @@ class Product extends CI_Controller
 
     foreach ($dataImage as $val) {
       $image .= '<div class="column-prev-img">
-            <img class="img-responsive" style="width:75%" src="' . base_url() . 'image/product/' . $val['image'] . '" alt="Product Image">
+            <img class="img-responsive" id="image-detail" style="width:75%" src="' . base_url() . 'image/product/' . $val['image'] . '" alt="Product Image">
           </div>';
     }
 

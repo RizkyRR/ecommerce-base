@@ -104,15 +104,16 @@
               </div>
 
               <ul class="pd-tags">
-                <li><span>CATEGORIES</span>: <?php echo $detail['category_name'] ?></li>
+                <li><span>Brand</span>: <?php echo $detail['brand_name'] ?></li>
               </ul>
 
               <div class="pd-share">
-                <div class="p-code">Sku : 00012</div>
                 <div class="pd-social">
-                  <a href="#"><i class="ti-facebook"></i></a>
-                  <a href="#"><i class="ti-twitter-alt"></i></a>
-                  <a href="#"><i class="ti-linkedin"></i></a>
+                  <?php if ($detail_company > 0) : ?>
+                    <?php foreach ($detail_company as $val) : ?>
+                      <a href="<?php echo $val['url'] ?>" target="_blank"><i class="<?php echo $val['link_icon'] ?>"></i></a>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                 </div>
               </div>
             </div>
@@ -253,14 +254,14 @@
                     </a>
                   </li> -->
 
-                  <li class="quick-view"><a href="<?php echo base_url() ?>product-detail/<?php echo $val['id_product'] ?>">+ See Details</a></li>
+                  <li class="quick-view"><a href="<?php echo base_url() ?>product-detail/<?php echo $val['slug'] ?>">+ See Details</a></li>
                 </ul>
               </div>
 
               <div class="pi-text">
                 <div class="catagory-name"><?php echo $val['category_name'] ?></div>
 
-                <a href="<?php echo base_url() ?>product-detail/<?php echo $val['id_product'] ?>">
+                <a href="<?php echo base_url() ?>product-detail/<?php echo $val['slug'] ?>">
                   <h5><?php echo $val['product_name'] ?></h5>
                 </a>
 
