@@ -49,7 +49,7 @@
               </li>
               <li class="list-group-item">
                 <b>Joined since</b>
-                <p class="pull-right"><?php echo date('d F Y', $user['created_at']) ?></p>
+                <p class="pull-right"><?php echo date('d M Y', strtotime($user['created_at'])) ?></p>
               </li>
             </ul>
 

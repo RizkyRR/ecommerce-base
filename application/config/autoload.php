@@ -158,5 +158,6 @@ $autoload['model'] = array(
   'CustomerPurchase_m' => 'customerPurchase_m',
   'CustomerReturn_m' => 'customerReturn_m',
   'Message_m' => 'message_m',
-  'Brand_m' => 'brand_m'
+  'Brand_m' => 'brand_m',
+  'Customer_m' => 'customer_m'
 );

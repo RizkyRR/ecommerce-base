@@ -7,9 +7,9 @@
     </h1>
   </section>
 
-  <section class="content-header">
+  <!-- <section class="content-header">
     <button onclick="add_role()" class="btn btn-primary"><i class="fa fa-plus"></i> Role</button>
-  </section>
+  </section> -->
 
   <section class="content-header">
     <div class="row">

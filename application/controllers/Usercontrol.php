@@ -90,6 +90,8 @@ class Usercontrol extends CI_Controller
     $data = array();
     $no = @$_POST['start'];
     foreach ($list as $item) {
+      $id = htmlspecialchars(json_encode($item->user_id));
+
       $no++;
       $row = array();
       $row[] = $no . ".";
@@ -101,8 +103,8 @@ class Usercontrol extends CI_Controller
       // add html for action
       $row[] =
         '
-        <a href="javascript:void(0)" class="btn btn-warning btn-xs" onclick="edit_user(' . $item->user_id . ')" title="edit data"><i class="fa fa-pencil"></i> Update</a>
-        <a href="javascript:void(0)" onclick="delete_user(' . $item->user_id . ')" class="btn btn-danger btn-xs" title="delete data"><i class="fa fa-trash-o"></i> Delete</a>
+        <a href="javascript:void(0)" class="btn btn-warning btn-xs" onclick="edit_user(' . $id . ')" title="edit data"><i class="fa fa-pencil"></i> Update</a>
+        <a href="javascript:void(0)" onclick="delete_user(' . $id . ')" class="btn btn-danger btn-xs" title="delete data"><i class="fa fa-trash-o"></i> Delete</a>
       ';
       $data[] = $row;
     }
@@ -124,10 +126,58 @@ class Usercontrol extends CI_Controller
   //   echo json_encode($data);
   // }
 
-  public function data_role()
+  public function createCode()
+  {
+    $id = "USER" . "-";
+    $generate = $id  . date("m") . date('y')  . date('His');
+
+    // return $generate;
+    echo json_encode($generate);
+  }
+
+  public function getRoleSelect()
   {
     $data = $this->usercontrol_m->_getAllRole();
+
     echo json_encode($data);
+  }
+
+  public function getRoleSelect2()
+  {
+    $getInput = $this->input->post('searchTerm', true);
+
+    if (!isset($getInput)) {
+      $data = $this->usercontrol_m->getAllRoleBySelect($keyword = null, $limit = 10);
+    } else {
+      $data = $this->usercontrol_m->getAllRoleBySelect($keyword = $getInput, $limit = 10);
+    }
+
+    $row = array();
+    if ($data > 0) {
+      foreach ($data as $val) {
+        $row[] = array(
+          'id' => $val['id'],
+          'text' => $val['role']
+        );
+      }
+    }
+
+    echo json_encode($row);
+  }
+
+  public function getSelectedOptionRole()
+  {
+    $user_id = $this->input->post('user_id');
+
+    $data = $this->usercontrol_m->getUserControlById($user_id);
+
+    if ($data != null) {
+      $dataRole = $data;
+    } else {
+      $dataRole = $this->usercontrol_m->getAllRoleBySelect($keyword = null, $limit = 10);
+    }
+
+    echo json_encode($dataRole);
   }
 
   // public function editUserControl($id)
@@ -157,32 +207,66 @@ class Usercontrol extends CI_Controller
   //   redirect('usercontrol', 'refresh');
   // }
 
-  public function edit_user($id)
+  public function add_user()
   {
-    $data = $this->usercontrol_m->getUserControlById($id);
+    $response = array();
+
+    $this->form_validation->set_rules('name', 'User name', 'trim|required');
+    $this->form_validation->set_rules('email', 'User email', 'trim|required|valid_email');
+    $this->form_validation->set_rules('role', 'User role', 'trim|required');
+
+    if ($this->form_validation->run() == TRUE) {
+      $status = 0;
+
+      if ($this->input->post('status') != null) {
+        $status = 1; // if condition not null it means checked
+      }
+
+      $data = [
+        'id' => $this->input->post('user_id', true),
+        'name' => $this->input->post('name', true),
+        'email' => $this->input->post('email', true),
+        'image' => 'default.png',
+        'password' => '$2y$10$ojVg/Mvr9wpLnHNd.9AxXOlpSEWuivT9dQDbnoZx5Hw9MLaCFjmWK',
+        'role_id' => $this->input->post('role', true),
+        'is_active' => $status,
+        'created_at' => date('Y-m-d H:i:s'),
+      ];
+
+      $insert = $this->usercontrol_m->insertUserControl($data);
+
+      if ($insert > 0) {
+        $response['status'] = TRUE;
+        $response['message'] = 'New user has been successfully created!';
+      } else {
+        $response['status'] = False;
+        $response['message'] = 'New user not saved successfully!';
+      }
+    } else {
+      $response['status'] = FALSE;
+      $response['message'] = validation_errors();
+    }
+
+    echo json_encode($response);
+  }
+
+  public function edit_user()
+  {
+    $user_id = $this->input->post('user_id');
+
+    $data = $this->usercontrol_m->getUserControlById($user_id);
     echo json_encode($data);
   }
 
   public function update_user()
   {
-    $rules = [
-      [
-        'field' => 'role',
-        'label' => 'role',
-        'rules' => 'trim|required'
-      ]
-    ];
-    $this->form_validation->set_rules($rules);
-    $this->form_validation->set_message('required', '{field} tidak boleh kosong');
+    $response = array();
+    $user_id = $this->input->post('user_id');
 
-    if ($this->form_validation->run() == FALSE) {
-      $data = [
-        'role' => form_error('role')
-      ];
+    $this->form_validation->set_rules('role', 'User role', 'trim|required');
 
-      echo json_encode($data);
-    } else {
-      $status = 0; // set default if 0 status = unchecked
+    if ($this->form_validation->run() == TRUE) {
+      $status = 0;
 
       if ($this->input->post('status') != null) {
         $status = 1; // if condition not null it means checked
@@ -190,18 +274,42 @@ class Usercontrol extends CI_Controller
 
       $data = [
         'role_id' => $this->input->post('role', true),
-        'is_active' => $status
+        'is_active' => $status,
       ];
 
-      $this->usercontrol_m->updateUserControl($this->input->post('id'), $data);
-      echo json_encode('success');
+      $update = $this->usercontrol_m->updateUserControl($user_id, $data);
+
+      if ($update > 0) {
+        $response['status'] = TRUE;
+        $response['message'] = 'User has been successfully updated!';
+      } else {
+        $response['status'] = False;
+        $response['message'] = 'User not updated successfully!';
+      }
+    } else {
+      $response['status'] = FALSE;
+      $response['message'] = validation_errors();
     }
+
+    echo json_encode($response);
   }
 
   public function deleteUserControl()
   {
-    $this->usercontrol_m->deleteUserControl($this->input->post('id'));
-    $this->session->set_flashdata('success', 'User has been deleted !');
+    $user_id = $this->input->post('user_id');
+    $response = array();
+
+    $delete = $this->usercontrol_m->deleteUserControl($user_id);
+
+    if ($delete > 0) {
+      $response['status'] = TRUE;
+      $response['message'] = 'User has been successfully deleted!';
+    } else {
+      $response['status'] = False;
+      $response['message'] = 'User was not successfully deleted!';
+    }
+
+    echo json_encode($response);
   }
 }
 

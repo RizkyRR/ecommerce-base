@@ -113,11 +113,38 @@ class Usercontrol_m extends CI_Model
     return $query->result_array();
   }
 
+  public function getAllRoleBySelect($keyword, $limit)
+  {
+    $this->db->select('*');
+    $this->db->from('user_role');
+
+    if ($keyword != null) {
+      $this->db->like('id', $keyword);
+      $this->db->or_like('role', $keyword);
+    }
+
+    $this->db->order_by('role', 'ASC');
+    $this->db->limit($limit);
+
+    $query = $this->db->get();
+    return $query->result_array();
+  }
+
+  public function getUserRoleByID($id)
+  {
+    $this->db->where('id', $id);
+    $query = $this->db->get('user_role');
+
+    return $query->row_array();
+  }
+
   public function getUserControlById($id)
   {
-    $this->db->select('users.*, users.id AS user_id, user_role.role');
+    $this->db->select('*, users.id AS user_id, user_role.id AS id_role');
+
     $this->db->from('users');
-    $this->db->join('user_role', 'users.role_id = user_role.id');
+    $this->db->join('user_role', 'users.role_id = user_role.id', 'left');
+
     $this->db->where('users.id', $id);
 
     // $this->db->order_by('name', 'ASC'); // must be specify which the part of table 
@@ -127,16 +154,27 @@ class Usercontrol_m extends CI_Model
     // return $this->db->get_where('users', ['id' => $id])->row_array();
   }
 
+  public function insertUserControl($data)
+  {
+    $this->db->insert('users', $data);
+
+    return $this->db->affected_rows();
+  }
+
   public function updateUserControl($id, $data)
   {
     $this->db->where('id', $id);
     $this->db->update('users', $data);
+
+    return $this->db->affected_rows();
   }
 
   public function deleteUserControl($id)
   {
     $this->db->where('id', $id);
     $this->db->delete('users');
+
+    return $this->db->affected_rows();
   }
 }
   

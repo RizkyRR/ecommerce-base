@@ -11,8 +11,9 @@
           <div class="box-body">
             <div class="form-group">
               <label for="name">User name</label>
-              <input type="hidden" value="id" name="id">
+              <input type="hidden" name="user_id" id="user_id">
               <input type="text" class="form-control" name="name" id="name" placeholder="Enter user name">
+
               <span id="msg_name_error" class="help-block"></span>
             </div>
           </div>
@@ -21,14 +22,16 @@
             <div class="form-group">
               <label for="email">User email</label>
               <input type="text" class="form-control" name="email" id="email" placeholder="Enter user email">
+
               <span id="msg_email_error" class="help-block"></span>
             </div>
           </div>
 
-          <div class="box-body">
+          <div class="box-body created_date">
             <div class="form-group">
               <label for="date">Created at</label>
               <input type="text" class="form-control" name="date" id="date" placeholder="Enter create date">
+
               <span id="msg_date_error" class="help-block"></span>
             </div>
           </div>
@@ -36,13 +39,10 @@
           <div class="box-body">
             <div class="form-group">
               <label for="role">User role</label>
-              <!-- <select class="form-control" name="role" id="role" onchange="select_role()"> -->
-              <select class="form-control select-role" name="role" id="role">
-                <option value=""></option>
-                <?php foreach ($userrole as $ur) : ?>
-                  <option value="<?php echo $ur['id'] ?>"><?php echo $ur['role'] ?></option>
-                <?php endforeach; ?>
+              <select class="form-control select-role" name="role" id="role" style="width: 100%;">
+
               </select>
+
               <span id="msg_role_error" class="help-block"></span>
             </div>
           </div>

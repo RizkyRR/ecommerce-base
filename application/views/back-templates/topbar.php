@@ -90,7 +90,7 @@
 
               <p>
                 <?php echo $user['name'] ?> - <?php echo $user['role'] ?>
-                <small>Member since <?php echo date('d F Y', $user['created_at']) ?></small>
+                <small>Member since <?php echo date('d M Y', strtotime($user['created_at'])) ?></small>
               </p>
             </li>
             <!-- Menu Footer-->

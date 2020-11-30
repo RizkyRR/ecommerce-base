@@ -48,23 +48,26 @@ class User extends CI_Controller
 
     $this->form_validation->set_rules('name', 'full name', 'trim|required|min_length[5]');
 
-    if (empty($_FILES['image']['name'])) {
-      $data = [
-        'name' => $this->input->post('name', true)
-      ];
-    } else {
-      $data = [
-        'name' => $this->input->post('name', true),
-        'image' => $this->_uploadImage()
-      ];
-
-      @unlink('./image/profile/' . $this->input->post('old_image'));
-    }
-
     if ($this->form_validation->run() == FALSE) {
       renderBackTemplate('users/edit-user', $info);
     } else {
+      if (empty($_FILES['image']['name'])) {
+        $data = [
+          'name' => $this->input->post('name', true)
+        ];
+      } else {
+        $data = [
+          'name' => $this->input->post('name', true),
+          'image' => $this->_uploadImage()
+        ];
+
+        if ($this->input->post('old_image') != "default.png") {
+          @unlink('./image/profile/' . $this->input->post('old_image'));
+        }
+      }
+
       $this->user_m->updateUser($data);
+
       $this->session->set_flashdata('success', 'Updated !');
       redirect('user', 'refresh');
     }
