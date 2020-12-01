@@ -438,11 +438,12 @@ class Product_m extends CI_Model
   public function getShowDiscountProducts()
   {
     $this->db->select('*, products.id AS id_product, product_categories.id AS id_category, product_brands.id AS id_brand, product_details.id AS id_detail, product_discounts.id AS id_discount');
+
     $this->db->from('products');
     $this->db->join('product_categories', 'product_categories.id = products.category_id', 'left');
     $this->db->join('product_brands', 'product_brands.id = products.brand_id', 'left');
     $this->db->join('product_details', 'product_details.product_id = products.id', 'left');
-    $this->db->join('product_discounts', 'product_discounts.product_id = products.id', 'left');
+    $this->db->join('product_discounts', 'product_discounts.product_id = products.id');
 
     $this->db->group_by('product_details.product_id');
 

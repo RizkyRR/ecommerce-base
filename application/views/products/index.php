@@ -250,12 +250,6 @@
         required: true,
         number: true
       },
-      start_date: {
-        required: true
-      },
-      end_date: {
-        required: true
-      }
     },
     messages: {
       product: {
@@ -265,12 +259,6 @@
         required: "Set discount is required",
         number: "Set discount must contain numbers"
       },
-      start_date: {
-        required: "Start date is required"
-      },
-      end_date: {
-        required: "End date is required"
-      }
     },
   });
 
@@ -378,8 +366,8 @@
         $('[name="s_discount"]').val(data.discount_charge_rate);
         $('[name="s_discount_value"]').val(data.discount_charge);
         $('[name="d_price"]').val(data.after_discount);
-        moment($('[name="start_date"]').val(data.start_time_discount)).format("YYYY-MM-DD");
-        moment($('[name="end_date"]').val(data.end_time_discount)).format("YYYY-MM-DD");
+        /* moment($('[name="start_date"]').val(data.start_time_discount)).format("YYYY-MM-DD");
+        moment($('[name="end_date"]').val(data.end_time_discount)).format("YYYY-MM-DD"); */
 
         $('#modal-discount-product').modal('show'); // show bootstrap modal when complete loaded
         $('.modal-title').text('Edit Discount Product'); // Set title to Bootstrap modal title

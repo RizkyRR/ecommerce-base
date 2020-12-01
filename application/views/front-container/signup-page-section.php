@@ -67,7 +67,7 @@
             <button type="button" class="site-btn register-btn" id="btnRegister">REGISTER</button>
           </form>
           <div class="switch-login">
-            <a href="<?php echo base_url(); ?>sign-in" class="or-login">Or Register</a>
+            <a href="<?php echo base_url(); ?>sign-in" class="or-login">Or Sign In</a>
           </div>
         </div>
       </div>

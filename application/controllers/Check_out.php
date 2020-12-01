@@ -105,15 +105,15 @@ class Check_out extends CI_Controller
         '<div class="col-sm-10">' .
         '<textarea class="form-control" name="full_address" id="full_address" cols="5" rows="5" readonly>' . $data['street_name'] . ', ' . $getData['city_name'] . ', ' . $getData['province'] . '</textarea>' . '</div>';
     } else {
-      $response['name'] = '';
-      $response['email'] = '';
-      $response['phone'] = '';
-      $response['province'] = '';
-      $response['city_name'] = '';
-      $response['city_id'] = '';
-      $response['street_name'] = '';
+      $response['name'] = $data['customer_name'];
+      $response['email'] = $data['customer_email'];
+      $response['phone'] = $data['customer_phone'];
+      $response['province'] = [];
+      $response['city_name'] = [];
+      $response['city_id'] = [];
+      $response['street_name'] = [];
 
-      $response['html'] = '';
+      $response['html'] = [];
     }
 
     echo json_encode($response);

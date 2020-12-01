@@ -118,22 +118,27 @@ class Auth_shop extends CI_Controller
       $user = $this->authShop_m->customerLogin($email);
 
       if ($user) {
-        if (password_verify($password, $user['customer_password'])) {
-          $file = [
-            'customer_id' => $user['id_customer'],
-            'customer_name' => $user['customer_name'],
-            'customer_email'   => $user['customer_email'],
-            'customer_is_active' => $user['is_active'],
-            'customer_is_online' => $user['is_online']
-          ];
+        if ($user['is_active'] == 1) {
+          if (password_verify($password, $user['customer_password'])) {
+            $file = [
+              'customer_id' => $user['id_customer'],
+              'customer_name' => $user['customer_name'],
+              'customer_email'   => $user['customer_email'],
+              'customer_is_active' => $user['is_active'],
+              'customer_is_online' => $user['is_online']
+            ];
 
-          $this->session->set_userdata($file);
-          $this->authShop_m->updateCustomerOnline($this->session->userdata('customer_email'));
+            $this->session->set_userdata($file);
+            $this->authShop_m->updateCustomerOnline($this->session->userdata('customer_email'));
 
-          $response['status'] = TRUE;
+            $response['status'] = TRUE;
+          } else {
+            $response['status'] = FALSE;
+            $response['message'] = 'Sorry, wrong password. Please try agian!';
+          }
         } else {
           $response['status'] = FALSE;
-          $response['message'] = 'Sorry, wrong password. Please try agian!';
+          $response['message'] = 'Sorry, your email has not been activated. Please check your email to activate account!';
         }
       } else {
         $response['status'] = FALSE;
@@ -154,19 +159,21 @@ class Auth_shop extends CI_Controller
 
     $user  = $this->db->get_where('customers', ['customer_email' => $email])->row_array();
 
-    if ($user) {
+    if ($user != null) {
       $user_token = $this->db->get_where('customer_token', ['token' => $token])->row_array();
 
-      if ($user_token) {
+      if ($user_token != null) {
         if (time() - $user_token['created_at'] < (60 * 60 * 24)) {
           $this->authShop_m->updateCustomer($email);
           $this->authShop_m->insertAddress($email);
           $this->authShop_m->deleteCustomerToken($email);
+
           $this->session->set_flashdata('success', $email . ' has been activated. Please login!');
           redirect('sign-in', 'refresh');
         } else {
           $this->authShop_m->deleteCustomerToken($email);
           $this->authShop_m->deleteCustomer($email);
+
           $this->session->set_flashdata('error', 'Account activation failed, token expired!');
           redirect('sign-in', 'refresh');
         }

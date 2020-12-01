@@ -50,15 +50,15 @@ class AuthShop_m extends CI_Model
     $this->db->update('customers');
   }
 
-  public function deleteCustomerToken($data)
+  public function deleteCustomerToken($email)
   {
-    $this->db->where('email', $data);
+    $this->db->where('email', $email);
     $this->db->delete('customer_token');
   }
 
-  public function deleteCustomer($data)
+  public function deleteCustomer($email)
   {
-    $this->db->where('customer_email', $data);
+    $this->db->where('customer_email', $email);
     $this->db->delete('customers');
   }
 

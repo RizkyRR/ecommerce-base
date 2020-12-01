@@ -54,7 +54,7 @@
               </div>
             </div>
 
-            <div class="row">
+            <!-- <div class="row">
               <div class="col-lg-6">
                 <div class="form-group">
                   <label for="start_date">Start date</label>
@@ -80,7 +80,7 @@
                   <span id="msg_enddate_error" class="help-block"></span>
                 </div>
               </div>
-            </div>
+            </div> -->
 
           </div>
           <!-- /.box-body -->

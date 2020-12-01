@@ -21,25 +21,25 @@
           <div class="row">
             <div class="col-lg-12">
               <label for="name">Customer Name<span>*</span></label>
-              <input type="text" id="name" name="name">
+              <input type="text" id="name" name="name" readonly>
             </div>
 
             <div class="col-lg-12">
               <label for="street">Street Address<span>*</span></label>
               <!-- <input type="text" id="street" name="street" class="street-first" placeholder="Example: Jalan Abc No. 1 RT 001 / RW 002, Kelurahan A, Kecamatan B" required> -->
-              <textarea class="street-first" name="street" id="street" cols="500" rows="20" placeholder="Example: Jalan Abc No. 1 RT 001 / RW 002, Kelurahan A, Kecamatan B" required></textarea>
+              <textarea class="street-first" name="street" id="street" cols="500" rows="20" placeholder="Please complete this address on your profile page address list" required readonly></textarea>
               <input type="hidden" name="city_id" id="city_id" readonly>
               <input type="hidden" name="company_city_id" id="company_city_id" readonly>
             </div>
 
             <div class="col-lg-6 mt-3">
               <label for="email">Email Address<span>*</span></label>
-              <input type="text" id="email" name="email">
+              <input type="text" id="email" name="email" readonly>
             </div>
 
             <div class="col-lg-6 mt-3 mb-3">
               <label for="phone">Phone<span>*</span></label>
-              <input type="text" id="phone" name="phone">
+              <input type="text" id="phone" name="phone" readonly>
             </div>
 
             <div class="col-lg-12 mb-3">
@@ -120,12 +120,17 @@
       type: 'GET',
       dataType: 'JSON',
       success: function(data) {
-        var streetName = data.street_name + ', ' + data.city_name + ', ' + data.province;
-        $("#name").val(data.name).prop("readonly", true);
-        $('#street').val(streetName).prop("readonly", true);
-        $('#city_id').val(data.city_id).prop("readonly", true);
-        $("#email").val(data.email).prop("readonly", true);
-        $("#phone").val(data.phone).prop("readonly", true);
+        var streetName = data.street_name;
+
+        if (streetName != '') {
+          streetName = data.street_name + ', ' + data.city_name + ', ' + data.province;
+        }
+
+        $("#name").val(data.name).attr("readonly", true);
+        $('#street').val(streetName).attr("readonly", true);
+        $('#city_id').val(data.city_id).attr("readonly", true);
+        $("#email").val(data.email).attr("readonly", true);
+        $("#phone").val(data.phone).attr("readonly", true);
       }
     })
   }

@@ -788,9 +788,9 @@ class Product extends CI_Controller
         'before_discount' => $this->input->post('l_price', true),
         'discount_charge_rate' => $this->input->post('s_discount', true),
         'discount_charge' => $this->input->post('s_discount_value', true),
-        'after_discount' => $this->input->post('d_price', true),
+        'after_discount' => $this->input->post('d_price', true),/* 
         'start_time_discount' => $this->input->post('start_date', true),
-        'end_time_discount' => $this->input->post('end_date', true)
+        'end_time_discount' => $this->input->post('end_date', true) */
       ];
 
       $getNameProduct = $this->product_m->getDetailNameProductDiscounts($this->input->post('product'));
@@ -836,8 +836,8 @@ class Product extends CI_Controller
       'discount_charge_rate' => $this->input->post('s_discount', true),
       'discount_charge' => $this->input->post('s_discount_value', true),
       'after_discount' => $this->input->post('d_price', true),
-      'start_time_discount' => $this->input->post('start_date', true),
-      'end_time_discount' => $this->input->post('end_date', true)
+      /* 'start_time_discount' => $this->input->post('start_date', true),
+      'end_time_discount' => $this->input->post('end_date', true) */
     ];
 
     // ADD UPDATE CONDITION IN PRODUCTS TABLE AFTER SET DISCOUNT

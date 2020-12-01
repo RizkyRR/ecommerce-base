@@ -233,14 +233,22 @@ class Usercontrol extends CI_Controller
         'created_at' => date('Y-m-d H:i:s'),
       ];
 
-      $insert = $this->usercontrol_m->insertUserControl($data);
+      // check email
+      $user  = $this->db->get_where('users', ['email' => $this->input->post('email', true)])->row_array();
 
-      if ($insert > 0) {
-        $response['status'] = TRUE;
-        $response['message'] = 'New user has been successfully created!';
-      } else {
+      if ($user) {
         $response['status'] = False;
-        $response['message'] = 'New user not saved successfully!';
+        $response['message'] = 'Sorry, you can not input the same email. Please use different one!';
+      } else {
+        $insert = $this->usercontrol_m->insertUserControl($data);
+
+        if ($insert > 0) {
+          $response['status'] = TRUE;
+          $response['message'] = 'New user has been successfully created!';
+        } else {
+          $response['status'] = False;
+          $response['message'] = 'New user not saved successfully!';
+        }
       }
     } else {
       $response['status'] = FALSE;

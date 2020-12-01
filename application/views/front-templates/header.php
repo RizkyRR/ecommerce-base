@@ -218,7 +218,7 @@
         </div>
         <nav class="nav-menu mobile-menu">
           <ul>
-            <li><a href="<?php echo base_url(); ?>home">Home</a></li>
+            <li><a href="<?php echo base_url(); ?>home" class="active">Home</a></li>
             <li><a href="<?php echo base_url(); ?>product-section">Shop</a></li>
             <li><a href="<?php echo base_url(); ?>company-about">About Us</a></li>
             <li><a href="<?php echo base_url(); ?>company-contact">Contact Us</a></li>

@@ -125,10 +125,10 @@ class CustomerProfile_m extends CI_Model
   {
     $this->db->select('*');
 
-    $this->db->from('customer_address');
-    $this->db->join('customers', 'customers.customer_email = customer_address.email', 'left');
+    $this->db->from('customers');
+    $this->db->join('customer_address', 'customer_address.email = customers.customer_email', 'left');
 
-    $this->db->where('customer_address.email', $email);
+    $this->db->where('customers.customer_email', $email);
 
     $query = $this->db->get();
     return $query->row_array();

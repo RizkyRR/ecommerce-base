@@ -272,6 +272,8 @@
 
     $("#form").valid();
 
+    create_code();
+
     $('[name="name"]').attr("readonly", false);
     $('[name="email"]').attr("readonly", false);
 
@@ -365,6 +367,7 @@
               timer: 5000,
             });
 
+            create_code();
             $('#form')[0].reset(); // reset form on modals
           } else {
             Swal.fire({
