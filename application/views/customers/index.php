@@ -87,7 +87,7 @@
         $('[name="customer_address"]').val(full_address);
         $('[name="created_at"]').val(moment(data.created_at).format('DD MMMM YYYY HH:mm:ss')).prop("readonly", true);
 
-        $('#image-container').html('<img class="img-responsive" style="width: auto; height: auto;" src="' + '<?php echo base_url(); ?>image/profile/' + '' + data.customer_image + '" />'); // tambahan
+        $('#image-container').html('<img class="img-responsive" style="width: auto; height: auto;" src="' + '<?php echo base_url(); ?>image/customer_profile/' + '' + data.customer_image + '" />'); // tambahan
 
         // ZoomImage ZoomMaster
         $('#image-container').zoom({
@@ -108,7 +108,7 @@
     });
   }
 
-  function deleteCustomer(id) {
+  /* function deleteCustomer(id) {
     Swal.fire({
       icon: 'warning',
       title: 'Are you sure?',
@@ -148,5 +148,5 @@
         });
       }
     });
-  }
+  } */
 </script>
