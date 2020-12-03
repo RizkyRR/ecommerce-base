@@ -197,7 +197,12 @@
     table_report_order = $("#table-data-report-order").DataTable({
       processing: true,
       serverSide: true,
-      bLengthChange: false,
+      bLengthChange: true,
+      lengthMenu: [
+        [10, 25, 50, -1],
+        [10, 25, 50, "All"]
+      ],
+      pageLength: 10,
       ajax: {
         url: "<?php echo base_url() ?>report_order/showAjaxReportOrder",
         type: "POST",
@@ -206,7 +211,7 @@
           end_date: end_date
         }
       },
-      dom: 'Bfrtip',
+      dom: 'Blfrtip',
       buttons: [{
         extend: 'excel',
         text: 'Download Excel',
@@ -215,8 +220,12 @@
         title: 'Data Order ' + moment(start_date).format('DD MMMM YYYY 00:00:00') + ' - ' + moment(end_date).format('DD MMMM YYYY 23:59:59'),
         download: 'open',
         exportOptions: {
-          columns: [0, 1, 2, 3, 4, 5, 6, 7]
-        }
+          // columns: [0, 1, 2, 3, 4, 5, 6, 7],
+          modifier: {
+            search: 'applied',
+            order: 'applied'
+          }
+        },
       }],
       order: [],
       columnDefs: [{
