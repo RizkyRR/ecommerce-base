@@ -43,7 +43,7 @@ class Report_retur_order extends CI_Controller
       $row[] = date('d M Y H:i:s', strtotime($item->purchase_return_date));
       $row[] = $item->total_product;
       $row[] = "Rp " . number_format($item->net_amount, 0, ',', '.');
-      $row[] = $item->status_name;
+      $row[] = '<span class="label label-' . $item->status_color . '">' . $item->status_name . '</span>';
 
       $data[] = $row;
     }

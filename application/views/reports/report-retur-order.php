@@ -63,8 +63,8 @@
               <th>Customer Name</th>
               <th>Return Date</th>
               <th>Total Return</th>
-              <th>Status Return</th>
               <th>Total Amount</th>
+              <th>Status Return</th>
             </tr>
           </thead>
           <tbody id="table_report_retur_order">
