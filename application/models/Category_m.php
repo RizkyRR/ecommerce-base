@@ -84,9 +84,20 @@ class Category_m extends CI_Model
 
   public function getCategory()
   {
-    $this->db->order_by('category_name', 'ASC');
+    /* $this->db->order_by('category_name', 'ASC');
 
     $query = $this->db->get('product_categories');
+    return $query->result_array(); */
+
+    $this->db->select('*, products.id AS id_product, product_categories.id AS id_category');
+
+    $this->db->from('product_categories');
+    $this->db->join('products', 'products.category_id = product_categories.id');
+
+    $this->db->group_by('products.category_id');
+    $this->db->order_by('category_name', 'ASC');
+
+    $query = $this->db->get();
     return $query->result_array();
   }
 

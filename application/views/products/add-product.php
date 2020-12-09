@@ -312,8 +312,7 @@
         number: true
       },
       price: {
-        required: true,
-        number: true
+        required: true
       }
     }
   });

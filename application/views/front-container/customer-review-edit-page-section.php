@@ -328,9 +328,12 @@
               accepted: true,
             };
 
+            var url = new URL("http://localhost/ecommerce-base/");
+
             foto_upload.emit("addedfile", mockFile);
             // foto_upload.emit("thumbnail", mockFile, value.path);
-            foto_upload.emit("thumbnail", mockFile, "http://" + window.location.hostname + '/ecommerce-base' + '/image/comment_review/' + value.name);
+            foto_upload.emit("thumbnail", mockFile, url.pathname + '/image/comment_review/' + value.name);
+            // foto_upload.emit("thumbnail", mockFile, "http://" + window.location.hostname + '/ecommerce-base' + '/image/comment_review/' + value.name);
             foto_upload.emit("complete", mockFile);
             foto_upload.files.push(mockFile);
 

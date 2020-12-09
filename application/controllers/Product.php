@@ -494,9 +494,17 @@ class Product extends CI_Controller
   public function updateProduct()
   {
     $id = $this->input->post('id');
-    $slug = set_slug($this->input->post('name', true));
+    // checking the same name 
+    $query = $this->db->where('id', $id)->get('products');
+    $getProduct = $query->row_array();
 
-    $product_name = $this->_regenerateProductName($this->input->post('name', true));
+    if ($this->input->post('name', true) == $getProduct['product_name']) {
+      $product_name = $this->input->post('name', true);
+    } else {
+      $product_name = $this->_regenerateProductName($this->input->post('name', true));
+    }
+
+    $slug = set_slug($product_name);
 
     date_default_timezone_set('Asia/Jakarta');
 

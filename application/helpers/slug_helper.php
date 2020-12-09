@@ -23,9 +23,9 @@ function set_slug($text)
     return 'n-a';
   }
 
-  $query = $ci->db->where('slug', $text)->get('products');
+  $query = $ci->db->where('product_name', $text)->get('products');
   if ($query->num_rows() > 0)
-    $text = $text . '-' . $query->num_rows();
+    $text = $text . ' ' . $query->num_rows();
 
   return $text;
 }
