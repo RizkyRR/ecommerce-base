@@ -80,6 +80,8 @@ class Role_m extends CI_Model
   public function getAllMenu()
   {
     $this->db->where('id !=', 1);
+    $this->db->where('id !=', 6);
+
     $query = $this->db->get('user_menu');
     return $query->result_array();
   }

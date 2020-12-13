@@ -125,23 +125,28 @@ class Auth extends CI_Controller
       $user = $this->auth_m->userLogin($email);
 
       if ($user != null) {
-        if (password_verify($pass, $user['password'])) {
-          $file = [
-            'id' => $user['id'],
-            'name' => $user['name'],
-            'email'   => $user['email'],
-            'role_id'  => $user['role_id'],
-            'is_active' => $user['is_active'],
-            'is_online' => $user['online']
-          ];
+        if ($user['is_active'] != 0) {
+          if (password_verify($pass, $user['password'])) {
+            $file = [
+              'id' => $user['id'],
+              'name' => $user['name'],
+              'email'   => $user['email'],
+              'role_id'  => $user['role_id'],
+              'is_active' => $user['is_active'],
+              'is_online' => $user['online']
+            ];
 
-          $this->session->set_userdata($file);
-          $this->auth_m->updateUserOnline($this->session->userdata('email'));
+            $this->session->set_userdata($file);
+            $this->auth_m->updateUserOnline($this->session->userdata('email'));
 
-          $response['status'] = TRUE;
+            $response['status'] = TRUE;
+          } else {
+            $response['status'] = FALSE;
+            $response['message'] = 'Wrong password!';
+          }
         } else {
           $response['status'] = FALSE;
-          $response['message'] = 'Wrong password!';
+          $response['message'] = 'Sorry, your account is not active. Please contact admin!';
         }
       } else {
         $response['status'] = FALSE;

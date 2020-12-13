@@ -95,17 +95,17 @@ class Role extends CI_Controller
       $row[] = $item->role;
       // add html for action
 
-      if ($item->id != 'tOBawuCPBAhAZzmyT10F1UbCIc7I42OwLBRmnRhS8e8=') {
+      /* if ($item->id != 'tOBawuCPBAhAZzmyT10F1UbCIc7I42OwLBRmnRhS8e8=') {
         $deleteAction = '<a href="javascript:void(0)" onclick="delete_role(' . $id . ')" class="btn btn-danger btn-xs" title="delete data"><i class="fa fa-trash-o"></i> Delete</a>';
       } else {
         $deleteAction = '';
-      }
+      } */
 
       $row[] =
         '
-        <a href="javascript:void(0)" class="btn btn-warning btn-xs" onclick="edit_role(' . $id . ')" title="edit data"><i class="fa fa-pencil"></i> Update</a> '
-        . $deleteAction .
-        ' <a href="' . base_url('role/accessrole/' . $item->id) . '" class="btn btn-success btn-xs" title="access control"><i class="fa fa-user-secret"></i> Access Control</a>
+        <a href="javascript:void(0)" class="btn btn-warning btn-xs" onclick="edit_role(' . $id . ')" title="edit data"><i class="fa fa-pencil"></i> Update</a> ' .
+        /* $deleteAction 
+        . */ ' <a href="' . base_url('role/accessrole/' . $item->id) . '" class="btn btn-success btn-xs" title="access control"><i class="fa fa-user-secret"></i> Access Control</a>
       ';
       $data[] = $row;
     }
