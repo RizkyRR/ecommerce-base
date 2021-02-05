@@ -62,8 +62,7 @@ $(document).ready(function (e) {
 
 			/* Return whether the element is optional or the result of the validation. */
 			return this.optional(element) || regexp.test(value);
-		}
-	);
+		}, 'Format email harus valid!');
 
 	var $validatorBaseProfile = $("#base-profile").validate({
 		focusInvalid: false,
@@ -336,23 +335,19 @@ $(document).ready(function (e) {
 
 					$("#company-address")[0].reset(); // reset form on modals
 					$("#province").select2({
-						data: [
-							{
-								id: "",
-								text: "",
-							},
-						],
+						data: [{
+							id: "",
+							text: "",
+						}, ],
 						placeholder: "Select for a province",
 					});
 					// $('#province').val(null).trigger("change");
 					// $('#province').empty().select2();
 					$("#regency").select2({
-						data: [
-							{
-								id: "",
-								text: "",
-							},
-						],
+						data: [{
+							id: "",
+							text: "",
+						}, ],
 						placeholder: "Select for a regency",
 					});
 					// $('#regency').val(null).trigger("change");
@@ -393,11 +388,11 @@ $(document).ready(function (e) {
 				$('[name="old_logo"]').val(data.image).prop("readonly", true);
 				$("#image-container").html(
 					'<img class="img-responsive" style="width: 128px; height: 64px;" src="' +
-						url.pathname +
-						"image/logo/" +
-						"" +
-						data.image +
-						'" />'
+					url.pathname +
+					"image/logo/" +
+					"" +
+					data.image +
+					'" />'
 				);
 				$('[name="about"]').val(data.about);
 			},
@@ -489,11 +484,14 @@ $(document).ready(function (e) {
 		});
 	}
 
-	$("#add_row_sosmed").click(function (e) {
+	// var row_id = 1;
+
+	$("#add_row_sosmed").unbind("click").bind("click", function (e) {
 		var table = $("#link_info_table");
 		var count_table_tbody_tr = $("#link_info_table tbody tr").length;
 		// console.log(count_table_tbody_tr);
 		var row_id = count_table_tbody_tr + 1;
+		// row_id++;
 		var html = "";
 
 		var url = new URL("http://localhost/ecommerce-base/");
@@ -526,7 +524,7 @@ $(document).ready(function (e) {
 					'" class="form-control url" required></td>';
 
 				html +=
-					'<td><button type="button" name="remove" id="remove" class="btn btn-danger btn-sm"  onclick="removeRow(\'' +
+					'<td><button type="button" id="remove_' + row_id + '" class="btn btn-danger btn-sm"  onclick="removeRow(\'' +
 					row_id +
 					'\')"><i class="fa fa-close"></i></button></td>';
 
@@ -692,11 +690,13 @@ $(document).ready(function (e) {
 		});
 	}
 
-	$("#add_row_bankaccount").click(function (e) {
+	$("#add_row_bankaccount").unbind("click").bind("click", function (e) {
 		var table = $("#bankaccount_info_table");
 		var count_table_tbody_tr = $("#bankaccount_info_table tbody tr").length;
-		// console.log(count_table_tbody_tr);
-		var row_id = count_table_tbody_tr + 1;
+		console.log(count_table_tbody_tr);
+		var row_id = parseInt(count_table_tbody_tr) + 1;
+		console.log(row_id);
+
 		var html = '<tr id="row_' + row_id + '">';
 
 		html +=
@@ -715,7 +715,7 @@ $(document).ready(function (e) {
 			'" class="form-control bank_account_holder" required></td>';
 
 		html +=
-			'<td><button type="button" name="remove_bank_account_row" id="remove_bank_account_row' +
+			'<td><button type="button" id="remove_bank_account_row_' +
 			row_id +
 			'" class="btn btn-danger btn-sm"  onclick="removeBankAccountRow(\'' +
 			row_id +

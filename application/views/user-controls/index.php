@@ -145,8 +145,7 @@
 
         /* Return whether the element is optional or the result of the validation. */
         return this.optional(element) || regexp.test(value);
-      }
-    );
+      }, 'Format email harus valid!');
 
     var $validator = $("#form").validate({
       focusInvalid: false,

@@ -54,7 +54,6 @@ getCheckCompanyChargeValue();
 getCompanyFullAddress();
 
 function setShoppingCart(id) {
-	c;
 	var url = new URL("http://localhost/ecommerce-base/");
 
 	var qty = 1;

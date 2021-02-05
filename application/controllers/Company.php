@@ -65,7 +65,7 @@ class Company extends CI_Controller
           '</td>' .
 
           '<td>' .
-          '<button type="button" class="btn btn-danger btn-sm" onclick="removeRow(' . $i . ')"><i class="fa fa-close"></i></button>' .
+          '<button type="button" class="btn btn-danger btn-sm" id="remove_' . $i . '" onclick="removeRow(' . $i . ')"><i class="fa fa-close"></i></button>' .
           '</td>' .
           '</tr>';
       }
@@ -375,7 +375,7 @@ class Company extends CI_Controller
           '</td>' .
 
           '<td>' .
-          '<button type="button" class="btn btn-danger btn-sm" onclick="removeBankAccountRow(' . $i . ')"><i class="fa fa-close"></i></button>' .
+          '<button type="button" class="btn btn-danger btn-sm" id="remove_bank_account_row_' . $i . '" onclick="removeBankAccountRow(' . $i . ')"><i class="fa fa-close"></i></button>' .
           '</td>' .
           '</tr>';
       }

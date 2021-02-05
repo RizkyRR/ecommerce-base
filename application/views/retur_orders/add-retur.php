@@ -298,11 +298,13 @@
     $("#mainOrdersNav").addClass('active');
     $("#addOrderNav").addClass('active');
 
+    // var row_id = 1;
     // Add new row in the table
     $("#add_row").unbind('click').bind('click', function() {
       var table = $("#product_info_table");
       var count_table_tbody_tr = $("#product_info_table tbody tr").length;
       var row_id = count_table_tbody_tr + 1;
+      // row_id++;
       var invoice_order = $("#invoice_order").val();
 
       $.ajax({

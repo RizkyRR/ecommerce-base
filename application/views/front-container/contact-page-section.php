@@ -44,14 +44,19 @@
             <p>Our staff will call back later and answer your questions.</p>
             <form action="#" class="comment-form" method="POST" id="form-contact">
               <div class="row">
-                <div class="col-lg-6">
+                <div class="form-group col-lg-6">
                   <input type="text" placeholder="Your name" name="g_name" id="g_name">
                 </div>
-                <div class="col-lg-6">
+
+                <div class="form-group col-lg-6">
                   <input type="text" placeholder="Your email" name="g_email" id="g_email">
                 </div>
-                <div class="col-lg-12">
+
+                <div class="form-group col-lg-12">
                   <textarea placeholder="Your message" name="g_message" id="g_message"></textarea>
+                </div>
+
+                <div class="col-lg-12">
                   <button type="button" class="site-btn" id="btnSendMessage">Send message</button>
                 </div>
               </div>
@@ -79,12 +84,10 @@
         if (element.parent(".input-group").length) {
           error.insertAfter(element.parent()); // radio/checkbox?
         } else if (element.hasClass("select2-hidden-accessible")) {
-          /* else if (element.hasClass('select2')) {
-             error.insertAfter(element.next('span')); // select2
-           } */
           error.insertAfter(element.next("span.select2")); // select2 new ver
         } else {
-          error.insertAfter(element); // default
+          error.addClass("has-error");
+          error.insertAfter(element);
         }
       },
     });
@@ -107,8 +110,7 @@
 
         /* Return whether the element is optional or the result of the validation. */
         return this.optional(element) || regexp.test(value);
-      }
-    );
+      }, 'Format email harus valid!');
 
     var $validator = $("#form-contact").validate({
       focusInvalid: false,

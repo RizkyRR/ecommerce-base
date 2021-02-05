@@ -432,7 +432,7 @@ class Product extends CI_Controller
     if ($data != null) {
       $dataBrand = $data;
     } else {
-      $dataBrand = $this->brand_m->getAllBrandBySelect($keyword = null, $limit = 10);;
+      $dataBrand = $this->brand_m->getAllBrandBySelect($keyword = null, $limit = 10);
     }
 
     echo json_encode($dataBrand);
