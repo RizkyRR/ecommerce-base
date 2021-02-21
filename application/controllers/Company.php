@@ -38,8 +38,8 @@ class Company extends CI_Controller
     $dataSocialLink = $this->company_m->getSocialLink();
 
     if ($dataSocialMedia != null) {
-      $option = '';
       foreach ($dataSocialMedia as $val) {
+        $option = '';
         $id = htmlspecialchars(json_encode($val['company_profile_id']));
         $i++;
 
