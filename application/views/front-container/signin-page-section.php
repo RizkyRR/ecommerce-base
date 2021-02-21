@@ -39,6 +39,20 @@
               <span class="help-block"><?php echo form_error('password') ?></span>
             </div>
 
+            <div class="group-input">
+              <div class="d-flex justify-content-center">
+                <p id="captImg" class="captcha-img mr-3"></p>
+
+                <!-- <a href="#" onclick="parent.window.location.reload(true)">[perbarui gambar]</a> -->
+                <a href="javascript:void(0)" style="text-decoration: none" id="btn-reload-captcha" title="refresh captcha"><i class="fa fa-refresh"></i></a>
+              </div>
+            </div>
+
+            <div class="group-input">
+              <input type="text" name="captcha" id="captcha" placeholder="Enter captcha" required>
+              <span class="help-block"><?php echo form_error('captcha') ?></span>
+            </div>
+
             <div class="group-input gi-check">
               <div class="gi-more">
                 <a href="<?php echo base_url(); ?>forgot-password" class="forget-pass">Forget your Password</a>
@@ -60,6 +74,8 @@
 
 <script>
   $(document).ready(function() {
+    setCaptcha();
+
     $.validator.setDefaults({
       highlight: function(element) {
         $(element).closest(".form-group").addClass("has-error");
@@ -113,6 +129,9 @@
         },
         password: {
           required: true,
+        },
+        captcha: {
+          required: true,
         }
       },
       messages: {
@@ -121,8 +140,27 @@
         },
         password: {
           required: 'Password can not be empty!',
+        },
+        captcha: {
+          required: 'Captcha can not be empty!',
         }
       }
+    });
+
+    function setCaptcha() {
+      $.ajax({
+        type: "GET",
+        url: "<?php echo base_url() ?>Auth_shop/createCaptcha",
+        dataType: "JSON",
+        success: function(data) {
+          $('.captcha-img').html(data);
+        }
+      });
+    }
+
+    $('#btn-reload-captcha').click(function(e) {
+      e.preventDefault();
+      setCaptcha();
     });
 
     $('#btnSignIn').click(function() {
@@ -173,12 +211,23 @@
                   window.location.href = "<?php echo base_url() ?>profile";
                 });
             } else {
+              var errorMsg = "";
+              var i;
+              var error = data.message;
+
+              for (i = 0; i < error.length; i++) {
+                errorMsg += error[i];
+              }
+
               Swal.fire({
                 icon: "error",
-                title: data.message,
+                html: "<p>" + errorMsg + "</p><br/>",
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
               });
+
+              $('#captcha').val("");
+              setCaptcha();
             }
 
             $('#btnSignIn').text('Sign In'); //change button text

@@ -8,36 +8,7 @@ class Auth_shop extends CI_Controller
   public function __construct()
   {
     parent::__construct();
-    $this->load->helper(['template', 'authaccess']);
-  }
-
-  private function _login()
-  {
-    $email = $this->security->xss_clean(html_escape($this->input->post('email', true)));
-    $pass  = $this->security->xss_clean(html_escape($this->input->post('pass', true)));
-
-    $user = $this->authShop_m->customerLogin($email);
-
-    if ($user) {
-      if (password_verify($pass, $user['customer_password'])) {
-        $file = [
-          'customer_id' => $user['id_customer'],
-          'customer_name' => $user['customer_name'],
-          'customer_email'   => $user['customer_email'],
-          'customer_is_active' => $user['is_active'],
-          'customer_is_online' => $user['is_online']
-        ];
-
-        $this->session->set_userdata($file);
-        $this->authShop_m->updateCustomerOnline($this->session->userdata('customer_email'));
-      } else {
-        $this->session->set_flashdata('error', 'Wrong Password !');
-        redirect('sign-in');
-      }
-    } else {
-      $this->session->set_flashdata('error', 'Your email has not registered !');
-      redirect('sign-in');
-    }
+    $this->load->helper(['template', 'authaccess', 'captcha']);
   }
 
   private function _sendEmail($token, $type)
@@ -93,6 +64,39 @@ class Auth_shop extends CI_Controller
     }
   }
 
+  public function createCaptcha()
+  {
+    // captcha 
+    $original_string = array_merge(range(0, 9), range('a', 'z'), range('A', 'Z'));
+    $original_string = implode("", $original_string);
+    $captcha = substr(str_shuffle($original_string), 0, 6);
+
+    //array untuk menampilkan gambar captcha
+    $vals = array(
+      'word' => $captcha, //huruf acak yang telah dibuat diatas
+      'img_path' => 'front-assets/img/captcha/', //path untuk menyimpan gambar captcha
+      'img_url' => base_url() . 'front-assets/img/captcha/', //url untuk menampilkan gambar captcha
+      'img_width' => '200', //lebar gambar captcha
+      'img_height' => 80, //tinggi gambar captcha
+      'expiration' => 7200, //expired time per captcha
+    );
+
+    $cap = create_captcha($vals);
+
+    if (file_exists("./front-assets/img/captcha/" . $this->session->userdata('image')))
+      @unlink("./front-assets/img/captcha/" . $this->session->userdata('image'));
+    $this->session->unset_userdata('captcha');
+    $this->session->unset_userdata('image');
+    $this->session->set_userdata(array('captcha' => $cap['word'], 'image' => $cap['time'] . '.jpg'));
+
+    // $val['captcha'] = $this->session->userdata('captcha');
+    // $val['image'] = $cap['image'];
+
+    $captcha_image = $cap['image']; //variable array untuk menampilkan captcha pada view
+
+    echo json_encode($captcha_image);
+  }
+
   public function index()
   {
     $info['title'] = 'Sign In Page';
@@ -110,6 +114,7 @@ class Auth_shop extends CI_Controller
 
     $this->form_validation->set_rules('email', 'email', 'trim|required|valid_email');
     $this->form_validation->set_rules('password', 'password', 'trim|required');
+    $this->form_validation->set_rules('captcha', 'captcha', 'trim|required');
 
     if ($this->form_validation->run() == TRUE) {
       $email = $this->security->xss_clean(html_escape($this->input->post('email', true)));
@@ -120,18 +125,35 @@ class Auth_shop extends CI_Controller
       if ($user) {
         if ($user['is_active'] == 1) {
           if (password_verify($password, $user['customer_password'])) {
-            $file = [
-              'customer_id' => $user['id_customer'],
-              'customer_name' => $user['customer_name'],
-              'customer_email'   => $user['customer_email'],
-              'customer_is_active' => $user['is_active'],
-              'customer_is_online' => $user['is_online']
-            ];
+            // cek captcha
+            if ($this->input->post('captcha') !== $this->session->userdata('captcha')) {
+              $response['status'] = FALSE;
+              $response['message'] = 'Sorry, captcha is wrong!';
 
-            $this->session->set_userdata($file);
-            $this->authShop_m->updateCustomerOnline($this->session->userdata('customer_email'));
+              if (file_exists("./front-assets/img/captcha/" . $this->session->userdata('image')))
+                @unlink("./front-assets/img/captcha/" . $this->session->userdata('image'));
+              $this->session->unset_userdata('captcha');
+              $this->session->unset_userdata('image');
+            } else {
+              // setelah berhasil maka harus dihapus gambr captcha dan string yang tersimpan didalam session
+              if (file_exists("./front-assets/img/captcha/" . $this->session->userdata('image')))
+                @unlink("./front-assets/img/captcha/" . $this->session->userdata('image'));
+              $this->session->unset_userdata('captcha');
+              $this->session->unset_userdata('image');
 
-            $response['status'] = TRUE;
+              $file = [
+                'customer_id' => $user['id_customer'],
+                'customer_name' => $user['customer_name'],
+                'customer_email'   => $user['customer_email'],
+                'customer_is_active' => $user['is_active'],
+                'customer_is_online' => $user['is_online']
+              ];
+
+              $this->session->set_userdata($file);
+              $this->authShop_m->updateCustomerOnline($this->session->userdata('customer_email'));
+
+              $response['status'] = TRUE;
+            }
           } else {
             $response['status'] = FALSE;
             $response['message'] = 'Sorry, wrong password. Please try agian!';

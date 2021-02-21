@@ -26,16 +26,31 @@
 
     <form action="" method="post" id="form-sign-in" enctype="multipart/form-data">
       <div class="form-group has-feedback">
-        <input type="email" name="email" id="email" class="form-control" placeholder="Email" value="<?php echo set_value('email'); ?>" autofocus>
+        <input type="email" name="email" id="email" class="form-control" placeholder="Enter email" value="<?php echo set_value('email'); ?>" autofocus>
         <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
         <span class="help-block"><?php echo form_error('email') ?></span>
       </div>
 
       <div class="form-group has-feedback">
-        <input type="password" name="password" id="password" class="form-control" placeholder="Password">
+        <input type="password" name="password" id="password" class="form-control" placeholder="Enter password">
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
         <span class="help-block"><?php echo form_error('password') ?></span>
       </div>
+
+      <div class="form-group has-feedback">
+        <div class="d-flex justify-content-center">
+          <p id="captImg" class="captcha-img mr-1"></p>
+
+          <!-- <a href="#" onclick="parent.window.location.reload(true)">[perbarui gambar]</a> -->
+          <a href="javascript:void(0)" style="text-decoration: none" id="btn-reload-captcha" title="refresh captcha"><i class="fa fa-refresh"></i></a>
+        </div>
+      </div>
+
+      <div class="form-group has-feedback">
+        <input type="text" name="captcha" id="captcha" class="form-control" placeholder="Enter captcha">
+        <span class="help-block"><?php echo form_error('captcha') ?></span>
+      </div>
+
       <div class="row">
         <!-- /.col -->
         <div class="col-xs-4">
@@ -54,6 +69,8 @@
 
 <script>
   $(document).ready(function() {
+    setCaptcha();
+
     $.validator.setDefaults({
       highlight: function(element) {
         $(element).closest(".form-group").addClass("has-error");
@@ -107,6 +124,9 @@
         },
         password: {
           required: true,
+        },
+        captcha: {
+          required: true,
         }
       },
       messages: {
@@ -115,8 +135,27 @@
         },
         password: {
           required: 'Password can not be empty!',
+        },
+        captcha: {
+          required: 'Captcha can not be empty!',
         }
       }
+    });
+
+    function setCaptcha() {
+      $.ajax({
+        type: "GET",
+        url: "<?php echo base_url() ?>Auth/createCaptcha",
+        dataType: "JSON",
+        success: function(data) {
+          $('.captcha-img').html(data);
+        }
+      });
+    }
+
+    $('#btn-reload-captcha').click(function(e) {
+      e.preventDefault();
+      setCaptcha();
     });
 
     $('#btnSignIn').click(function() {
@@ -168,12 +207,23 @@
                   window.location.href = "<?php echo base_url() ?>admin";
                 });
             } else {
+              var errorMsg = "";
+              var i;
+              var error = data.message;
+
+              for (i = 0; i < error.length; i++) {
+                errorMsg += error[i];
+              }
+
               Swal.fire({
                 icon: "error",
-                title: data.message,
+                html: "<p>" + errorMsg + "</p><br/>",
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
               });
+
+              $('#captcha').val("");
+              setCaptcha();
             }
 
             $('#btnSignIn').text('Sign In'); //change button text
