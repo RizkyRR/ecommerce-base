@@ -65,8 +65,8 @@
   <script src="<?php echo base_url(); ?>back-assets/plugins/select2/js/select2.min.js"></script>
 
   <!-- Validator -->
-  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
-  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/dist/additional-methods.min.js"></script>
+  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/additional-methods.min.js"></script>
 
   <!-- SweetAlert -->
   <!-- <script src="<?php echo base_url(); ?>front-assets/js/sweetalert.min.js"></script> -->

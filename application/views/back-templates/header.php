@@ -173,8 +173,8 @@
   <script type="text/javascript" src="<?php echo base_url() . 'back-assets/plugins/datetimepicker_bs/js/bootstrap-datetimepicker.js'; ?>"></script>
 
   <!-- Validator -->
-  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
-  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/dist/additional-methods.min.js"></script>
+  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/additional-methods.min.js"></script>
 
   <!-- AutoNumeric -->
   <script src="<?php echo base_url(); ?>back-assets/plugins/auto-numeric/autoNumeric.js"></script>

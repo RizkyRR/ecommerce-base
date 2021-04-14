@@ -301,9 +301,16 @@
     // var row_id = 1;
     // Add new row in the table
     $("#add_row").unbind('click').bind('click', function() {
-      var table = $("#product_info_table");
       var count_table_tbody_tr = $("#product_info_table tbody tr").length;
-      var row_id = count_table_tbody_tr + 1;
+
+      for (x = 0; x < count_table_tbody_tr; x++) {
+        var tr = $("#product_info_table tbody tr")[x];
+        var count = $(tr).attr('id');
+        count = parseInt(count.substring(4));
+      } // for
+
+      row_id = count + 1;
+
       // row_id++;
       var invoice_order = $("#invoice_order").val();
 
@@ -434,7 +441,13 @@
   create_code();
 
   function removeRow(tr_id) {
-    $("#product_info_table tbody tr#row_" + tr_id).remove();
+    // $("#product_info_table tbody tr#row_" + tr_id).remove();
+
+    var count_table_tbody_tr = $("#product_info_table tbody tr").length;
+
+    if (count_table_tbody_tr > 1) {
+      $("#product_info_table tbody tr#row_" + tr_id).remove();
+    }
 
     countWeightTotal();
     subAmount();

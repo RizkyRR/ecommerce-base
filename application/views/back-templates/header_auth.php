@@ -55,8 +55,8 @@
   </script>
 
   <!-- Validator -->
-  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/dist/jquery.validate.min.js"></script>
-  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/dist/additional-methods.min.js"></script>
+  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="<?php echo base_url(); ?>front-assets/plugins/jquery-validation/additional-methods.min.js"></script>
 
   <!-- Sweet Alert Js -->
   <script src="<?php echo base_url(); ?>front-assets/js/sweetalert2.all.min.js"></script>

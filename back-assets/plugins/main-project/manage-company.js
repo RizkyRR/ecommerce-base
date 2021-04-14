@@ -487,10 +487,14 @@ $(document).ready(function (e) {
 	// var row_id = 1;
 
 	$("#add_row_sosmed").unbind("click").bind("click", function (e) {
-		var table = $("#link_info_table");
 		var count_table_tbody_tr = $("#link_info_table tbody tr").length;
-		// console.log(count_table_tbody_tr);
-		var row_id = count_table_tbody_tr + 1;
+		for (x = 0; x < count_table_tbody_tr; x++) {
+			var tr = $("#link_info_table tbody tr")[x];
+			var count = $(tr).attr('id');
+			count = parseInt(count.substring(4));
+		} // for
+
+		row_id = count + 1;
 		// row_id++;
 		var html = "";
 
@@ -691,11 +695,14 @@ $(document).ready(function (e) {
 	}
 
 	$("#add_row_bankaccount").unbind("click").bind("click", function (e) {
-		var table = $("#bankaccount_info_table");
 		var count_table_tbody_tr = $("#bankaccount_info_table tbody tr").length;
-		console.log(count_table_tbody_tr);
-		var row_id = parseInt(count_table_tbody_tr) + 1;
-		console.log(row_id);
+		for (x = 0; x < count_table_tbody_tr; x++) {
+			var tr = $("#bankaccount_info_table tbody tr")[x];
+			var count = $(tr).attr('id');
+			count = parseInt(count.substring(4));
+		} // for
+
+		row_id = count + 1;
 
 		var html = '<tr id="row_' + row_id + '">';
 
@@ -937,11 +944,23 @@ function numberFormat(element) {
 
 // DELETE ROW TABLE SOCIAL MEDIA
 function removeRow(tr_id) {
-	$("#link_info_table tbody tr#row_" + tr_id).remove();
+	// $("#link_info_table tbody tr#row_" + tr_id).remove();
+
+	var count_table_tbody_tr = $("#link_info_table tbody tr").length;
+
+	if (count_table_tbody_tr > 1) {
+		$("#link_info_table tbody tr#row_" + tr_id).remove();
+	}
 }
 
 function removeBankAccountRow(tr_id) {
-	$("#bankaccount_info_table tbody tr#row_" + tr_id).remove();
+	// $("#bankaccount_info_table tbody tr#row_" + tr_id).remove();
+
+	var count_table_tbody_tr = $("#bankaccount_info_table tbody tr").length;
+
+	if (count_table_tbody_tr > 1) {
+		$("#bankaccount_info_table tbody tr#row_" + tr_id).remove();
+	}
 }
 
 $(function () {
