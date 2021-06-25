@@ -149,6 +149,7 @@
         dataType: "JSON",
         success: function(data) {
           $('.captcha-img').html(data);
+          console.log(data);
         }
       });
     }

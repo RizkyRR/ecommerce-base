@@ -85,8 +85,8 @@ class User extends CI_Controller
     if ($this->form_validation->run() == FALSE) {
       renderBackTemplate('users/edit-password', $info);
     } else {
-      $old_pass     = $this->input->post('oldpass', true);
-      $newpass    = $this->input->post('newpass', true);
+      $old_pass = $this->input->post('oldpass', true);
+      $newpass = $this->input->post('newpass', true);
 
       if (!password_verify($old_pass, $get_data['password'])) {
         $this->session->set_flashdata('error', 'Wrong current password !');
