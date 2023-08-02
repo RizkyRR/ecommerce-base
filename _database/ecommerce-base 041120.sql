@@ -271,7 +271,7 @@ CREATE TABLE `company_profile_email` (
 --
 
 INSERT INTO `company_profile_email` (`id`, `company_profile_id`, `email`, `password`) VALUES
-(1, 1, '111201408226@mhs.dinus.ac.id', 'number68');
+(1, 1, '111201408226@mhs.dinus.ac.id', 'yourpassword');
 
 -- --------------------------------------------------------
 
