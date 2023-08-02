@@ -28,7 +28,7 @@ Jika Anda ingin menjalankan aplikasi ini di mesin lokal Anda, ikuti langkah-lang
 
 2. Siapkan server web (misalnya Apache, Nginx) dan konfigurasikan untuk menyajikan aplikasi.
 
-3. Buat database baru untuk aplikasi dan impor data SQL (jika tersedia) untuk mengatur skema database yang diperlukan.
+3. Buat database baru untuk aplikasi dan impor data SQL (jika tersedia) untuk mengatur skema database yang diperlukan. SIlahkan impor data SQL di dalam proyek ini pada folder "_database/" silahkan pilih salah satu lalu impor.
 
 4. Konfigurasi koneksi database di file konfigurasi CodeIgniter.
 
